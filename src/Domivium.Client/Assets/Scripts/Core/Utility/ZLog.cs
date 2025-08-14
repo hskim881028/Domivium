@@ -4,7 +4,7 @@ using Domivium.Shared.Common;
 using MagicOnion.Client;
 using UnityEngine;
 
-namespace Domivium.Client.Utility
+namespace Domivium.Client.Core.Utility
 {
     public static class ZLog
     {

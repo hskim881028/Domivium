@@ -1,4 +1,4 @@
-﻿using Domivium.Client.Utility;
+﻿using Domivium.Client.Core.Utility;
 using Domivium.Shared.Common;
 using Domivium.Shared.Response;
 

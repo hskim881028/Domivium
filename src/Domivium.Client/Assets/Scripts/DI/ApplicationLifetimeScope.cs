@@ -1,6 +1,8 @@
 ﻿using Domivium.Client.Contents.Command;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Command;
+using Domivium.Client.Core.Message;
+using Domivium.Client.Core.Scene;
 using Domivium.Client.Network;
 using Domivium.Client.Network.ClientFilters;
 using MagicOnion.Client;
@@ -24,6 +26,7 @@ namespace Domivium.Client.DI
             Command(builder, Lifetime.Singleton);
             GlocalActors(builder, Lifetime.Singleton);
             Services(builder, Lifetime.Singleton);
+            Scene(builder, Lifetime.Singleton);
 
             builder.Register<ApplicationEntry>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
         }
@@ -31,6 +34,7 @@ namespace Domivium.Client.DI
         private static void Messages(IContainerBuilder builder)
         {
             var options = builder.RegisterMessagePipe();
+            builder.RegisterMessageBroker<SceneMessage>(options);
         }
 
         private void Network(IContainerBuilder builder, Lifetime lifetime)
@@ -45,6 +49,7 @@ namespace Domivium.Client.DI
         {
             builder.Register<ICommandExecutor, CommandExecutor>(lifetime);
             builder.Register<LoginCmd>(lifetime);
+            builder.Register<EnterStageCmd>(lifetime);
         }
 
         private void GlocalActors(IContainerBuilder builder, Lifetime lifetime)
@@ -58,11 +63,15 @@ namespace Domivium.Client.DI
         {
             builder.Register<NetworkService>(lifetime);
             builder.Register<CameraService>(lifetime);
+            builder.Register<SceneService>(lifetime);
+        }
+
+        private static void Scene(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<ISceneScopeManager, SceneScopeManager>(lifetime);
         }
 
         private void Repositories(IContainerBuilder builder, Lifetime lifetime) { }
-
-        private static void Scene(IContainerBuilder builder, Lifetime lifetime) { }
 
         private void UI(IContainerBuilder builder, Lifetime lifetime) { }
     }

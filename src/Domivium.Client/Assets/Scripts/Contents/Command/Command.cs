@@ -8,11 +8,13 @@ namespace Domivium.Client.Contents.Command
     public abstract class Command : ICommand
     {
         protected NetworkService NetworkService { get; private set; }
+        protected SceneService SceneService { get; private set; }
 
         [Inject]
-        public void Construct(NetworkService networkService)
+        public void Construct(NetworkService networkService, SceneService sceneService)
         {
             NetworkService = networkService;
+            SceneService = sceneService;
         }
 
         public abstract UniTask<bool> ExecuteAsync();

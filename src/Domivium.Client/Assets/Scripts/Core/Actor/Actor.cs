@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Domivium.Client.Contents.Actor
+namespace Domivium.Client.Core.Actor
 {
     public class Actor : MonoBehaviour { }
 }

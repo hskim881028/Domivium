@@ -1,4 +1,4 @@
-﻿using Domivium.Client.Contents.Actor;
+﻿using Domivium.Client.Core.Actor;
 using UnityEngine;
 
 namespace Domivium.Client.DI

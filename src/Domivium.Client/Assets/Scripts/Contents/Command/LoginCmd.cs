@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
-using Domivium.Client.Utility;
+using Domivium.Client.Core.Scene;
+using Domivium.Client.Core.Utility;
 using Domivium.Shared.Services;
 
 namespace Domivium.Client.Contents.Command
@@ -8,7 +9,7 @@ namespace Domivium.Client.Contents.Command
     {
         public LoginCmd()
         {
-            this.Log("LoginCmd");
+            this.Log();
         }
 
         public override async UniTask<bool> ExecuteAsync()
@@ -18,7 +19,7 @@ namespace Domivium.Client.Contents.Command
             if (!NetworkService.HandleResponse(response)) return false;
 
             this.Log($"[StatusCode]: {response.StatusCode}");
-            // SceneScopeManager.LoadScope(SceneScopeId.Lobby);
+            SceneService.LoadScope(SceneScopeId.Lobby);
             return true;
         }
 

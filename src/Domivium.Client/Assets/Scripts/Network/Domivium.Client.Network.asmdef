@@ -6,7 +6,7 @@
     "MagicOnion.Unity",
     "Cysharp.Net.Http.YetAnotherHttpHandler",
     "Domivium.Shared.Client",
-    "Domivium.Client.Utility"
+    "Domivium.Client.Core"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

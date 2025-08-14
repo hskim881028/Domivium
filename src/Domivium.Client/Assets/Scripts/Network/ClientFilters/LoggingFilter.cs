@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Domivium.Client.Utility;
+using Domivium.Client.Core.Utility;
 using MagicOnion.Client;
 
 namespace Domivium.Client.Network.ClientFilters

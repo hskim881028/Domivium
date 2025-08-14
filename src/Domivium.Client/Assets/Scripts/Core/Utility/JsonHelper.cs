@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Domivium.Client.Utility
+namespace Domivium.Client.Core.Utility
 {
     public static class JsonHelper
     {

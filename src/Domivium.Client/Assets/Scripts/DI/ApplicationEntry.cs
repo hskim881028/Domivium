@@ -2,6 +2,8 @@
 using Domivium.Client.Contents.Command;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Command;
+using Domivium.Client.Core.Scene;
+using UnityEngine.InputSystem;
 using VContainer.Unity;
 
 namespace Domivium.Client.DI
@@ -11,9 +13,11 @@ namespace Domivium.Client.DI
         private readonly ICommandExecutor _commandExecutor;
 
         public ApplicationEntry(
+            ISceneScopeManager sceneScopeManager,
+            ICommandExecutor commandExecutor,
             NetworkService networkService,
             CameraService cameraService,
-            ICommandExecutor commandExecutor)
+            SceneService sceneService)
         {
             networkService.Connect();
             _commandExecutor = commandExecutor;
@@ -26,7 +30,16 @@ namespace Domivium.Client.DI
 
         public void Tick()
         {
+            ForTest();
             _commandExecutor.TickAsync().Forget();
+        }
+
+        private void ForTest()
+        {
+            if (Keyboard.current.spaceKey.wasPressedThisFrame)
+            {
+                _commandExecutor.Enqueue<EnterStageCmd>();
+            }
         }
     }
 }

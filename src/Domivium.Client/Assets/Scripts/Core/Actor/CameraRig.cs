@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using VContainer;
 
-namespace Domivium.Client.Contents.Actor
+namespace Domivium.Client.Core.Actor
 {
     public class CameraRig : Actor
     {

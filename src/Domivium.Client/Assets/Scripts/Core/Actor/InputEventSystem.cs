@@ -2,7 +2,7 @@
 using UnityEngine.InputSystem.UI;
 using VContainer;
 
-namespace Domivium.Client.Contents.Actor
+namespace Domivium.Client.Core.Actor
 {
     public class InputEventSystem : Actor
     {
