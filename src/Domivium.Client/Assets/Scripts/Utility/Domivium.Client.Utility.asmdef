@@ -1,0 +1,14 @@
+{
+    "name": "Domivium.Client.Utility",
+    "rootNamespace": "Domivium.Client",
+    "references": ["GUID:c4666d3df8229d64f848ae0879d1947f"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

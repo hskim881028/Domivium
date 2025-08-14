@@ -1,0 +1,20 @@
+{
+  "name": "Domivium.Client.Network",
+  "rootNamespace": "Domivium.Client",
+  "references": [
+    "VContainer",
+    "MagicOnion.Unity",
+    "Cysharp.Net.Http.YetAnotherHttpHandler",
+    "Domivium.Shared.Client",
+    "Domivium.Client.Utility"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
