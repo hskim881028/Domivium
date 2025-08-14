@@ -48,3 +48,4 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
+  _globalActors: {fileID: 11400000, guid: aae910f9e923de84995cb63c03068007, type: 2}

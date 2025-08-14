@@ -13,6 +13,7 @@ namespace Domivium.Client.Contents.Services
         {
             _networkConnection = networkConnection;
         }
+
         public void Dispose() { }
 
         public void Connect()

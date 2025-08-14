@@ -5,25 +5,30 @@ using Domivium.Client.Network;
 using Domivium.Client.Network.ClientFilters;
 using MagicOnion.Client;
 using MessagePipe;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
 namespace Domivium.Client.DI
 {
-    public class ApplicationLifetimeScope : LifetimeScope
+    public sealed class ApplicationLifetimeScope : LifetimeScope
     {
+        [SerializeField] private GlobalActors _globalActors;
+
         protected override void Configure(IContainerBuilder builder)
         {
             base.Configure(builder);
 
-            Message(builder);
+            Messages(builder);
             Network(builder, Lifetime.Singleton);
             Command(builder, Lifetime.Singleton);
+            GlocalActors(builder, Lifetime.Singleton);
+            Services(builder, Lifetime.Singleton);
 
             builder.Register<ApplicationEntry>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
         }
 
-        private static void Message(IContainerBuilder builder)
+        private static void Messages(IContainerBuilder builder)
         {
             var options = builder.RegisterMessagePipe();
         }
@@ -34,7 +39,6 @@ namespace Domivium.Client.DI
             builder.Register<IClientFilter, RetryFilter>(lifetime).AsSelf();
             builder.Register<IResponseHandler, ResponseHandler>(lifetime);
             builder.Register<INetworkConnection, NetworkConnection>(lifetime);
-            builder.Register<NetworkService>(lifetime);
         }
 
         private void Command(IContainerBuilder builder, Lifetime lifetime)
@@ -43,11 +47,20 @@ namespace Domivium.Client.DI
             builder.Register<LoginCmd>(lifetime);
         }
 
-        private void Components(IContainerBuilder builder, Lifetime lifetime) { }
+        private void GlocalActors(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.RegisterComponentInNewPrefab(_globalActors.InputEventSystem, lifetime).UnderTransform(transform);
+            builder.RegisterComponentInNewPrefab(_globalActors.CameraRig, lifetime).UnderTransform(transform);
+            builder.RegisterComponentInNewPrefab(_globalActors.EnvironmentRig, lifetime).UnderTransform(transform);
+        }
 
-        private void Repository(IContainerBuilder builder, Lifetime lifetime) { }
+        private void Services(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<NetworkService>(lifetime);
+            builder.Register<CameraService>(lifetime);
+        }
 
-        private void Services(IContainerBuilder builder, Lifetime lifetime) { }
+        private void Repositories(IContainerBuilder builder, Lifetime lifetime) { }
 
         private static void Scene(IContainerBuilder builder, Lifetime lifetime) { }
 

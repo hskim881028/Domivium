@@ -12,6 +12,7 @@ namespace Domivium.Client.DI
 
         public ApplicationEntry(
             NetworkService networkService,
+            CameraService cameraService,
             ICommandExecutor commandExecutor)
         {
             networkService.Connect();
