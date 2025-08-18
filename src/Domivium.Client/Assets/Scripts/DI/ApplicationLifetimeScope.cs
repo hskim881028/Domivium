@@ -1,8 +1,12 @@
 ﻿using Domivium.Client.Contents.Command;
 using Domivium.Client.Contents.Services;
+using Domivium.Client.Contents.UI;
+using Domivium.Client.Contents.UI.Generated;
 using Domivium.Client.Core.Command;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
+using Domivium.Client.Core.UI;
+using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Network;
 using Domivium.Client.Network.ClientFilters;
 using MagicOnion.Client;
@@ -27,6 +31,7 @@ namespace Domivium.Client.DI
             GlocalActors(builder, Lifetime.Singleton);
             Services(builder, Lifetime.Singleton);
             Scene(builder, Lifetime.Singleton);
+            UI(builder, Lifetime.Singleton);
 
             builder.Register<ApplicationEntry>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
         }
@@ -71,8 +76,13 @@ namespace Domivium.Client.DI
             builder.Register<ISceneScopeManager, SceneScopeManager>(lifetime);
         }
 
-        private void Repositories(IContainerBuilder builder, Lifetime lifetime) { }
+        private void UI(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<IUIManager, UIManager>(lifetime).WithParameter(UIMapping.UI);
+            builder.Register<IUINavigationNodePool, UINavigationNodePool>(lifetime);
+            builder.Register<IUINavigation, UINavigation>(lifetime);
+        }
 
-        private void UI(IContainerBuilder builder, Lifetime lifetime) { }
+        private void Repositories(IContainerBuilder builder, Lifetime lifetime) { }
     }
 }

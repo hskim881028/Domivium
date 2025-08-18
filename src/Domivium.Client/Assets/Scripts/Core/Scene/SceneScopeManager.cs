@@ -1,5 +1,6 @@
 ﻿using System;
 using Domivium.Client.Core.Message;
+using JetBrains.Annotations;
 using MessagePipe;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,6 +9,7 @@ using VContainer.Unity;
 
 namespace Domivium.Client.Core.Scene
 {
+    [UsedImplicitly]
     public sealed class SceneScopeManager : ISceneScopeManager
     {
         private readonly LifetimeScope _root;

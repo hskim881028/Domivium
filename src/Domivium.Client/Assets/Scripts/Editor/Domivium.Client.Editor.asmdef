@@ -1,7 +1,9 @@
 {
   "name": "Domivium.Client.Editor",
-  "rootNamespace": "",
-  "references": [],
+  "rootNamespace": "Domivium.Client",
+  "references": [
+    "GUID:3d10d29a0c966f54ca0c48ca9ef92ed6"
+  ],
   "includePlatforms": [
     "Editor"
   ],
