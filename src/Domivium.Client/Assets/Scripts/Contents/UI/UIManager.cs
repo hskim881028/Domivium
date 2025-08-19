@@ -9,7 +9,6 @@ using Domivium.Client.Core.UI.Presenter;
 using Domivium.Client.Core.UI.View;
 using MessagePipe;
 using R3;
-using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using DisposableBag = R3.DisposableBag;
@@ -19,7 +18,8 @@ namespace Domivium.Client.Contents.UI
     public sealed class UIManager : IUIManager
     {
         private readonly LifetimeScope _rooLifetimeScope;
-        private readonly Dictionary<UIId, (Type type, string prefabPath)> _presenters;
+        private readonly Dictionary<UIId, (Type presenter, Type view)> _uiContainer;
+        private readonly List<UIViewBase> _prefabs;
         private readonly Dictionary<Type, UICanvasScope> _canvas = new();
         private readonly Dictionary<UIId, UIScope> _ui = new();
         private DisposableBag _disposable;
@@ -28,11 +28,13 @@ namespace Domivium.Client.Contents.UI
 
         public UIManager(
             LifetimeScope rooLifetimeScope,
-            Dictionary<UIId, (Type type, string prefabPath)> presenters,
+            Dictionary<UIId, (Type presenter, Type view)> uiContainer,
+            List<UIViewBase> prefabs,
             ISubscriber<SceneMessage> subscriber)
         {
             _rooLifetimeScope = rooLifetimeScope;
-            _presenters = presenters;
+            _uiContainer = uiContainer;
+            _prefabs = prefabs;
             subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
         }
 
@@ -44,7 +46,7 @@ namespace Domivium.Client.Contents.UI
                 .Select(f => (UIId)f.GetValue(null))
                 .ToHashSet();
 
-            var ids = _presenters
+            var ids = _uiContainer
                 .Where(kv => staticUIIds.Contains(kv.Key))
                 .Select(kv => kv.Key)
                 .ToList();
@@ -60,10 +62,14 @@ namespace Domivium.Client.Contents.UI
             }
 
             var canvas = GetCanvas<T>();
-            var (type, prefabPath) = _presenters[id];
+            var (type, viewType) = _uiContainer[id];
             var child = canvas.CreateChild<UIScope>(builder =>
                 {
-                    var prefab = Resources.Load<UIViewBase>(prefabPath);
+                    var prefab = _prefabs.FirstOrDefault(p => viewType.IsAssignableFrom(p.GetType()));
+                    if (prefab == null)
+                    {
+                        throw new InvalidOperationException($"UI prefab not found for view type {viewType.FullName}. Make sure it is listed in UIContainer.");
+                    }
                     builder.RegisterComponentInNewPrefab(prefab, Lifetime.Singleton).AsSelf();
                     builder.Register(type, Lifetime.Singleton);
                 },

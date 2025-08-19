@@ -19,7 +19,8 @@ namespace Domivium.Client.DI
 {
     public sealed class ApplicationLifetimeScope : LifetimeScope
     {
-        [SerializeField] private GlobalActors _globalActors;
+        [SerializeField] private GlobalActorContainer _globalActorContainer;
+        [SerializeField] private UIContainer _uiContainer;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -59,9 +60,9 @@ namespace Domivium.Client.DI
 
         private void GlocalActors(IContainerBuilder builder, Lifetime lifetime)
         {
-            builder.RegisterComponentInNewPrefab(_globalActors.InputEventSystem, lifetime).UnderTransform(transform);
-            builder.RegisterComponentInNewPrefab(_globalActors.CameraRig, lifetime).UnderTransform(transform);
-            builder.RegisterComponentInNewPrefab(_globalActors.EnvironmentRig, lifetime).UnderTransform(transform);
+            builder.RegisterComponentInNewPrefab(_globalActorContainer.InputEventSystem, lifetime).UnderTransform(transform);
+            builder.RegisterComponentInNewPrefab(_globalActorContainer.CameraRig, lifetime).UnderTransform(transform);
+            builder.RegisterComponentInNewPrefab(_globalActorContainer.EnvironmentRig, lifetime).UnderTransform(transform);
         }
 
         private void Services(IContainerBuilder builder, Lifetime lifetime)
@@ -78,7 +79,9 @@ namespace Domivium.Client.DI
 
         private void UI(IContainerBuilder builder, Lifetime lifetime)
         {
-            builder.Register<IUIManager, UIManager>(lifetime).WithParameter(UIMapping.UI);
+            builder.Register<IUIManager, UIManager>(lifetime)
+                .WithParameter(UIMapping.UI)
+                .WithParameter(_uiContainer.UI);
             builder.Register<IUINavigationNodePool, UINavigationNodePool>(lifetime);
             builder.Register<IUINavigation, UINavigation>(lifetime);
         }

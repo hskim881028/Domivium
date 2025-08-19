@@ -1,0 +1,9 @@
+﻿using Domivium.Client.Core.UI.View;
+
+namespace {{NAMESPACE}}
+{
+    public class {{VIEW_NAME}} : {{UI_TYPE}}UIView<{{MESSAGE_NAME}}>
+    {
+        
+    }
+}

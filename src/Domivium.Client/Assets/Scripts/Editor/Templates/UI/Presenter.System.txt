@@ -1,0 +1,12 @@
+﻿using Domivium.Client.Core.UI;
+using Domivium.Client.Core.UI.Navigation;
+using Domivium.Client.Core.UI.Presenter;
+
+namespace {{NAMESPACE}}
+{
+    public class {{PRESENTER_NAME}} : {{UI_TYPE}}UIPresenter<{{VIEW_NAME}}, {{MESSAGE_NAME}}>, {{MESSAGE_NAME}}
+    {
+        public override UIPriority Priority { get; }
+        public {{PRESENTER_NAME}}({{VIEW_NAME}} view, IUINavigation navigation) : base(view, navigation) { }
+    }
+}
