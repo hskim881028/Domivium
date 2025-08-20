@@ -22,6 +22,9 @@ namespace Domivium.Client.Editor
         private static string _uiName = string.Empty;
 
         private GUIStyle _buttonStyle;
+        private Texture2D _normalTex;
+        private Texture2D _hoverTex;
+        private Texture2D _activeTex;
         private bool _stylesInitialized;
 
         static UIEditorWindow()
@@ -39,7 +42,27 @@ namespace Domivium.Client.Editor
 
         private void OnEnable()
         {
+            _uiType = (UIType)SessionState.GetInt(EditorConfig.TypeSessionKey, (int)_uiType);
+            _uiName = SessionState.GetString(EditorConfig.NameSessionKey, _uiName);
+
             Refresh();
+            SetStyles();
+        }
+
+        private void OnDisable()
+        {
+            SessionState.SetInt(EditorConfig.TypeSessionKey, (int)_uiType);
+            SessionState.SetString(EditorConfig.NameSessionKey, string.Empty);
+            GUI.FocusControl(null);
+            EditorGUIUtility.editingTextField = false;
+            Repaint();
+
+            if (_normalTex) DestroyImmediate(_normalTex);
+            if (_hoverTex) DestroyImmediate(_hoverTex);
+            if (_activeTex) DestroyImmediate(_activeTex);
+
+            _stylesInitialized = false;
+            _buttonStyle = null;
         }
 
         private void OnGUI()
@@ -54,20 +77,29 @@ namespace Domivium.Client.Editor
 
         private static void OnAfterAssemblyReload()
         {
-            var selectedUIType = EditorPrefs.GetString(EditorConfig.SelectedTypeKey, string.Empty);
+            var selectedUIType = EditorPrefs.GetString(EditorConfig.TypePrefsKey, string.Empty);
             if (!Enum.TryParse<UIType>(selectedUIType, out var uiType)) return;
 
-            var uiName = EditorPrefs.GetString(EditorConfig.SelectedNameKey, string.Empty);
+            var uiName = EditorPrefs.GetString(EditorConfig.NamePrefsKey, string.Empty);
             if (string.IsNullOrEmpty(uiName)) return;
-
-            CreatePrefabWithView(uiType, uiName);
 
             EditorApplication.delayCall += () =>
             {
-                RefreshSettings();
-                EditorPrefs.DeleteKey(EditorConfig.SelectedTypeKey);
-                EditorPrefs.DeleteKey(EditorConfig.SelectedNameKey);
-                EditorUtility.DisplayDialog("Success", $"[Type] {uiType}\n[Name] {uiName}", "OK");
+                try
+                {
+                    CreatePrefabWithView(uiType, uiName);
+                    RefreshSettings();
+                    DisplayDialog($"{uiType} -> {uiName}");
+                }
+                catch (Exception ex)
+                {
+                    DisplayDialog(ex.Message, true);
+                }
+                finally
+                {
+                    EditorPrefs.DeleteKey(EditorConfig.TypePrefsKey);
+                    EditorPrefs.DeleteKey(EditorConfig.NamePrefsKey);
+                }
             };
         }
 
@@ -89,26 +121,18 @@ namespace Domivium.Client.Editor
 
             try
             {
+                _normalTex = CreateColorTexture(new Color(0.23f, 0.35f, 0.48f));
+                _hoverTex = CreateColorTexture(new Color(0.28f, 0.45f, 0.65f));
+                _activeTex = CreateColorTexture(new Color(0.2f, 0.3f, 0.4f));
+
                 _buttonStyle = new GUIStyle(GUI.skin.button)
                 {
                     fontSize = 12,
                     padding = new RectOffset(15, 15, 5, 5),
                     margin = new RectOffset(5, 5, 5, 5),
-                    normal =
-                    {
-                        background = CreateColorTexture(new Color(0.23f, 0.35f, 0.48f)),
-                        textColor = new Color(0.9f, 0.9f, 0.9f)
-                    },
-                    hover =
-                    {
-                        background = CreateColorTexture(new Color(0.28f, 0.45f, 0.65f)),
-                        textColor = Color.white
-                    },
-                    active =
-                    {
-                        background = CreateColorTexture(new Color(0.2f, 0.3f, 0.4f)),
-                        textColor = Color.white
-                    }
+                    normal = { background = _normalTex, textColor = new Color(0.9f, 0.9f, 0.9f) },
+                    hover = { background = _hoverTex, textColor = Color.white },
+                    active = { background = _activeTex, textColor = Color.white }
                 };
 
                 _stylesInitialized = true;
@@ -126,13 +150,15 @@ namespace Domivium.Client.Editor
 
         private void DrawUITypeSelection()
         {
+            EditorGUI.BeginChangeCheck();
+
             var uiTypes = Enum.GetValues(typeof(UIType)).Cast<UIType>().ToArray();
             var newUIType = (UIType)EditorGUILayout.IntPopup("Type",
                 (int)_uiType,
                 uiTypes.Select(t => t.ToString()).ToArray(),
                 uiTypes.Select(t => (int)t).ToArray());
 
-            if (_uiType != newUIType)
+            if (EditorGUI.EndChangeCheck())
             {
                 _uiType = newUIType;
             }
@@ -140,8 +166,9 @@ namespace Domivium.Client.Editor
 
         private void DrawUINameField()
         {
+            EditorGUI.BeginChangeCheck();
             var newUIName = EditorGUILayout.TextField("Name", _uiName);
-            if (newUIName != _uiName)
+            if (EditorGUI.EndChangeCheck())
             {
                 _uiName = CapitalizeFirstLetter(newUIName);
             }
@@ -150,16 +177,17 @@ namespace Domivium.Client.Editor
         private void DrawButtons()
         {
             EditorGUILayout.Space(10);
-            if (GUILayout.Button("Refresh", _buttonStyle))
+            using (new EditorGUI.DisabledScope(false))
             {
-                _uiName = string.Empty;
-                RefreshSettings();
-            }
+                if (GUILayout.Button("Refresh", _buttonStyle))
+                {
+                    RefreshSettings();
+                }
 
-            if (GUILayout.Button("Generate", _buttonStyle))
-            {
-                GenerateUI();
-                _uiName = string.Empty;
+                if (GUILayout.Button("Generate", _buttonStyle))
+                {
+                    GenerateUI();
+                }
             }
         }
 
@@ -186,64 +214,64 @@ namespace Domivium.Client.Editor
             _uiName = SanitizeName(_uiName);
             if (string.IsNullOrEmpty(_uiName))
             {
-                EditorUtility.DisplayDialog("Generate UI", "Name is empty or invalid.", "OK");
+                DisplayDialog("Name is empty or invalid.", true);
                 return;
             }
 
             try
             {
-                // 0) Duplicate checks (scripts folder, prefab, UIIds entry)
                 if (HasDuplicates(_uiType, _uiName)) return;
 
-                EditorPrefs.SetString(EditorConfig.SelectedNameKey, _uiName);
-                EditorPrefs.SetString(EditorConfig.SelectedTypeKey, _uiType.ToString());
+                var tMsg = LoadTemplate("Message", _uiType);
+                var tView = LoadTemplate("View", _uiType);
+                var tPresenter = LoadTemplate("Presenter", _uiType);
+                if (tMsg == null || tView == null || tPresenter == null)
+                {
+                    DisplayDialog($"Template missing.\nMessage: {tMsg != null}\nView: {tView != null}\nPresenter: {tPresenter != null}", true);
+                    return;
+                }
 
-                // 1) Create scripts folder and files
-                var scriptsFolder = CreateScriptsFolder(_uiType, _uiName);
-                CreateMessageScript(_uiType, _uiName, scriptsFolder);
-                CreateViewScript(_uiType, _uiName, scriptsFolder);
-                CreatePresenterScript(_uiType, _uiName, scriptsFolder);
+                EditorPrefs.SetString(EditorConfig.NamePrefsKey, _uiName);
+                EditorPrefs.SetString(EditorConfig.TypePrefsKey, _uiType.ToString());
+
+                AssetDatabase.StartAssetEditing();
+                try
+                {
+                    var scriptsFolder = CreateScriptsFolder(_uiType, _uiName);
+                    CreateMessageScript(_uiType, _uiName, scriptsFolder, tMsg);
+                    CreateViewScript(_uiType, _uiName, scriptsFolder, tView);
+                    CreatePresenterScript(_uiType, _uiName, scriptsFolder, tPresenter);
+                }
+                finally
+                {
+                    AssetDatabase.StopAssetEditing();
+                }
 
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"❌ UI generation failed: {ex.Message}\n{ex}");
+                DisplayDialog(ex.Message, true);
             }
         }
 
         private static bool HasDuplicates(UIType uiType, string uiName)
         {
-            // Scripts folder duplicate
             var basePath = uiType.ToScriptPath();
             var folder = Path.Combine(basePath, uiName);
             if (Directory.Exists(folder))
             {
-                EditorUtility.DisplayDialog("Generate UI", $"Scripts folder already exists: {folder}", "OK");
+                DisplayDialog($"Scripts folder already exists: {folder}", true);
                 return true;
             }
 
-            // Prefab duplicate
             var prefabPath = uiType.ToPrefabPath();
             var fullPrefab = Path.Combine(prefabPath, uiName + EditorConfig.PrefabExtension);
             if (File.Exists(fullPrefab))
             {
-                EditorUtility.DisplayDialog("Generate UI", $"Prefab already exists: {fullPrefab}", "OK");
+                DisplayDialog($"Prefab already exists: {fullPrefab}", true);
                 return true;
-            }
-
-            // UIIds duplicate
-            var idsFile = EditorConfig.GetScriptPath(UIConfig.UIIds);
-            if (File.Exists(idsFile))
-            {
-                var idsContent = File.ReadAllText(idsFile);
-                var pattern = $@"class\\s+{uiType}{EditorConfig.UIId}[\n\r\s]*{{[\n\r\s\S]*?public\\s+static\\s+UIId\\s+{uiName}\\s*=";
-                if (Regex.IsMatch(idsContent, pattern))
-                {
-                    EditorUtility.DisplayDialog("Generate UI", $"UIId for '{uiName}' already exists in UIIds.cs.", "OK");
-                    return true;
-                }
             }
 
             return false;
@@ -255,20 +283,17 @@ namespace Domivium.Client.Editor
             if (!Directory.Exists(basePath)) Directory.CreateDirectory(basePath);
             var folder = Path.Combine(basePath, uiName);
             Directory.CreateDirectory(folder);
-            AssetDatabase.ImportAsset(EditorConfig.ToAssetsRelative(folder));
+
+            var assetsRel = EditorConfig.ToAssetsRelative(folder);
+            AssetDatabase.ImportAsset(assetsRel);
             return folder;
         }
 
-        private static void CreateMessageScript(UIType uiType, string uiName, string folder)
+        private static void CreateMessageScript(UIType uiType, string uiName, string folder, string template)
         {
             var ns = EditorConfig.GetContentsNamespaceName(uiType);
             var interfaceName = uiType.ToMessage(uiName);
-            var template = LoadTemplate("Message", uiType);
-            if (template == null)
-            {
-                EditorUtility.DisplayDialog("Generate UI", $"Could not find Message template. Path: {EditorConfig.GetTemplatePath("Message", uiType)}", "OK");
-                return;
-            }
+
             var content = FillTemplate(template,
                 ("NAMESPACE", ns),
                 ("INTERFACE_NAME", interfaceName),
@@ -282,17 +307,12 @@ namespace Domivium.Client.Editor
             AssetDatabase.ImportAsset(EditorConfig.ToAssetsRelative(outPath));
         }
 
-        private static void CreateViewScript(UIType uiType, string uiName, string folder)
+        private static void CreateViewScript(UIType uiType, string uiName, string folder, string template)
         {
             var ns = EditorConfig.GetContentsNamespaceName(uiType);
             var viewName = uiType.ToView(uiName);
             var messageName = uiType.ToMessage(uiName);
-            var template = LoadTemplate("View", uiType);
-            if (template == null)
-            {
-                EditorUtility.DisplayDialog("Generate UI", $"Could not find View template. Path: {EditorConfig.GetTemplatePath("View", uiType)}", "OK");
-                return;
-            }
+
             var content = FillTemplate(template,
                 ("NAMESPACE", ns),
                 ("UI_TYPE", uiType.ToString()),
@@ -305,18 +325,13 @@ namespace Domivium.Client.Editor
             AssetDatabase.ImportAsset(EditorConfig.ToAssetsRelative(outPath));
         }
 
-        private static void CreatePresenterScript(UIType uiType, string uiName, string folder)
+        private static void CreatePresenterScript(UIType uiType, string uiName, string folder, string template)
         {
             var ns = EditorConfig.GetContentsNamespaceName(uiType);
             var presenterName = uiType.ToPresenter(uiName);
             var viewName = uiType.ToView(uiName);
             var messageName = uiType.ToMessage(uiName);
-            var template = LoadTemplate("Presenter", uiType);
-            if (template == null)
-            {
-                EditorUtility.DisplayDialog("Generate UI", $"Could not find Presenter template. Path: {EditorConfig.GetTemplatePath("Presenter", uiType)}", "OK");
-                return;
-            }
+
             var content = FillTemplate(template,
                 ("NAMESPACE", ns),
                 ("UI_TYPE", uiType.ToString()),
@@ -346,7 +361,12 @@ namespace Domivium.Client.Editor
 
             go.AddComponent<CanvasRenderer>();
             var rect = go.AddComponent<RectTransform>();
-            rect.SetParent(FindFirstObjectByType<Canvas>().transform);
+            var canvas = FindFirstObjectByType<Canvas>();
+            if (canvas != null)
+            {
+                rect.SetParent(canvas.transform, false);
+            }
+
             rect.localPosition = Vector3.zero;
             rect.localScale = Vector3.one;
             rect.offsetMin = Vector2.zero;
@@ -383,7 +403,7 @@ namespace Domivium.Client.Editor
             }
 
             AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         }
 
         private static string LoadTemplate(string kind, UIType uiType)
@@ -402,40 +422,25 @@ namespace Domivium.Client.Editor
             return result;
         }
 
+        private static int StableId(string name)
+        {
+            unchecked
+            {
+                var h = 2166136261;
+                foreach (var t in name)
+                {
+                    h ^= t;
+                    h *= 16777619;
+                }
+                return (int)(h & 0x3FFFFFFF);
+            }
+        }
+
         private static void GenerateUIIds()
         {
             try
             {
-                var validMap = new Dictionary<UIType, List<string>>
-                {
-                    { UIType.System, new List<string>() },
-                    { UIType.Static, new List<string>() },
-                    { UIType.Stack, new List<string>() }
-                };
-
-                foreach (UIType type in Enum.GetValues(typeof(UIType)))
-                {
-                    var scriptsRoot = type.ToScriptPath();
-                    if (!Directory.Exists(scriptsRoot)) continue;
-
-                    foreach (var dir in Directory.GetDirectories(scriptsRoot))
-                    {
-                        var name = Path.GetFileName(dir);
-                        if (string.IsNullOrEmpty(name)) continue;
-
-                        var hasMessage = File.Exists(Path.Combine(dir, type.ToMessage(name) + EditorConfig.CSharpExtension));
-                        var hasView = File.Exists(Path.Combine(dir, type.ToView(name) + EditorConfig.CSharpExtension));
-                        var hasPresenter = File.Exists(Path.Combine(dir, type.ToPresenter(name) + EditorConfig.CSharpExtension));
-
-                        if (!(hasMessage && hasView && hasPresenter)) continue;
-
-                        var prefabFolder = type.ToPrefabPath();
-                        var prefabPath = Path.Combine(prefabFolder, name + EditorConfig.PrefabExtension);
-                        if (!File.Exists(prefabPath)) continue;
-
-                        validMap[type].Add(name);
-                    }
-                }
+                var validMap = CollectValidNames();
 
                 var filePath = EditorConfig.GetScriptPath(UIConfig.UIIds);
                 var genDir = Path.GetDirectoryName(filePath);
@@ -451,17 +456,25 @@ namespace Domivium.Client.Editor
                 sb.AppendLine(EditorConfig.NamespaceGenerated);
                 sb.AppendLine("{");
 
-                WriteClass(sb, UIType.System, validMap[UIType.System], 0);
+                WriteClass(sb, UIType.System, validMap[UIType.System]);
                 sb.AppendLine();
-                WriteClass(sb, UIType.Static, validMap[UIType.Static], 100);
+                WriteClass(sb, UIType.Static, validMap[UIType.Static]);
                 sb.AppendLine();
-                WriteClass(sb, UIType.Stack, validMap[UIType.Stack], 1000);
+                WriteClass(sb, UIType.Stack, validMap[UIType.Stack]);
 
                 sb.AppendLine("}");
                 sb.AppendLine(EditorConfig.EndGenerate);
 
-                File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
-                AssetDatabase.ImportAsset(EditorConfig.ToAssetsRelative(filePath));
+                AssetDatabase.StartAssetEditing();
+                try
+                {
+                    File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+                    AssetDatabase.ImportAsset(EditorConfig.ToAssetsRelative(filePath));
+                }
+                finally
+                {
+                    AssetDatabase.StopAssetEditing();
+                }
             }
             catch (Exception ex)
             {
@@ -474,39 +487,8 @@ namespace Domivium.Client.Editor
         {
             try
             {
-                // Collect valid UI names per type (same criteria as GenerateUIIds)
-                var validMap = new Dictionary<UIType, List<string>>
-                {
-                    { UIType.System, new List<string>() },
-                    { UIType.Static, new List<string>() },
-                    { UIType.Stack, new List<string>() }
-                };
+                var validMap = CollectValidNames();
 
-                foreach (UIType type in Enum.GetValues(typeof(UIType)))
-                {
-                    var scriptsRoot = type.ToScriptPath();
-                    if (!Directory.Exists(scriptsRoot)) continue;
-
-                    foreach (var dir in Directory.GetDirectories(scriptsRoot))
-                    {
-                        var name = Path.GetFileName(dir);
-                        if (string.IsNullOrEmpty(name)) continue;
-
-                        var hasMessage = File.Exists(Path.Combine(dir, type.ToMessage(name) + EditorConfig.CSharpExtension));
-                        var hasView = File.Exists(Path.Combine(dir, type.ToView(name) + EditorConfig.CSharpExtension));
-                        var hasPresenter = File.Exists(Path.Combine(dir, type.ToPresenter(name) + EditorConfig.CSharpExtension));
-                        if (!(hasMessage && hasView && hasPresenter)) continue;
-
-                        // Prefab existence check in type-specific prefab folder
-                        var prefabFolder = type.ToPrefabPath();
-                        var prefabPath = Path.Combine(prefabFolder, name + EditorConfig.PrefabExtension);
-                        if (!File.Exists(prefabPath)) continue;
-
-                        validMap[type].Add(name);
-                    }
-                }
-
-                // Write UIMapping.cs from scratch
                 var filePath = EditorConfig.GetScriptPath(UIConfig.UIMapping);
                 var genDir = Path.GetDirectoryName(filePath);
                 if (!string.IsNullOrEmpty(genDir) && !Directory.Exists(genDir))
@@ -531,17 +513,13 @@ namespace Domivium.Client.Editor
                 {
                     if (!validMap.TryGetValue(type, out var names) || names.Count == 0) continue;
 
-                    sb.AppendLine($"\t\t\t// {type.ToString()}");
+                    sb.AppendLine($"\t\t\t// {type}");
                     foreach (var name in names.OrderBy(n => n))
                     {
-                        // Key: <Type>UIId.<Name>
                         var keyClass = $"{type}UIId";
-                        // Presenter: typeof(<ContentsNamespace>.<Name><Type>UIPresenter)
                         var contentsNs = EditorConfig.GetContentsNamespaceName(type);
                         var presenterType = $"{contentsNs}.{name}{type}UIPresenter";
-                        // View type: typeof(<ContentsNamespace>.<Name><Type>UIView)
                         var viewType = $"{contentsNs}.{name}{type}UIView";
-
                         var line = $"\t\t\t{{ {keyClass}.{name}, (typeof({presenterType}), typeof({viewType})) }}";
                         sb.AppendLine(line + ",");
                     }
@@ -552,8 +530,16 @@ namespace Domivium.Client.Editor
                 sb.AppendLine("}");
                 sb.AppendLine(EditorConfig.EndGenerate);
 
-                File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
-                AssetDatabase.ImportAsset(EditorConfig.ToAssetsRelative(filePath));
+                AssetDatabase.StartAssetEditing();
+                try
+                {
+                    File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+                    AssetDatabase.ImportAsset(EditorConfig.ToAssetsRelative(filePath));
+                }
+                finally
+                {
+                    AssetDatabase.StopAssetEditing();
+                }
             }
             catch (Exception ex)
             {
@@ -562,23 +548,59 @@ namespace Domivium.Client.Editor
             }
         }
 
+        private static Dictionary<UIType, List<string>> CollectValidNames()
+        {
+            var validMap = new Dictionary<UIType, List<string>>
+            {
+                { UIType.System, new List<string>() },
+                { UIType.Static, new List<string>() },
+                { UIType.Stack, new List<string>() }
+            };
+
+            foreach (UIType type in Enum.GetValues(typeof(UIType)))
+            {
+                var scriptsRoot = type.ToScriptPath();
+                if (!Directory.Exists(scriptsRoot)) continue;
+
+                foreach (var dir in Directory.GetDirectories(scriptsRoot))
+                {
+                    var name = Path.GetFileName(dir);
+                    if (string.IsNullOrEmpty(name)) continue;
+
+                    var hasMessage = File.Exists(Path.Combine(dir, type.ToMessage(name) + EditorConfig.CSharpExtension));
+                    var hasView = File.Exists(Path.Combine(dir, type.ToView(name) + EditorConfig.CSharpExtension));
+                    var hasPresenter = File.Exists(Path.Combine(dir, type.ToPresenter(name) + EditorConfig.CSharpExtension));
+
+                    if (!(hasMessage && hasView && hasPresenter)) continue;
+
+                    var prefabFolder = type.ToPrefabPath();
+                    var prefabPath = Path.Combine(prefabFolder, name + EditorConfig.PrefabExtension);
+                    if (!File.Exists(prefabPath)) continue;
+
+                    validMap[type].Add(name);
+                }
+            }
+
+            return validMap;
+        }
+
         private static void UpdateUIContainer()
         {
             try
             {
-                var container = _uiContainer as UIContainer;
-                if (container == null)
-                {
-                    container = AssetDatabase.LoadAssetAtPath<UIContainer>(EditorConfig.UIContainer);
-                }
-
+                var container = _uiContainer as UIContainer ?? AssetDatabase.LoadAssetAtPath<UIContainer>(EditorConfig.UIContainer);
                 var collected = new List<UIViewBase>();
+
                 if (Directory.Exists(EditorConfig.PrefabRootPath))
                 {
                     var guids = new List<string>();
                     foreach (UIType type in Enum.GetValues(typeof(UIType)))
                     {
-                        guids.AddRange(AssetDatabase.FindAssets("t:Prefab", new[] { EditorConfig.ToAssetsRelative(type.ToPrefabPath()) }));
+                        var folder = EditorConfig.ToAssetsRelative(type.ToPrefabPath());
+                        if (!string.IsNullOrEmpty(folder) && AssetDatabase.IsValidFolder(folder))
+                        {
+                            guids.AddRange(AssetDatabase.FindAssets("t:Prefab", new[] { folder }));
+                        }
                     }
 
                     foreach (var guid in guids)
@@ -586,16 +608,13 @@ namespace Domivium.Client.Editor
                         var path = AssetDatabase.GUIDToAssetPath(guid);
                         if (string.IsNullOrEmpty(path)) continue;
 
-                        var view = AssetDatabase.LoadAssetAtPath<UIViewBase>(path);
-                        if (view == null)
-                        {
-                            var assets = AssetDatabase.LoadAllAssetsAtPath(path);
-                            view = assets?.OfType<UIViewBase>().FirstOrDefault();
-                        }
+                        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                        if (prefab == null) continue;
 
-                        if (view != null)
+                        var viewOnAsset = prefab.GetComponentInChildren<UIViewBase>(true);
+                        if (viewOnAsset != null)
                         {
-                            collected.Add(view);
+                            collected.Add(viewOnAsset);
                         }
                     }
                 }
@@ -612,7 +631,7 @@ namespace Domivium.Client.Editor
 
                 EditorUtility.SetDirty(container);
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             }
             catch (Exception ex)
             {
@@ -621,7 +640,7 @@ namespace Domivium.Client.Editor
             }
         }
 
-        private static void WriteClass(StringBuilder sb, UIType type, List<string> names, int startId)
+        private static void WriteClass(StringBuilder sb, UIType type, List<string> names)
         {
             var className = $"{type}UIId";
             sb.AppendLine($"\tpublic static class {className}");
@@ -629,9 +648,9 @@ namespace Domivium.Client.Editor
 
             if (names is { Count: > 0 })
             {
-                foreach (var (uiName, idx) in names.OrderBy(n => n).Select((n, i) => (n, i)))
+                foreach (var uiName in names.OrderBy(n => n))
                 {
-                    var id = startId + idx;
+                    var id = StableId(uiName);
                     sb.AppendLine($"\t\tpublic static UIId {uiName} = {id};");
                 }
             }
@@ -639,9 +658,17 @@ namespace Domivium.Client.Editor
             sb.AppendLine("\t}");
         }
 
+        private static void DisplayDialog(string message, bool isError = false)
+        {
+            EditorUtility.DisplayDialog(isError ? "Error" : "Success", message, "OK");
+        }
+
         private Texture2D CreateColorTexture(Color color)
         {
-            var texture = new Texture2D(1, 1);
+            var texture = new Texture2D(1, 1)
+            {
+                hideFlags = HideFlags.HideAndDontSave
+            };
             texture.SetPixel(0, 0, color);
             texture.Apply();
             return texture;
