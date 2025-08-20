@@ -48,4 +48,5 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  _globalActors: {fileID: 11400000, guid: aae910f9e923de84995cb63c03068007, type: 2}
+  _globalActorContainer: {fileID: 11400000, guid: aae910f9e923de84995cb63c03068007, type: 2}
+  _uiContainer: {fileID: 11400000, guid: 02755ed9a2990804c9c9095c0153f71e, type: 2}

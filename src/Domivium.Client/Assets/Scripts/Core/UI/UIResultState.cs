@@ -5,6 +5,6 @@
         Ok,
         Cancel,
         Close,
-        Failure,
+        Failure
     }
 }

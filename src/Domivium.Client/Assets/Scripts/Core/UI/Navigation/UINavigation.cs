@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Exceptions;
+using Domivium.Client.Core.Message;
 using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Presenter;
+using MessagePipe;
+using R3;
+using DisposableBag = R3.DisposableBag;
 
 namespace Domivium.Client.Core.UI.Navigation
 {
@@ -14,17 +19,17 @@ namespace Domivium.Client.Core.UI.Navigation
         private readonly Stack<IUINavigationNode> _stackNodes = new();
         private readonly HashSet<IUINavigationNode> _staticNodes = new();
         private readonly HashSet<IUINavigationNode> _systemNodes = new();
+        private DisposableBag _disposable;
         private bool _isDisposed;
 
-        public UINavigation(IUINavigationNodePool navigationNodePool, IUIManager uiManager)
+        public UINavigation(
+            IUINavigationNodePool navigationNodePool,
+            IUIManager uiManager,
+            ISubscriber<SceneMessage> subscriber)
         {
             _navigationNodePool = navigationNodePool;
             _uiManager = uiManager;
-            foreach (var id in _uiManager.GetStaticUI())
-            {
-                var node = _navigationNodePool.Get(id);
-                _staticNodes.Add(node);
-            }
+            subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
         }
 
         public async UniTask ApplyUILayer(UILayer layer, bool immediately = false)
@@ -32,12 +37,21 @@ namespace Domivium.Client.Core.UI.Navigation
             try
             {
                 var tasks = new List<UniTask>();
+                var uiIdsByLayer = _uiManager.GetStaticUI(layer);
                 foreach (var node in _staticNodes)
                 {
                     var presenter = _uiManager.Get<IStaticUIPresenter>(node.Id);
-                    tasks.Add(presenter.HasLayer(layer)
-                        ? ShowPresenterAsync(presenter, node, UIParam.Empty, immediately)
-                        : HidePresenterAsync(presenter, node, UIResult.Close, immediately));
+                    tasks.Add(HidePresenterAsync(presenter, node, UIResult.Close, immediately));
+                    _navigationNodePool.Return(node);
+                }
+                _staticNodes.Clear();
+
+                foreach (var uiId in uiIdsByLayer)
+                {
+                    var presenter = _uiManager.Get<IStaticUIPresenter>(uiId);
+                    var node = _navigationNodePool.Get(uiId);
+                    _staticNodes.Add(node);
+                    tasks.Add(ShowPresenterAsync(presenter, node, UIParam.Empty, immediately));
                 }
 
                 await UniTask.WhenAll(tasks);
@@ -131,6 +145,14 @@ namespace Domivium.Client.Core.UI.Navigation
             return true;
         }
 
+        public void Dispose()
+        {
+            if (_isDisposed) return;
+
+            _isDisposed = true;
+            _disposable.Dispose();
+        }
+
         private async UniTask<IUIHandle> ShowPresenterAsync(
             IUIPresenter presenter,
             IUINavigationNode node,
@@ -156,6 +178,36 @@ namespace Domivium.Client.Core.UI.Navigation
             await presenter.HideAsync(node.Token, immediately);
             presenter.OnHideExit();
             node.Closed(result);
+        }
+
+        private void OnSceneMessage(SceneMessage message)
+        {
+            switch (message.Type)
+            {
+                case SceneMessageType.Unload:
+                    foreach (var node in _stackNodes)
+                    {
+                        _navigationNodePool.Return(node);
+                    }
+                    _stackNodes.Clear();
+
+                    foreach (var node in _staticNodes)
+                    {
+                        _navigationNodePool.Return(node);
+                    }
+                    _staticNodes.Clear();
+
+                    foreach (var node in _systemNodes)
+                    {
+                        _navigationNodePool.Return(node);
+                    }
+                    _systemNodes.Clear();
+                    break;
+                case SceneMessageType.Load:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

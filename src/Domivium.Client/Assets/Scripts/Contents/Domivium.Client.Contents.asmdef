@@ -1,20 +1,20 @@
 {
-    "name": "Domivium.Client.Contents",
-    "rootNamespace": "Domivium.Client",
-    "references": [
-        "GUID:08b38f39e2d9e594389b7a4cf4c2c338",
-        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
-        "GUID:c4666d3df8229d64f848ae0879d1947f",
-        "GUID:3d10d29a0c966f54ca0c48ca9ef92ed6",
-        "GUID:039440667a3746842bf56b1246653bdf"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Domivium.Client.Contents",
+  "rootNamespace": "Domivium.Client",
+  "references": [
+    "GUID:08b38f39e2d9e594389b7a4cf4c2c338",
+    "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
+    "GUID:c4666d3df8229d64f848ae0879d1947f",
+    "GUID:3d10d29a0c966f54ca0c48ca9ef92ed6",
+    "GUID:039440667a3746842bf56b1246653bdf"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

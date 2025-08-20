@@ -1,8 +1,5 @@
-﻿using Domivium.Client.Contents.Command;
-using Domivium.Client.Contents.Services;
-using Domivium.Client.Contents.UI;
+﻿using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI.Generated;
-using Domivium.Client.Core.Command;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
 using Domivium.Client.Core.UI;
@@ -28,7 +25,6 @@ namespace Domivium.Client.DI
 
             Messages(builder);
             Network(builder, Lifetime.Singleton);
-            Command(builder, Lifetime.Singleton);
             GlocalActors(builder, Lifetime.Singleton);
             Services(builder, Lifetime.Singleton);
             Scene(builder, Lifetime.Singleton);
@@ -41,6 +37,7 @@ namespace Domivium.Client.DI
         {
             var options = builder.RegisterMessagePipe();
             builder.RegisterMessageBroker<SceneMessage>(options);
+            builder.RegisterMessageBroker<SceneUIReadyMessage>(options);
         }
 
         private void Network(IContainerBuilder builder, Lifetime lifetime)
@@ -49,13 +46,6 @@ namespace Domivium.Client.DI
             builder.Register<IClientFilter, RetryFilter>(lifetime).AsSelf();
             builder.Register<IResponseHandler, ResponseHandler>(lifetime);
             builder.Register<INetworkConnection, NetworkConnection>(lifetime);
-        }
-
-        private void Command(IContainerBuilder builder, Lifetime lifetime)
-        {
-            builder.Register<ICommandExecutor, CommandExecutor>(lifetime);
-            builder.Register<LoginCmd>(lifetime);
-            builder.Register<EnterStageCmd>(lifetime);
         }
 
         private void GlocalActors(IContainerBuilder builder, Lifetime lifetime)
@@ -70,6 +60,7 @@ namespace Domivium.Client.DI
             builder.Register<NetworkService>(lifetime);
             builder.Register<CameraService>(lifetime);
             builder.Register<SceneService>(lifetime);
+            builder.Register<InputEventService>(lifetime);
         }
 
         private static void Scene(IContainerBuilder builder, Lifetime lifetime)
@@ -81,6 +72,7 @@ namespace Domivium.Client.DI
         {
             builder.Register<IUIManager, UIManager>(lifetime)
                 .WithParameter(UIMapping.UI)
+                .WithParameter(UIMapping.UIsByLayer)
                 .WithParameter(_uiContainer.UI);
             builder.Register<IUINavigationNodePool, UINavigationNodePool>(lifetime);
             builder.Register<IUINavigation, UINavigation>(lifetime);

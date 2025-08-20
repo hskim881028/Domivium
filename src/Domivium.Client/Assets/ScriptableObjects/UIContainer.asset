@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27f2fe7f1d714f339c2b7af237d699ed, type: 3}
   m_Name: UIContainer
   m_EditorClassIdentifier: 
-  _ui: []
+  _ui:
+  - {fileID: 9071487255453537739, guid: a85d100acc652d942becdf8050c55d8e, type: 3}
+  - {fileID: 78799711638818607, guid: 1b635adf5e8ba3e41b6672d28a3f4544, type: 3}
+  - {fileID: 5132604529022047670, guid: ef13b674eaf37ad4fa0deb36e9bc1a3f, type: 3}
+  - {fileID: 4584460419621636537, guid: 9d400b45a3231ef4db04aad7cf331d80, type: 3}

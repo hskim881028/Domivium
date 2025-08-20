@@ -9,6 +9,19 @@ namespace Domivium.Client.Contents.UI.Generated
 	{
 		public static readonly Dictionary<UIId, (Type presenter, Type view)> UI = new() 
 		{
+			// Static
+			{ StaticUIId.Lobby, (typeof(Domivium.Client.Contents.UI.Static.LobbyStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.LobbyStaticUIView)) },
+			{ StaticUIId.Stage, (typeof(Domivium.Client.Contents.UI.Static.StageStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.StageStaticUIView)) },
+			{ StaticUIId.Title, (typeof(Domivium.Client.Contents.UI.Static.TitleStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.TitleStaticUIView)) },
+			// Stack
+			{ StackUIId.Login, (typeof(Domivium.Client.Contents.UI.Stack.LoginStackUIPresenter), typeof(Domivium.Client.Contents.UI.Stack.LoginStackUIView)) },
+		};
+
+		public static readonly Dictionary<UILayer, HashSet<UIId>> UIsByLayer = new () 
+		{
+			{ Domivium.Client.Contents.UI.UILayers.Lobby, new HashSet<UIId> { StaticUIId.Lobby } },
+			{ Domivium.Client.Contents.UI.UILayers.Stage, new HashSet<UIId> { StaticUIId.Stage } },
+			{ Domivium.Client.Contents.UI.UILayers.Title, new HashSet<UIId> { StaticUIId.Title } },
 		};
 	}
 }

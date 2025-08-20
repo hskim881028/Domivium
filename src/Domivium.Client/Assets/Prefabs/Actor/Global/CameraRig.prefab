@@ -82,7 +82,7 @@ Camera:
   m_AllowMSAA: 1
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
+  m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
 --- !u!81 &6946999155144142920
@@ -109,7 +109,8 @@ MonoBehaviour:
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
-  m_Cameras: []
+  m_Cameras:
+  - {fileID: 5940016900175334027}
   m_RendererIndex: -1
   m_VolumeLayerMask:
     serializedVersion: 2
@@ -149,7 +150,7 @@ GameObject:
   - component: {fileID: 5940016900175334027}
   - component: {fileID: 7911469014913633776}
   m_Layer: 0
-  m_Name: UICameera
+  m_Name: UICamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

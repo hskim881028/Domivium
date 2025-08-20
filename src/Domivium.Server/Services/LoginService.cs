@@ -18,7 +18,7 @@ public class LoginService(ILoginUseCase loginUseCase) : ServiceBase<ILoginServic
             UserId = num.ToString(),
             Username = "tester",
             IsNewUser = true,
-            LastLoginAt = DateTime.UtcNow,
+            LastLoginAt = DateTime.UtcNow
         };
         return response;
     }

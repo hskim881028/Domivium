@@ -4,6 +4,6 @@
     {
         Created,
         Opened,
-        Closed,
+        Closed
     }
 }

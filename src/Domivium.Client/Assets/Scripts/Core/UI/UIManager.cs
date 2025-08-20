@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domivium.Client.Contents.UI.Generated;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
-using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.Presenter;
 using Domivium.Client.Core.UI.View;
 using MessagePipe;
@@ -13,13 +11,15 @@ using VContainer;
 using VContainer.Unity;
 using DisposableBag = R3.DisposableBag;
 
-namespace Domivium.Client.Contents.UI
+namespace Domivium.Client.Core.UI
 {
     public sealed class UIManager : IUIManager
     {
         private readonly LifetimeScope _rooLifetimeScope;
         private readonly Dictionary<UIId, (Type presenter, Type view)> _uiContainer;
+        private readonly Dictionary<UILayer, HashSet<UIId>> _uisByLayer;
         private readonly List<UIViewBase> _prefabs;
+        private readonly IPublisher<SceneUIReadyMessage> _publisher;
         private readonly Dictionary<Type, UICanvasScope> _canvas = new();
         private readonly Dictionary<UIId, UIScope> _ui = new();
         private DisposableBag _disposable;
@@ -29,29 +29,22 @@ namespace Domivium.Client.Contents.UI
         public UIManager(
             LifetimeScope rooLifetimeScope,
             Dictionary<UIId, (Type presenter, Type view)> uiContainer,
+            Dictionary<UILayer, HashSet<UIId>> uisByLayer,
             List<UIViewBase> prefabs,
+            IPublisher<SceneUIReadyMessage> publisher,
             ISubscriber<SceneMessage> subscriber)
         {
             _rooLifetimeScope = rooLifetimeScope;
             _uiContainer = uiContainer;
+            _uisByLayer = uisByLayer;
             _prefabs = prefabs;
+            _publisher = publisher;
             subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
         }
 
-        public IReadOnlyList<UIId> GetStaticUI()
+        public HashSet<UIId> GetStaticUI(UILayer layer)
         {
-            var staticUIIds = typeof(StaticUIId)
-                .GetFields()
-                .Where(f => f.IsStatic && f.FieldType == typeof(UIId))
-                .Select(f => (UIId)f.GetValue(null))
-                .ToHashSet();
-
-            var ids = _uiContainer
-                .Where(kv => staticUIIds.Contains(kv.Key))
-                .Select(kv => kv.Key)
-                .ToList();
-
-            return ids;
+            return _uisByLayer.TryGetValue(layer, out var uis) ? uis.ToHashSet() : new HashSet<UIId>();
         }
 
         public T Get<T>(UIId id) where T : IUIPresenter
@@ -62,7 +55,7 @@ namespace Domivium.Client.Contents.UI
             }
 
             var canvas = GetCanvas<T>();
-            var (type, viewType) = _uiContainer[id];
+            var (presenterType, viewType) = _uiContainer[id];
             var child = canvas.CreateChild<UIScope>(builder =>
                 {
                     var prefab = _prefabs.FirstOrDefault(p => viewType.IsAssignableFrom(p.GetType()));
@@ -71,12 +64,12 @@ namespace Domivium.Client.Contents.UI
                         throw new InvalidOperationException($"UI prefab not found for view type {viewType.FullName}. Make sure it is listed in UIContainer.");
                     }
                     builder.RegisterComponentInNewPrefab(prefab, Lifetime.Singleton).AsSelf();
-                    builder.Register(type, Lifetime.Singleton);
+                    builder.Register(presenterType, Lifetime.Singleton);
                 },
-                $"{type.Name.AsUI()}");
+                $"{presenterType.Name.AsUI()}(Scope)");
 
-            var presenter = (T)child.Container.Resolve(type);
-            var component = child.gameObject.AddComponent<UIScope>().Initialize(presenter);
+            var presenter = (T)child.Container.Resolve(presenterType);
+            var component = child.Initialize(presenter);
             _ui.Add(id, component);
             return (T)component.Presenter;
         }
@@ -95,6 +88,21 @@ namespace Domivium.Client.Contents.UI
             _disposable.Dispose();
         }
 
+        private void Clear()
+        {
+            foreach (var uiScope in _ui.Values.Where(uiScope => uiScope != null))
+            {
+                uiScope.Dispose();
+            }
+            _ui.Clear();
+
+            foreach (var canvasScope in _canvas.Values.Where(canvasScope => canvasScope != null))
+            {
+                canvasScope.Dispose();
+            }
+            _canvas.Clear();
+        }
+
         private void OnSceneMessage(SceneMessage message)
         {
             switch (message.Type)
@@ -104,6 +112,7 @@ namespace Domivium.Client.Contents.UI
                     break;
                 case SceneMessageType.Load:
                     _uiRoot = message.SceneScope.UIScope;
+                    _publisher.Publish(SceneUIReadyMessage.Ready(message.SceneScope.Id));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -119,21 +128,6 @@ namespace Domivium.Client.Contents.UI
             var component = child.Initialize(uiType, _uiRoot.transform);
             _canvas.Add(uiType, component);
             return component;
-        }
-
-        private void Clear()
-        {
-            foreach (var uiScope in _ui.Values.Where(uiScope => uiScope != null))
-            {
-                uiScope.Dispose();
-            }
-            _ui.Clear();
-
-            foreach (var canvasScope in _canvas.Values.Where(canvasScope => canvasScope != null))
-            {
-                canvasScope.Dispose();
-            }
-            _canvas.Clear();
         }
     }
 }

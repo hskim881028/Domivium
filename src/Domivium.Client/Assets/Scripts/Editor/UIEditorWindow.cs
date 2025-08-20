@@ -496,6 +496,82 @@ namespace Domivium.Client.Editor
                     Directory.CreateDirectory(genDir);
                 }
 
+                // Build base UI mapping and collect layers for static UIs
+                var layersMap = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+
+                string QualifyUILayers(string layerName)
+                {
+                    return $"Domivium.Client.Contents.UI.UILayers.{layerName}";
+                }
+
+                void CollectLayersForStaticUI(string uiName)
+                {
+                    try
+                    {
+                        var type = UIType.Static;
+                        var presenterPath = Path.Combine(type.ToScriptPath(), uiName, type.ToPresenter(uiName) + EditorConfig.CSharpExtension);
+                        if (!File.Exists(presenterPath)) return;
+
+                        var text = File.ReadAllText(presenterPath);
+
+                        var marker = "protected override HashSet<UILayer> Layer";
+                        var idx = text.IndexOf(marker, StringComparison.Ordinal);
+                        if (idx < 0) return;
+
+                        var after = text.IndexOf("=>", idx, StringComparison.Ordinal);
+                        if (after < 0) return;
+
+                        var semi = text.IndexOf(';', after);
+                        if (semi < 0) return;
+
+                        var expr = text.Substring(after + 2, semi - (after + 2));
+
+                        bool contains(string s)
+                        {
+                            return expr.IndexOf(s, StringComparison.Ordinal) >= 0;
+                        }
+
+                        var layers = new List<string>();
+                        if (contains("UILayer.SetDefault"))
+                        {
+                            layers.Add(QualifyUILayers("Default"));
+                        }
+
+                        // Extract UILayers.X identifiers
+                        foreach (Match m in Regex.Matches(expr, @"UILayers\s*\.\s*(?<name>[A-Za-z_][A-Za-z0-9_]*)"))
+                        {
+                            var name = m.Groups["name"].Value;
+                            if (string.Equals(name, "HideAll", StringComparison.Ordinal))
+                            {
+                                // Skip HideAll in mapping to avoid unintended behavior
+                            }
+                            var q = QualifyUILayers(name);
+                            if (!layers.Contains(q)) layers.Add(q);
+                        }
+
+                        // For SetWithDefault ensure Default included
+                        if (contains("UILayer.SetWithDefault") && !layers.Contains(QualifyUILayers("Default")))
+                        {
+                            layers.Add(QualifyUILayers("Default"));
+                        }
+
+                        // Register collected layers
+                        foreach (var layer in layers.Distinct().OrderBy(x => x, StringComparer.Ordinal))
+                        {
+                            if (!layersMap.TryGetValue(layer, out var list))
+                            {
+                                list = new List<string>();
+                                layersMap[layer] = list;
+                            }
+                            list.Add($"StaticUIId.{uiName}");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning($"Failed to collect layers for Static UI '{uiName}': {e.Message}");
+                    }
+                }
+
                 var sb = new StringBuilder();
                 sb.AppendLine(EditorConfig.StartGenerate);
                 sb.AppendLine(EditorConfig.UsingSystem);
@@ -522,10 +598,33 @@ namespace Domivium.Client.Editor
                         var viewType = $"{contentsNs}.{name}{type}UIView";
                         var line = $"\t\t\t{{ {keyClass}.{name}, (typeof({presenterType}), typeof({viewType})) }}";
                         sb.AppendLine(line + ",");
+
+                        // Collect layer info only for Static UIs
+                        if (type == UIType.Static)
+                        {
+                            CollectLayersForStaticUI(name);
+                        }
                     }
                 }
 
                 sb.AppendLine("\t\t};");
+                sb.AppendLine();
+
+                // Emit UIsByLayer dictionary
+                sb.AppendLine("\t\tpublic static readonly Dictionary<UILayer, HashSet<UIId>> UIsByLayer = new () ");
+                sb.AppendLine("\t\t{");
+                if (layersMap.Count > 0)
+                {
+                    foreach (var kv in layersMap.OrderBy(kv => kv.Key, StringComparer.Ordinal))
+                    {
+                        var layerKey = kv.Key; // already qualified
+                        var ids = kv.Value.Distinct().OrderBy(x => x, StringComparer.Ordinal).ToArray();
+                        var idsJoined = string.Join(", ", ids);
+                        sb.AppendLine($"\t\t\t{{ {layerKey}, new HashSet<UIId> {{ {idsJoined} }} }},");
+                    }
+                }
+                sb.AppendLine("\t\t};");
+
                 sb.AppendLine("\t}");
                 sb.AppendLine("}");
                 sb.AppendLine(EditorConfig.EndGenerate);

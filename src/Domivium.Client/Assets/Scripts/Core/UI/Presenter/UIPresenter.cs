@@ -14,11 +14,11 @@ namespace Domivium.Client.Core.UI.Presenter
         where TView : IUIView<TMessage>
         where TMessage : IUIMessage
     {
-        private IUINavigation _navigation;
         private bool _initialized;
         private bool _isDisposed;
 
         protected readonly TView View;
+        protected readonly IUINavigation Navigation;
         protected DisposableBag Disposable;
 
         public virtual bool DeactivateBehindView { get; }
@@ -32,7 +32,7 @@ namespace Domivium.Client.Core.UI.Presenter
 
             View = view;
             View.AttachMessage(message);
-            _navigation = navigation;
+            Navigation = navigation;
         }
 
         public void Dispose()
@@ -94,7 +94,7 @@ namespace Domivium.Client.Core.UI.Presenter
 
         protected void Close(UIId id, UIResult result, bool immediately = false)
         {
-            _navigation.HideSystemUIAsync(id, result, immediately).Forget();
+            Navigation.HideSystemUIAsync(id, result, immediately).Forget();
         }
     }
 }

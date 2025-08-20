@@ -6,7 +6,7 @@ namespace Domivium.Client.Core.UI
 {
     public interface IUIManager : IDisposable
     {
-        public IReadOnlyList<UIId> GetStaticUI();
+        public HashSet<UIId> GetStaticUI(UILayer layer);
         public T Get<T>(UIId id) where T : IUIPresenter;
         public void Remove(UIId id);
     }
