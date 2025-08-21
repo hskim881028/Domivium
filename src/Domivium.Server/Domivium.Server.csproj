@@ -14,14 +14,13 @@
         <PackageReference Include="MagicOnion.Server" Version="7.0.6"/>
         <PackageReference Include="MagicOnion.Server.JsonTranscoding" Version="7.0.6"/>
         <PackageReference Include="MagicOnion.Server.JsonTranscoding.Swagger" Version="7.0.6"/>
+        <PackageReference Include="Npgsql" Version="9.0.2" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Domivium.Shared\Domivium.Shared.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Repositories\"/>
     </ItemGroup>
 
 </Project>

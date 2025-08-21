@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Domivium.Shared.DataTransferObject;
 using MessagePack;
 
 namespace Domivium.Shared.Response
@@ -8,9 +8,7 @@ namespace Domivium.Shared.Response
     {
         [Key(0)] public ushort StatusCode { get; set; }
         [Key(1)] public string Token { get; set; }
-        [Key(2)] public string UserId { get; set; }
-        [Key(3)] public string Username { get; set; }
-        [Key(4)] public bool IsNewUser { get; set; }
-        [Key(5)] public DateTime LastLoginAt { get; set; }
+        [Key(2)] public UserDto User { get; set; }
+        [Key(3)] public bool IsNewUser { get; set; }
     }
 }

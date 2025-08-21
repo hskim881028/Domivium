@@ -1,6 +1,8 @@
-﻿namespace Domivium.Server.UseCases.Login;
+﻿using Domivium.Shared.Response;
+
+namespace Domivium.Server.UseCases.Login;
 
 public interface ILoginUseCase
 {
-    public Task<int> Test();
+    Task<LoginResponse> LoginOrCreateAsync(string username);
 }
