@@ -39,10 +39,7 @@ namespace Domivium.Client.Core.UI.Navigation
             return this;
         }
 
-        public async UniTask<UIResult> WaitUntilClosedAsync()
-        {
-            return await _closeSource.Task.AttachExternalCancellation(_cancellationToken);
-        }
+        public async UniTask<UIResult> WaitUntilClosedAsync() => await _closeSource.Task.AttachExternalCancellation(_cancellationToken);
 
         public void Dispose()
         {

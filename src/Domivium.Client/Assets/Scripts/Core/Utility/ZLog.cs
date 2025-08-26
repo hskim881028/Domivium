@@ -8,21 +8,21 @@ namespace Domivium.Client.Core.Utility
 {
     public static class ZLog
     {
-        public static void Request(RequestContext requestContext)
+        public static void Request(RequestContext ctx)
         {
 #if UNITY_EDITOR
             if (!Debug.isDebugBuild) return;
 
             using var sb = ZString.CreateStringBuilder();
             sb.Append("<color=#4FC3F7>[Req]</color> ");
-            sb.Append(requestContext.MethodPath);
+            sb.Append(ctx.MethodPath);
             sb.Append("\n");
-            sb.Append(JsonHelper.ExtractKey(requestContext, "Request"));
+            sb.Append(JsonHelper.ExtractKey(ctx, "Request"));
             Debug.Log(sb.ToString());
 #endif
         }
 
-        public static void Response(string caller, double elapsed, ResponseContext responseContext)
+        public static void Response(string caller, double elapsed, ResponseContext ctx)
         {
 #if UNITY_EDITOR
             if (!Debug.isDebugBuild) return;
@@ -34,7 +34,7 @@ namespace Domivium.Client.Core.Utility
             sb.Append(GetElapsedColor(elapsed));
             sb.Append(elapsed.ToString("0.0"));
             sb.Append("</color>ms)\n");
-            sb.Append(JsonHelper.ExtractNestedKey(responseContext, "ResponseAsync", "Result"));
+            sb.Append(JsonHelper.ExtractNestedKey(ctx, "ResponseAsync", "Result"));
             Debug.Log(sb.ToString());
 #endif
         }
@@ -51,12 +51,9 @@ namespace Domivium.Client.Core.Utility
 #endif
         }
 
-        private static string GetElapsedColor(double elapsed)
-        {
-            return elapsed <= 300 ? "<color=#81C784>" :
-                elapsed <= 800 ? "<color=#FFD54F>" :
-                "<color=#E57373>";
-        }
+        private static string GetElapsedColor(double elapsed) =>
+            elapsed <= 300 ? "<color=#81C784>" :
+            elapsed <= 800 ? "<color=#FFD54F>" : "<color=#E57373>";
 
         public static void Log(this object obj, string message = "", [CallerMemberName] string caller = "")
         {

@@ -1,10 +1,12 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Scene;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
 using Domivium.Client.Core.UI.Navigation;
+using Domivium.Client.Core.Utility;
 using JetBrains.Annotations;
 using MessagePipe;
 using R3;
@@ -29,6 +31,7 @@ namespace Domivium.Client.DI
             IUINavigation uiNavigation,
             ISubscriber<SceneUIReadyMessage> sceneUIReadySubscriber)
         {
+            this.Log();
             networkService.Connect();
             _sceneService = sceneService;
             _uiNavigation = uiNavigation;
@@ -37,7 +40,7 @@ namespace Domivium.Client.DI
 
         public void Start()
         {
-            _sceneService.Load(SceneScopeId.Title);
+            _sceneService.Load(SceneScopeIds.Title);
         }
 
         public void Dispose()
@@ -51,15 +54,15 @@ namespace Domivium.Client.DI
         private void OnSceneUIReady(SceneUIReadyMessage message)
         {
             var id = message.SceneScopeId;
-            if (id == SceneScopeId.Title)
+            if (id == SceneScopeIds.Title)
             {
                 _uiNavigation.ApplyUILayer(UILayers.Title).Forget();
             }
-            else if (id == SceneScopeId.Lobby)
+            else if (id == SceneScopeIds.Lobby)
             {
                 _uiNavigation.ApplyUILayer(UILayers.Lobby).Forget();
             }
-            else if (id == SceneScopeId.Stage)
+            else if (id == SceneScopeIds.Stage)
             {
                 _uiNavigation.ApplyUILayer(UILayers.Stage).Forget();
             }

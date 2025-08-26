@@ -15,8 +15,21 @@ services:
     networks:
       - backend
 
+  redis:
+    image: redis:7-alpine
+    container_name: local_redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass domivium_redis_2024
+    volumes:
+      - redisdata:/data
+    networks:
+      - backend
+    restart: unless-stopped
+
 volumes:
   pgdata:
+  redisdata:
 
 networks:
   backend:

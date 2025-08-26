@@ -4,6 +4,6 @@ namespace Domivium.Client.Core.Scene
 {
     public interface ISceneScopeManager : IDisposable
     {
-        public void LoadScope(SceneScopeId sceneScopeId);
+        public void LoadScope<T>(SceneScopeId sceneScopeId) where T : SceneScope;
     }
 }

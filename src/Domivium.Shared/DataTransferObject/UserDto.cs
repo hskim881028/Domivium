@@ -7,6 +7,5 @@ namespace Domivium.Shared.DataTransferObject
     public class UserDto
     {
         [Key(0)] public Guid Id { get; set; }
-        [Key(1)] public string Name { get; set; }
     }
 }

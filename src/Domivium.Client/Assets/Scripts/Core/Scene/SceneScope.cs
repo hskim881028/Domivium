@@ -18,8 +18,8 @@ namespace Domivium.Client.Core.Scene
             builder.RegisterBuildCallback(resolver =>
             {
                 Id = resolver.Resolve<SceneScopeId>();
-                UIScope = CreateChild<UIRootScope>(childScopeName: $"{Id.ToName()} UI");
-                ActorScope = CreateChild<ActorScope>(childScopeName: $"{Id.ToName()} Actor");
+                UIScope = CreateChild<UIRootScope>(childScopeName: $"{GetType().Name} UI");
+                ActorScope = CreateChild<ActorScope>(childScopeName: $"{GetType().Name} Actor");
             });
         }
 

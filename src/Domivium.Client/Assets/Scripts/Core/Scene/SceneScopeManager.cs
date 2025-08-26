@@ -3,7 +3,6 @@ using Domivium.Client.Core.Message;
 using JetBrains.Annotations;
 using MessagePipe;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using VContainer;
 using VContainer.Unity;
 
@@ -23,16 +22,16 @@ namespace Domivium.Client.Core.Scene
             _publisher = publisher;
         }
 
-        public void LoadScope(SceneScopeId sceneScopeId)
+        public void LoadScope<T>(SceneScopeId sceneScopeId) where T : SceneScope
         {
             if (_current != null)
             {
                 Unload();
             }
 
-            _current = _root.CreateChild<SceneScope>(
+            _current = _root.CreateChild<T>(
                 builder => builder.RegisterInstance(sceneScopeId).AsSelf(),
-                sceneScopeId.ToName());
+                typeof(T).Name);
             _publisher.Publish(SceneMessage.Load(_current));
         }
 

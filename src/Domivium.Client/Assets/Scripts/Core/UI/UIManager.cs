@@ -42,10 +42,7 @@ namespace Domivium.Client.Core.UI
             subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
         }
 
-        public HashSet<UIId> GetStaticUI(UILayer layer)
-        {
-            return _uisByLayer.TryGetValue(layer, out var uis) ? uis.ToHashSet() : new HashSet<UIId>();
-        }
+        public HashSet<UIId> GetStaticUI(UILayer layer) => _uisByLayer.TryGetValue(layer, out var uis) ? uis.ToHashSet() : new HashSet<UIId>();
 
         public T Get<T>(UIId id) where T : IUIPresenter
         {

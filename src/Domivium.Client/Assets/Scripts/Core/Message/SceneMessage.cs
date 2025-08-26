@@ -19,14 +19,8 @@ namespace Domivium.Client.Core.Message
             SceneScope = sceneScope;
         }
 
-        public static SceneMessage Load(SceneScope sceneScope)
-        {
-            return new SceneMessage(SceneMessageType.Load, sceneScope);
-        }
+        public static SceneMessage Load(SceneScope sceneScope) => new(SceneMessageType.Load, sceneScope);
 
-        public static SceneMessage Unload()
-        {
-            return new SceneMessage(SceneMessageType.Unload);
-        }
+        public static SceneMessage Unload() => new(SceneMessageType.Unload);
     }
 }

@@ -93,25 +93,13 @@ namespace Domivium.Client.Editor
             return Path.Combine(RootPath, PrefabsFolderName, UI, typeFolder);
         }
 
-        public static string ToPresenter(this UIType uiType, string prefix = "")
-        {
-            return $"{prefix}{uiType}{UI}Presenter";
-        }
+        public static string ToPresenter(this UIType uiType, string prefix = "") => $"{prefix}{uiType}{UI}Presenter";
 
-        public static string ToView(this UIType uiType, string prefix = "")
-        {
-            return $"{prefix}{uiType}{UI}View";
-        }
+        public static string ToView(this UIType uiType, string prefix = "") => $"{prefix}{uiType}{UI}View";
 
-        public static string ToMessage(this UIType uiType, string prefix)
-        {
-            return $"I{prefix}{uiType}{UI}Message";
-        }
+        public static string ToMessage(this UIType uiType, string prefix) => $"I{prefix}{uiType}{UI}Message";
 
-        public static string GetScriptPath(string scriptName)
-        {
-            return Path.Combine(RootPath, ScriptsFolderName, ContentsFolderName, UI, GeneratedFolderName, $"{scriptName}{CSharpExtension}");
-        }
+        public static string GetScriptPath(string scriptName) => Path.Combine(RootPath, ScriptsFolderName, ContentsFolderName, UI, GeneratedFolderName, $"{scriptName}{CSharpExtension}");
 
         public static string ToAssetsRelative(string absolutePath)
         {

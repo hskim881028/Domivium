@@ -4,6 +4,8 @@ using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
 using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.Navigation;
+using Domivium.Client.Data.Cache;
+using Domivium.Client.Data.SecureStore;
 using Domivium.Client.Network;
 using Domivium.Client.Network.ClientFilters;
 using MagicOnion.Client;
@@ -24,10 +26,12 @@ namespace Domivium.Client.DI
             base.Configure(builder);
 
             Messages(builder);
+            SecureStore(builder, Lifetime.Singleton);
+            Cache(builder, Lifetime.Singleton);
             Network(builder, Lifetime.Singleton);
-            GlocalActors(builder, Lifetime.Singleton);
             Services(builder, Lifetime.Singleton);
             Scene(builder, Lifetime.Singleton);
+            GlocalActors(builder, Lifetime.Singleton);
             UI(builder, Lifetime.Singleton);
 
             builder.Register<ApplicationEntry>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
@@ -40,22 +44,28 @@ namespace Domivium.Client.DI
             builder.RegisterMessageBroker<SceneUIReadyMessage>(options);
         }
 
-        private void Network(IContainerBuilder builder, Lifetime lifetime)
+        private static void SecureStore(IContainerBuilder builder, Lifetime lifetime)
         {
-            builder.Register<IClientFilter, LoggingFilter>(lifetime).AsSelf();
-            builder.Register<IClientFilter, RetryFilter>(lifetime).AsSelf();
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            builder.Register<ISecureStore, WindowsDpapiSecureStore>(lifetime);
+#endif
+        }
+
+        private static void Cache(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<AuthenticationTokenCache>(lifetime);
+        }
+
+        private static void Network(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<IClientFilter, AuthenticationClientFilter>(lifetime).AsSelf();
+            builder.Register<IClientFilter, LoggingClientFilter>(lifetime).AsSelf();
+
             builder.Register<IResponseHandler, ResponseHandler>(lifetime);
             builder.Register<INetworkConnection, NetworkConnection>(lifetime);
         }
 
-        private void GlocalActors(IContainerBuilder builder, Lifetime lifetime)
-        {
-            builder.RegisterComponentInNewPrefab(_globalActorContainer.InputEventSystem, lifetime).UnderTransform(transform);
-            builder.RegisterComponentInNewPrefab(_globalActorContainer.CameraRig, lifetime).UnderTransform(transform);
-            builder.RegisterComponentInNewPrefab(_globalActorContainer.EnvironmentRig, lifetime).UnderTransform(transform);
-        }
-
-        private void Services(IContainerBuilder builder, Lifetime lifetime)
+        private static void Services(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<NetworkService>(lifetime);
             builder.Register<CameraService>(lifetime);
@@ -68,6 +78,13 @@ namespace Domivium.Client.DI
             builder.Register<ISceneScopeManager, SceneScopeManager>(lifetime);
         }
 
+        private void GlocalActors(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.RegisterComponentInNewPrefab(_globalActorContainer.InputEventSystem, lifetime).UnderTransform(transform);
+            builder.RegisterComponentInNewPrefab(_globalActorContainer.CameraRig, lifetime).UnderTransform(transform);
+            builder.RegisterComponentInNewPrefab(_globalActorContainer.EnvironmentRig, lifetime).UnderTransform(transform);
+        }
+
         private void UI(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<IUIManager, UIManager>(lifetime)
@@ -77,7 +94,5 @@ namespace Domivium.Client.DI
             builder.Register<IUINavigationNodePool, UINavigationNodePool>(lifetime);
             builder.Register<IUINavigation, UINavigation>(lifetime);
         }
-
-        private void Repositories(IContainerBuilder builder, Lifetime lifetime) { }
     }
 }

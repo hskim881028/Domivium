@@ -7,20 +7,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Protobuf Include="Protos\greet.proto" GrpcServices="Server"/>
+        <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="MagicOnion.Server" Version="7.0.6"/>
-        <PackageReference Include="MagicOnion.Server.JsonTranscoding" Version="7.0.6"/>
-        <PackageReference Include="MagicOnion.Server.JsonTranscoding.Swagger" Version="7.0.6"/>
+        <PackageReference Include="MagicOnion.Server" Version="7.0.6" />
+        <PackageReference Include="MagicOnion.Server.JsonTranscoding" Version="7.0.6" />
         <PackageReference Include="Npgsql" Version="9.0.2" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
+        <PackageReference Include="RedLock.net" Version="2.3.2" />
+        <PackageReference Include="StackExchange.Redis" Version="2.9.11" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Domivium.Shared\Domivium.Shared.csproj"/>
+        <ProjectReference Include="..\Domivium.Shared\Domivium.Shared.csproj" />
     </ItemGroup>
 
 </Project>

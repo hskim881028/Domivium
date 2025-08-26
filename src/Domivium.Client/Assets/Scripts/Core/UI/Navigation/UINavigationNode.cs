@@ -25,10 +25,7 @@ namespace Domivium.Client.Core.UI.Navigation
             _handle.Reset(Token);
         }
 
-        public IUIHandle Opened()
-        {
-            return _handle.Opened();
-        }
+        public IUIHandle Opened() => _handle.Opened();
 
         public void Closed(UIResult result)
         {

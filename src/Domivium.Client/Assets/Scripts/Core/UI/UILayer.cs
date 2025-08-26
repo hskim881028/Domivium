@@ -9,10 +9,7 @@ namespace Domivium.Client.Core.UI
         public static readonly UILayer HideAll = -1;
         public static readonly UILayer Default = 0;
 
-        public static HashSet<UILayer> Set(params UILayer[] values)
-        {
-            return new HashSet<UILayer>(values);
-        }
+        public static HashSet<UILayer> Set(params UILayer[] values) => new(values);
 
         public static HashSet<UILayer> SetWithDefault(params UILayer[] values)
         {

@@ -6,17 +6,17 @@ using MagicOnion.Client;
 
 namespace Domivium.Client.Network.ClientFilters
 {
-    public sealed class LoggingFilter : IClientFilter
+    public sealed class LoggingClientFilter : IClientFilter
     {
         public async ValueTask<ResponseContext> SendAsync(
-            RequestContext context,
+            RequestContext ctx,
             Func<RequestContext, ValueTask<ResponseContext>> next)
         {
-            ZLog.Request(context);
+            ZLog.Request(ctx);
             var sw = Stopwatch.StartNew();
-            var response = await next(context);
+            var response = await next(ctx);
             sw.Stop();
-            ZLog.Response(context.MethodPath, sw.Elapsed.TotalMilliseconds, response);
+            ZLog.Response(ctx.MethodPath, sw.Elapsed.TotalMilliseconds, response);
             return response;
         }
     }

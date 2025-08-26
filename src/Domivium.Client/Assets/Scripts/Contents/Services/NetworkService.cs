@@ -1,7 +1,10 @@
 ﻿using System;
+using Domivium.Client.Core.Utility;
 using Domivium.Client.Network;
+using Domivium.Client.Network.ClientFilters;
 using Domivium.Shared.Response;
 using MagicOnion;
+using MagicOnion.Client;
 
 namespace Domivium.Client.Contents.Services
 {
@@ -21,13 +24,16 @@ namespace Domivium.Client.Contents.Services
             _networkConnection.Connect();
         }
 
-        public Lazy<T> CreateService<T>() where T : IService<T>
+        public void AddFilter(AuthenticationClientFilter filter)
         {
-            return _networkConnection.CreateService<T>();
+            _networkConnection.AddAuthenticationFilter(filter);
         }
+
+        public Lazy<T> CreateService<T>() where T : IService<T> => _networkConnection.CreateService<T>();
 
         public bool HandleResponse(IResponse response)
         {
+            this.Log($"[{nameof(IResponse)}] StatusCode: {response.StatusCode}");
             return _networkConnection.HandleResponse(response);
         }
     }

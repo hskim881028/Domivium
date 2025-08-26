@@ -1,26 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
+using Domivium.Client.Core.Utility;
 using Domivium.Client.Network.ClientFilters;
 using Domivium.Shared.Response;
 using MagicOnion;
 using MagicOnion.Client;
+using UnityEngine;
 
 namespace Domivium.Client.Network
 {
     public sealed class NetworkConnection : INetworkConnection
     {
-        private readonly IClientFilter[] _clientFilters = new IClientFilter[2];
         private readonly IResponseHandler _responseHandler;
-
+        private IClientFilter[] _clientFilters;
         private GrpcChannelx _channel;
 
-        public NetworkConnection(
-            IResponseHandler responseHandler,
-            LoggingFilter loggingFilter,
-            RetryFilter retryFilter)
+        public NetworkConnection(IResponseHandler responseHandler, LoggingClientFilter loggingClientFilter)
         {
             _responseHandler = responseHandler;
-            _clientFilters[0] = loggingFilter;
-            _clientFilters[1] = retryFilter;
+            _clientFilters = new IClientFilter[1];
+            _clientFilters[0] = loggingClientFilter;
         }
 
         public void Connect()
@@ -28,14 +27,19 @@ namespace Domivium.Client.Network
             _channel = GrpcChannelx.ForAddress("http://localhost:5000");
         }
 
-        public Lazy<T> CreateService<T>() where T : IService<T>
+        public void AddAuthenticationFilter(AuthenticationClientFilter filter)
         {
-            return new Lazy<T>(MagicOnionClient.Create<T>(_channel, _clientFilters));
+            this.Log();
+            filter.SetChannel(_channel);
+
+            var filters = new List<IClientFilter>();
+            filters.AddRange(_clientFilters);
+            filters.Add(filter);
+            _clientFilters = filters.ToArray();
         }
 
-        public bool HandleResponse(IResponse response)
-        {
-            return _responseHandler.HandleResponse(response);
-        }
+        public Lazy<T> CreateService<T>() where T : IService<T> => new(MagicOnionClient.Create<T>(_channel, _clientFilters));
+
+        public bool HandleResponse(IResponse response) => _responseHandler.HandleResponse(response);
     }
 }

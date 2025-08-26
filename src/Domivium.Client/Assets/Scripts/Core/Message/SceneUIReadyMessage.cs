@@ -11,9 +11,6 @@ namespace Domivium.Client.Core.Message
             SceneScopeId = sceneScopeId;
         }
 
-        public static SceneUIReadyMessage Ready(SceneScopeId sceneScopeId)
-        {
-            return new SceneUIReadyMessage(sceneScopeId);
-        }
+        public static SceneUIReadyMessage Ready(SceneScopeId sceneScopeId) => new(sceneScopeId);
     }
 }

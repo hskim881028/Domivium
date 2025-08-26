@@ -14,9 +14,6 @@ namespace Domivium.Client.Core.UI.Presenter
 
         protected StaticUIPresenter(TView view, IUINavigation navigation) : base(view, navigation) { }
 
-        public bool HasLayer(UILayer layer)
-        {
-            return Layer.Contains(layer);
-        }
+        public bool HasLayer(UILayer layer) => Layer.Contains(layer);
     }
 }
