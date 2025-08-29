@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Domivium.Client.Core.UI.View
 {
     [RequireComponent(typeof(CanvasGroup))]
-    public class UIView<TMessage> : UIViewBase, IUIView<TMessage> where TMessage : IUIMessage
+    public class UIView<TMessage> : UIBehaviour, IUIView<TMessage> where TMessage : IUIMessage
     {
         protected TMessage Message;
         private CanvasGroup _canvasGroup;

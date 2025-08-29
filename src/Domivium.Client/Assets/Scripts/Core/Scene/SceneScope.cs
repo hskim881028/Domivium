@@ -9,7 +9,7 @@ namespace Domivium.Client.Core.Scene
 
         public UIRootScope UIScope { get; set; }
 
-        public ActorScope ActorScope { get; set; }
+        public ActorRootScope ActorRootScope { get; set; }
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -19,7 +19,7 @@ namespace Domivium.Client.Core.Scene
             {
                 Id = resolver.Resolve<SceneScopeId>();
                 UIScope = CreateChild<UIRootScope>(childScopeName: $"{GetType().Name} UI");
-                ActorScope = CreateChild<ActorScope>(childScopeName: $"{GetType().Name} Actor");
+                ActorRootScope = CreateChild<ActorRootScope>(childScopeName: $"{GetType().Name} Actor");
             });
         }
 
@@ -27,8 +27,8 @@ namespace Domivium.Client.Core.Scene
         {
             UIScope?.Dispose();
             UIScope = null;
-            ActorScope?.Dispose();
-            ActorScope = null;
+            ActorRootScope?.Dispose();
+            ActorRootScope = null;
             base.OnDestroy();
         }
     }

@@ -48,5 +48,7 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
+  _configContainer: {fileID: 11400000, guid: cf18891826425cd429cdc54a2a9ee8fa, type: 2}
   _globalActorContainer: {fileID: 11400000, guid: aae910f9e923de84995cb63c03068007, type: 2}
   _uiContainer: {fileID: 11400000, guid: 02755ed9a2990804c9c9095c0153f71e, type: 2}
+  _stageActorContainer: {fileID: 11400000, guid: a39183a11068bca469e0a18824133f5a, type: 2}

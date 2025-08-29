@@ -10,6 +10,8 @@ namespace Domivium.Client.Core.UI
         public const string UIMapping = "UIMapping";
         public const string UIIds = "UIIds";
 
+        public static string AsActor(this string str) => str.Replace("Presenter", string.Empty);
+
         public static string AsUI(this string str) => str
             .Replace("Presenter", string.Empty)
             .Replace($"{Static}UI", string.Empty)

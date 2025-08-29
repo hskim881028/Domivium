@@ -4,7 +4,6 @@ using Domivium.Client.Network;
 using Domivium.Client.Network.ClientFilters;
 using Domivium.Shared.Response;
 using MagicOnion;
-using MagicOnion.Client;
 
 namespace Domivium.Client.Contents.Services
 {

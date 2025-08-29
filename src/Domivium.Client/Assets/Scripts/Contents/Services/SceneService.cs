@@ -1,4 +1,5 @@
-﻿using Domivium.Client.Contents.Scene;
+﻿using Domivium.Client.Contents.DI;
+using Domivium.Client.Contents.DI.Scene;
 using Domivium.Client.Core.Scene;
 using JetBrains.Annotations;
 
@@ -24,7 +25,10 @@ namespace Domivium.Client.Contents.Services
             {
                 _sceneScopeManager.LoadScope<Lobby>(sceneScopeId);
             }
-            else if (sceneScopeId == SceneScopeIds.Stage) { }
+            else if (sceneScopeId == SceneScopeIds.Stage)
+            {
+                _sceneScopeManager.LoadScope<Stage>(sceneScopeId);
+            }
         }
     }
 }

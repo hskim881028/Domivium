@@ -9,7 +9,7 @@ namespace Domivium.Client.Core.Component
         private Image _image;
         private TextMeshProUGUI _text;
 
-        public UIViewBase Parent { get; private set; }
+        public UIBehaviour Parent { get; private set; }
 
         public string Text
         {
@@ -22,7 +22,7 @@ namespace Domivium.Client.Core.Component
             base.Awake();
             _image = GetComponent<Image>();
             _text = GetComponentInChildren<TextMeshProUGUI>();
-            Parent = GetComponentInParent<UIViewBase>();
+            Parent = GetComponentInParent<UIBehaviour>();
         }
     }
 }

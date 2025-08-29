@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Domivium.Client.Core;
 using Domivium.Client.Core.Utility;
 using Domivium.Client.Network.ClientFilters;
 using Domivium.Shared.Response;
@@ -24,7 +25,7 @@ namespace Domivium.Client.Network
 
         public void Connect()
         {
-            _channel = GrpcChannelx.ForAddress("http://localhost:5000");
+            _channel = GrpcChannelx.ForAddress(AppEnv.ServerUrl);
         }
 
         public void AddAuthenticationFilter(AuthenticationClientFilter filter)

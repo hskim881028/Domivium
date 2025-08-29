@@ -45,7 +45,7 @@ namespace Domivium.Client.Core.Scene
 
         private void Unload()
         {
-            _publisher.Publish(SceneMessage.Unload());
+            _publisher.Publish(SceneMessage.Unload);
 
             _current?.Dispose();
             _current = null;

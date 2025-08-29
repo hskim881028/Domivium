@@ -18,7 +18,7 @@ namespace Domivium.Client.Core.UI
         private readonly LifetimeScope _rooLifetimeScope;
         private readonly Dictionary<UIId, (Type presenter, Type view)> _uiContainer;
         private readonly Dictionary<UILayer, HashSet<UIId>> _uisByLayer;
-        private readonly List<UIViewBase> _prefabs;
+        private readonly List<UIBehaviour> _prefabs;
         private readonly IPublisher<SceneUIReadyMessage> _publisher;
         private readonly Dictionary<Type, UICanvasScope> _canvas = new();
         private readonly Dictionary<UIId, UIScope> _ui = new();
@@ -30,7 +30,7 @@ namespace Domivium.Client.Core.UI
             LifetimeScope rooLifetimeScope,
             Dictionary<UIId, (Type presenter, Type view)> uiContainer,
             Dictionary<UILayer, HashSet<UIId>> uisByLayer,
-            List<UIViewBase> prefabs,
+            List<UIBehaviour> prefabs,
             IPublisher<SceneUIReadyMessage> publisher,
             ISubscriber<SceneMessage> subscriber)
         {

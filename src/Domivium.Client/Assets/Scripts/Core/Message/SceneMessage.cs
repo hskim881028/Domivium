@@ -21,6 +21,6 @@ namespace Domivium.Client.Core.Message
 
         public static SceneMessage Load(SceneScope sceneScope) => new(SceneMessageType.Load, sceneScope);
 
-        public static SceneMessage Unload() => new(SceneMessageType.Unload);
+        public static SceneMessage Unload => new(SceneMessageType.Unload);
     }
 }

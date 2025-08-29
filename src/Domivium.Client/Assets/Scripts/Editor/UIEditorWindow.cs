@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Domivium.Client.Contents.DI.Container;
 using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.View;
 using Domivium.Client.Core.Utility;
-using Domivium.Client.DI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -688,7 +688,7 @@ namespace Domivium.Client.Editor
             try
             {
                 var container = _uiContainer as UIContainer ?? AssetDatabase.LoadAssetAtPath<UIContainer>(EditorConfig.UIContainer);
-                var collected = new List<UIViewBase>();
+                var collected = new List<UIBehaviour>();
 
                 if (Directory.Exists(EditorConfig.PrefabRootPath))
                 {
@@ -710,7 +710,7 @@ namespace Domivium.Client.Editor
                         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
                         if (prefab == null) continue;
 
-                        var viewOnAsset = prefab.GetComponentInChildren<UIViewBase>(true);
+                        var viewOnAsset = prefab.GetComponentInChildren<UIBehaviour>(true);
                         if (viewOnAsset != null)
                         {
                             collected.Add(viewOnAsset);

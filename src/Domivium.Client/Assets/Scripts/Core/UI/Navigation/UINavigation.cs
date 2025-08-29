@@ -32,6 +32,9 @@ namespace Domivium.Client.Core.UI.Navigation
             subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
         }
 
+        public bool HasOpenSystemUI => _systemNodes.Count > 0;
+        public bool HasOpenStackUI => _stackNodes.Count > 0;
+
         public async UniTask ApplyUILayer(UILayer layer, bool immediately = false)
         {
             try
