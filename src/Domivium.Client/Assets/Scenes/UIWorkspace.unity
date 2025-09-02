@@ -127,17 +127,37 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4110048036412145639, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
+      propertyPath: m_Antialiasing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4110048036412145639, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
+      propertyPath: m_RenderShadows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6149011415165025666, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6149011415165025666, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6149011415165025666, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8006518007959671587, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
       propertyPath: m_Name
       value: CameraRig
       objectReference: {fileID: 0}
     - target: {fileID: 8899948646982051114, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 635.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8899948646982051114, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 328.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8899948646982051114, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
       propertyPath: m_LocalPosition.z

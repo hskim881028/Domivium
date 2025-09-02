@@ -43,5 +43,10 @@ namespace Domivium.Client.Contents.UI.Static
             _towerPlacementCommand.Show(index);
             _towerPlacementCommand.Update(_pointerRead.Current);
         }
+
+        public void Cancel()
+        {
+            _towerPlacementCommand.Hide();
+        }
     }
 }

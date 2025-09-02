@@ -27,8 +27,9 @@ namespace Domivium.Client.Contents.Input.Consumer
             return message.Type switch
             {
                 InputMessageType.Submit => false,
+                InputMessageType.ClickEnter => false,
                 InputMessageType.Cancel => IsTowerPlacementMode && _command.Hide(),
-                InputMessageType.Click => IsTowerPlacementMode && _command.Placement(message.Value),
+                InputMessageType.ClickExit => IsTowerPlacementMode && _command.Placement(message.Value),
                 InputMessageType.Point => IsTowerPlacementMode && _command.Update(message.Value),
                 _ => throw new ArgumentOutOfRangeException()
             };

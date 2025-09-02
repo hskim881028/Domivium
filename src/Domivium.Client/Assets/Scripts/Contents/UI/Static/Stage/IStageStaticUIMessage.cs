@@ -1,5 +1,4 @@
 ﻿using Domivium.Client.Core.UI;
-using UnityEngine;
 
 namespace Domivium.Client.Contents.UI.Static
 {
@@ -7,5 +6,6 @@ namespace Domivium.Client.Contents.UI.Static
     {
         public void EnterLobby();
         public void SelectTower(int index);
+        public void Cancel();
     }
 }

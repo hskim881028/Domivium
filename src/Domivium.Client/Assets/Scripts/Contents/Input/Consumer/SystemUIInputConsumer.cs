@@ -26,7 +26,8 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.Submit:
                 case InputMessageType.Cancel:
                     return _uiNavigation.HasOpenSystemUI;
-                case InputMessageType.Click:
+                case InputMessageType.ClickEnter:
+                case InputMessageType.ClickExit:
                     return _inputEventSystem.IsPointerOverUI(message.Value);
                 case InputMessageType.Point:
                     return false;

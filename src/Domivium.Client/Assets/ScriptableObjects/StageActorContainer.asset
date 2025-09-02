@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.DI.Container.StageActorContainer
   _actor:
   - {fileID: 7482531951027177798, guid: 8607e987f4ac1704185435760a8987f1, type: 3}
+  - {fileID: 1098331822369118249, guid: e67753e4d91c4b24fb4d5b006f87b957, type: 3}

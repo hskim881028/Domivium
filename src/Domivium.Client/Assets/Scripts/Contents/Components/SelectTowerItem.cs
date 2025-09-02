@@ -1,14 +1,22 @@
-﻿using Domivium.Client.Core.Component;
+﻿using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Domivium.Client.Contents.Components
 {
-    public class SelectTowerItem : MonoBehaviour
+    public class SelectTowerItem : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
-        [SerializeField] private DvmButton _button;
+        public Action PointerDown { get; set; }
+        public Action PointerUp { get; set; }
 
-        public DvmButton Button => _button;
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            PointerDown?.Invoke();
+        }
 
-        private void Awake() { }
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            PointerUp?.Invoke();
+        }
     }
 }

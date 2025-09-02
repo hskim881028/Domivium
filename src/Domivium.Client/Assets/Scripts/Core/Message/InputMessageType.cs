@@ -4,7 +4,8 @@
     {
         Submit,
         Cancel,
-        Click,
+        ClickEnter,
+        ClickExit,
         Point
     }
 }

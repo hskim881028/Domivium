@@ -64,25 +64,19 @@ namespace Domivium.Client.Core.Input
         private void Cancel(InputAction.CallbackContext context)
         {
             _publisher.Publish(InputMessage.Cancel);
-
-            // var currentSelected = _inputEventSystem.EventSystem.currentSelectedGameObject;
-            // if (currentSelected == null) return;
-
-            // var selectable = currentSelected.GetComponent<IUISelectable>();
-            // if (selectable != null)
-            // {
-            //     // TODO: Need to implement
-            // }
         }
 
         private void Click(InputAction.CallbackContext context)
         {
-            if (context.action.WasPressedThisFrame()) return;
+            if (context.action.WasPressedThisFrame())
+            {
+                _publisher.Publish(InputMessage.ClickEnter(_pointer));
+            }
 
-            // var currentSelected = _inputEventSystem.EventSystem.currentSelectedGameObject;
-            // if (currentSelected != null) return;
-
-            _publisher.Publish(InputMessage.Click(_pointer));
+            if (context.action.WasReleasedThisFrame())
+            {
+                _publisher.Publish(InputMessage.ClickExit(_pointer));
+            }
         }
 
         private void Point(InputAction.CallbackContext context)

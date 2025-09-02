@@ -97,9 +97,11 @@ namespace Domivium.Client.Contents.DI.Scene
         {
             builder.Register<NetworkService>(lifetime);
             builder.Register<SceneService>(lifetime);
+            builder.Register<EnvironmentService>(lifetime);
             builder.Register<CameraService>(lifetime).AsImplementedInterfaces();
             builder.Register<PointerService>(lifetime).AsImplementedInterfaces();
             builder.Register<TowerPlacementService>(lifetime).AsImplementedInterfaces();
+            builder.Register<BattleService>(lifetime).AsImplementedInterfaces();
         }
 
         private static void Input(IContainerBuilder builder, Lifetime lifetime)

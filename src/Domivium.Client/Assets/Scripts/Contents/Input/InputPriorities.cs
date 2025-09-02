@@ -9,6 +9,6 @@ namespace Domivium.Client.Contents.Input
         public static InputPriority StackUI = 2;
         public static InputPriority StaticUI = 3;
         public static InputPriority TowerPlacement = 4;
-        public static InputPriority Gameplay = 5;
+        public static InputPriority Battle = 5;
     }
 }

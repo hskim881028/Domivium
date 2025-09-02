@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Domivium.Client.Contents.Commands;
 using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Provider;
-using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Store;
 using MessagePipe;
 using ObservableCollections;
@@ -83,7 +83,7 @@ namespace Domivium.Client.Contents.Services
         public bool Hide()
         {
             ResetReadModel();
-            return _director.TrySetMode(StageModes.Idle);
+            return _director.TrySetMode(StageModes.Battle);
         }
 
         public bool Update(Vector2 position)
@@ -102,19 +102,17 @@ namespace Domivium.Client.Contents.Services
         public bool Placement(Vector2 position)
         {
             Update(position);
-
-            foreach (var (_, canPlace) in _tower)
+            if (_tower.All(x => x.Value))
             {
-                if (!canPlace) return false;
+                _stagedTower.Clear();
+                foreach (var (cell, _) in _tower)
+                {
+                    _stagedTower.Add(cell);
+                }
+
+                _store.Occupy(_stagedTower);
             }
 
-            _stagedTower.Clear();
-            foreach (var (cell, _) in _tower)
-            {
-                _stagedTower.Add(cell);
-            }
-
-            _store.Occupy(_stagedTower);
             Hide();
             return true;
         }

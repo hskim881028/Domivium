@@ -19,7 +19,8 @@ namespace Domivium.Client.Contents.UI.Static
             for (var i = 0; i < _towerItems.Count; i++)
             {
                 var index = i;
-                _towerItems[i].Button.onClick.AddListener(() => Message.SelectTower(index));
+                _towerItems[i].PointerDown = () => Message.SelectTower(index);
+                _towerItems[i].PointerUp = () => Message.Cancel();
             }
 
             await base.InitializeAsync(token);

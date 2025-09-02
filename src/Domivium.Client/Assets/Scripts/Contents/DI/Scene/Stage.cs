@@ -20,6 +20,7 @@ namespace Domivium.Client.Contents.DI.Scene
         private static void Input(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<TowerPlacementInputConsumer>(lifetime);
+            builder.Register<BattleInputConsumer>(lifetime);
             builder.Register<IInputComposition, StageInputComposition>(lifetime);
         }
     }

@@ -22,7 +22,8 @@ namespace Domivium.Client.Core.Message
 
         public static InputMessage Submit => new(InputMessageType.Submit);
         public static InputMessage Cancel => new(InputMessageType.Cancel);
-        public static InputMessage Click(Vector2 value) => new(InputMessageType.Click, value);
+        public static InputMessage ClickEnter(Vector2 value) => new(InputMessageType.ClickEnter, value);
+        public static InputMessage ClickExit(Vector2 value) => new(InputMessageType.ClickExit, value);
         public static InputMessage Point(Vector2 value) => new(InputMessageType.Point, value);
     }
 }

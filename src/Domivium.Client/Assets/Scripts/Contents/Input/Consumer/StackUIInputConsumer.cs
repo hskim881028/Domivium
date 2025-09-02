@@ -3,7 +3,6 @@ using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.UI.Navigation;
-using Domivium.Client.Core.Utility;
 
 namespace Domivium.Client.Contents.Input.Consumer
 {
@@ -27,7 +26,8 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.Submit:
                 case InputMessageType.Cancel:
                     return _uiNavigation.HasOpenStackUI;
-                case InputMessageType.Click:
+                case InputMessageType.ClickEnter:
+                case InputMessageType.ClickExit:
                     return _inputEventSystem.IsPointerOverUI(message.Value);
                 case InputMessageType.Point:
                     return false;

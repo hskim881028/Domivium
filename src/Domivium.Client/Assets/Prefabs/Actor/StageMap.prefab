@@ -63,7 +63,8 @@ MonoBehaviour:
   _background: {fileID: 4793454625162403826}
   _grid: {fileID: 6465926416529136712}
   _preview: {fileID: 8076945431501588051}
-  _base: {fileID: 11400000, guid: c984e222d1eedbc4ba41d0b92b9c834d, type: 2}
+  _gridBase: {fileID: 11400000, guid: c984e222d1eedbc4ba41d0b92b9c834d, type: 2}
+  _towerBase: {fileID: 11400000, guid: 9a738961a1882a043b00cca7af181191, type: 2}
 --- !u!1 &1052736793272824103
 GameObject:
   m_ObjectHideFlags: 0
@@ -1940,7 +1941,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: 55f015532b8913240a3d2f80d82d165b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
