@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
 using Domivium.Client.Core.UI;
@@ -46,12 +47,11 @@ namespace Domivium.Client.Core.Actors
             _disposable.Dispose();
         }
 
-        public async UniTask SpawnAsync(ActorId id)
+        public async UniTask<IActorPresenter> SpawnAsync(ActorId id, ActorParam param)
         {
             if (TryGet(id, out var scope))
             {
-                await scope.SpawnAsync();
-                return;
+                return await scope.SpawnAsync(param);
             }
 
             var (presenterType, viewType) = _container[id];
@@ -69,7 +69,8 @@ namespace Domivium.Client.Core.Actors
 
             var presenter = (IActorPresenter)child.Container.Resolve(presenterType);
             child.Initialize(id, presenter, Despawn);
-            await child.SpawnAsync();
+            await child.SpawnAsync(param);
+            return presenter;
         }
 
         private void OnSceneMessage(SceneMessage message)

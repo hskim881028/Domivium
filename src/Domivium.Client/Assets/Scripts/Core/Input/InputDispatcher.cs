@@ -8,13 +8,13 @@ using UnityEngine.InputSystem;
 
 namespace Domivium.Client.Core.Input
 {
-    public sealed class InputPublisher
+    public sealed class InputDispatcher
     {
         private readonly InputEventSystem _inputEventSystem;
         private readonly IPublisher<InputMessage> _publisher;
         private Vector2 _pointer;
 
-        public InputPublisher(InputEventSystem inputEventSystem, IPublisher<InputMessage> publisher)
+        public InputDispatcher(InputEventSystem inputEventSystem, IPublisher<InputMessage> publisher)
         {
             _inputEventSystem = inputEventSystem;
             _publisher = publisher;

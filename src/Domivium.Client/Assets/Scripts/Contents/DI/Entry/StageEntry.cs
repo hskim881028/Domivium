@@ -1,26 +1,34 @@
-﻿using System.Threading;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.Actors.StageMap;
+using Domivium.Client.Contents.Commands;
+using Domivium.Client.Contents.Context;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Context;
+using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Input;
-using Domivium.Client.Core.Message;
-using Domivium.Client.Core.Utility;
+using Domivium.Client.Core.Provider;
 using Domivium.Client.Data.Config;
-using MessagePipe;
 
 namespace Domivium.Client.Contents.DI.Entry
 {
     public class StageEntry : Entry
     {
+        private readonly StageMapProvider _stageMapProvider;
+        private readonly IStageDirector _stageDirector;
         private readonly IActorSpawner _actorSpawner;
-        private readonly CancellationTokenSource _cts = new();
+        private readonly ITowerPlacementCommand _towerPlacementCommand;
 
         public StageEntry(
-            IActorSpawner actorSpawner,
             IInputComposition inputComposition,
-            ISubscriber<InputMessage> subscriber)
+            IStageDirector stageDirector,
+            IActorSpawner actorSpawner,
+            ITowerPlacementCommand towerPlacementCommand)
         {
+            _stageDirector = stageDirector;
             _actorSpawner = actorSpawner;
+            _towerPlacementCommand = towerPlacementCommand;
         }
 
         protected override void OnStart()
@@ -31,42 +39,17 @@ namespace Domivium.Client.Contents.DI.Entry
             }).Forget();
         }
 
-        protected override void OnDispose()
+        private async UniTaskVoid RunAsync(StageConfig cfg)
         {
-            base.OnDispose();
-            _cts.Cancel();
-            _cts.Dispose();
-        }
+            var cells = _towerPlacementCommand.Initialize(cfg.StageId); //data 만들기
+            var presenter = await _actorSpawner.SpawnAsync(ActorIds.Map, new StageMapParam(cells));
+            if (presenter is StageMapPresenter stageMapPresenter)
+            {
+                _towerPlacementCommand.SetGrid(stageMapPresenter.Actor.Background);
+            }
 
-        private async UniTask RunAsync(StageConfig cfg)
-        {
-            this.Log($"StageId: {cfg.StageId}");
-            await _actorSpawner.SpawnAsync(ActorIds.Map);
-            // todo: 유저 로드
-            // 
-            // stage map presenter, stage map actor
-
-            // await _map.LoadAsync(cfg.StageId, ct);               // 맵/타일/네브/배경 등 준비
-            // await _playerSpawner.SpawnAsync(cfg.PlayerSpawnCell, ct);
-            // _pub.Publish(new StageEvents.StageStarted(cfg.StageId));
-            // await _waves.RunWavesAsync(cfg, ct);                  // 웨이브 진행
-            // _pub.Publish(new StageEvents.StageCleared(cfg.StageId));
-        }
-
-        private void Pause()
-        {
-            //todo: message pipe 연결
-        }
-
-        private void Resume()
-        {
-            //todo: message pipe 연결
-        }
-
-        private UniTask StopAsync()
-        {
-            _cts.Cancel();
-            return UniTask.CompletedTask;
+            _stageDirector.TrySetMode(StageMode.Idle);
+            _stageDirector.TrySetPhase(StagePhases.PreparingWave);
         }
     }
 }

@@ -1,7 +1,9 @@
 {
   "name": "Domivium.Client.Data",
   "rootNamespace": "Domivium.Client",
-  "references": [],
+  "references": [
+    "GUID:9de7868e27ef4f74a90a7c9c4a4b6337"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

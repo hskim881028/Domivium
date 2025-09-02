@@ -52,3 +52,4 @@ MonoBehaviour:
   _globalActorContainer: {fileID: 11400000, guid: aae910f9e923de84995cb63c03068007, type: 2}
   _uiContainer: {fileID: 11400000, guid: 02755ed9a2990804c9c9095c0153f71e, type: 2}
   _stageActorContainer: {fileID: 11400000, guid: a39183a11068bca469e0a18824133f5a, type: 2}
+  _stageMapContainer: {fileID: 11400000, guid: 0f0e72bf89f969c43902648a4ed62923, type: 2}

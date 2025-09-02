@@ -8,7 +8,7 @@ namespace Domivium.Client.Contents.Actors.Generated
     {
         public static readonly Dictionary<ActorId, (Type presenter, Type view)> Actor = new()
         {
-            { ActorIds.Map, (typeof(StageMapPresenter), typeof(StageMap)) }
+            { ActorIds.Map, (typeof(StageMap.StageMapPresenter), typeof(StageMap.StageMap)) }
         };
     }
 }

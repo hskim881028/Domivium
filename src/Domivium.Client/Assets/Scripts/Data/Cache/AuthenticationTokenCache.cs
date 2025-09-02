@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using Domivium.Client.Data.SecureStore;
-using UnityEngine;
 
 namespace Domivium.Client.Data.Cache
 {

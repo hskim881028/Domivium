@@ -3,7 +3,6 @@ using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.UI.Navigation;
-using Domivium.Client.Core.Utility;
 
 namespace Domivium.Client.Contents.Input.Consumer
 {
@@ -12,13 +11,13 @@ namespace Domivium.Client.Contents.Input.Consumer
         private readonly InputEventSystem _inputEventSystem;
         private readonly IUINavigation _uiNavigation;
 
+        public InputPriority Priority => InputPriorities.StackUI;
+
         public SystemUIInputConsumer(InputEventSystem inputEventSystem, IUINavigation uiNavigation)
         {
             _inputEventSystem = inputEventSystem;
             _uiNavigation = uiNavigation;
         }
-
-        public InputPriority Priority => InputPriorities.StackUI;
 
         public bool TryHandle(InputMessage message)
         {
@@ -26,7 +25,6 @@ namespace Domivium.Client.Contents.Input.Consumer
             {
                 case InputMessageType.Submit:
                 case InputMessageType.Cancel:
-                    this.Log();
                     return _uiNavigation.HasOpenSystemUI;
                 case InputMessageType.Click:
                     return _inputEventSystem.IsPointerOverUI(message.Value);

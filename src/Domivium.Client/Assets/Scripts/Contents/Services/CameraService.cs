@@ -1,9 +1,10 @@
-﻿using Domivium.Client.Core.Actors;
+﻿using Domivium.Client.Contents.ReadModels;
+using Domivium.Client.Core.Actors;
 using UnityEngine;
 
 namespace Domivium.Client.Contents.Services
 {
-    public sealed class CameraService
+    public sealed class CameraService : ICameraReadModel
     {
         private readonly CameraRig _cameraRig;
 

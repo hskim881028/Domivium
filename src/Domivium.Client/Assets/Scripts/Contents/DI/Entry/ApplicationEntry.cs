@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Controller;
-using Domivium.Client.Contents.Input;
+using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI;
 using Domivium.Client.Core;
@@ -9,6 +8,7 @@ using Domivium.Client.Core.Message;
 using Domivium.Client.Core.UI.Navigation;
 using MessagePipe;
 using R3;
+using UnityEngine;
 
 namespace Domivium.Client.Contents.DI.Entry
 {
@@ -18,12 +18,11 @@ namespace Domivium.Client.Contents.DI.Entry
         private readonly IUINavigation _uiNavigation;
 
         public ApplicationEntry(
-            CameraService cameraService,
-            InputPublisher inputPublisher,
             NetworkService networkService,
             SceneService sceneService,
+            InputDispatcher inputDispatcher,
+            ICameraReadModel cameraRead,
             IUINavigation uiNavigation,
-            IPlayerController playerController,
             IInputComposition inputComposition,
             ISubscriber<SceneUIReadyMessage> sceneUIReadySubscriber)
         {
@@ -39,6 +38,7 @@ namespace Domivium.Client.Contents.DI.Entry
 
         protected override void OnStart()
         {
+            Application.targetFrameRate = 60;
             _sceneService.Load(SceneScopeIds.Title);
         }
 

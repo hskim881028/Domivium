@@ -27,11 +27,12 @@ namespace Domivium.Client.Core.Scene
             _presenter.Initialize(transform, Despawn);
         }
 
-        public async UniTask SpawnAsync()
+        public async UniTask<IActorPresenter> SpawnAsync(ActorParam param)
         {
             _isDespawn = false;
             gameObject.SetActive(true);
-            await _presenter.ShowAsync(_cts.Token, ActorParam.Empty);
+            await _presenter.ShowAsync(_cts.Token, param);
+            return _presenter;
         }
 
         private void Despawn()

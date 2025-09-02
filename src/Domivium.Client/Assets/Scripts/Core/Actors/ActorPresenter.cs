@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors.Contract;
+using R3;
 using UnityEngine;
 
 namespace Domivium.Client.Core.Actors
@@ -9,8 +10,11 @@ namespace Domivium.Client.Core.Actors
     public abstract class ActorPresenter<TActor> : IActorPresenter where TActor : Actor
     {
         private Action _onDespawn;
+        private bool _isDisposed;
 
-        protected readonly TActor Actor;
+        protected DisposableBag Disposable;
+        protected abstract void OnDispose();
+        public TActor Actor { get; }
 
         protected ActorPresenter(TActor actor)
         {
@@ -32,6 +36,15 @@ namespace Domivium.Client.Core.Actors
         {
             await Actor.HideAsync(token, immediately);
             _onDespawn?.Invoke();
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed) return;
+
+            OnDispose();
+            _isDisposed = true;
+            Disposable.Dispose();
         }
     }
 }

@@ -22,7 +22,6 @@ namespace Domivium.Client.Network.ClientFilters
 
         public AuthenticationClientFilter(AuthenticationTokenCache tokenCache)
         {
-            this.Log();
             _tokenCache = tokenCache;
         }
 

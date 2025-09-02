@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using Domivium.Client.Contents.Commands;
 using Domivium.Client.Contents.DI;
+using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.Navigation;
@@ -10,20 +12,36 @@ namespace Domivium.Client.Contents.UI.Static
     public class StageStaticUIPresenter : StaticUIPresenter<StageStaticUIView, IStageStaticUIMessage>, IStageStaticUIMessage
     {
         private readonly SceneService _sceneService;
+        private readonly ITowerPlacementCommand _towerPlacementCommand;
+        private readonly IPointerReadModel _pointerRead;
+        private readonly ICameraReadModel _cameraReadModel;
+
         protected override HashSet<UILayer> Layer => UILayer.Set(UILayers.Stage);
+
         public override UIPriority Priority => UIPriorities.Stage;
 
         public StageStaticUIPresenter(
             StageStaticUIView view,
             IUINavigation navigation,
-            SceneService sceneService) : base(view, navigation)
+            SceneService sceneService,
+            ITowerPlacementCommand towerPlacementCommand,
+            IPointerReadModel pointerRead)
+            : base(view, navigation)
         {
             _sceneService = sceneService;
+            _towerPlacementCommand = towerPlacementCommand;
+            _pointerRead = pointerRead;
         }
 
         public void EnterLobby()
         {
             _sceneService.Load(SceneScopeIds.Lobby);
+        }
+
+        public void SelectTower(int index)
+        {
+            _towerPlacementCommand.Show(index);
+            _towerPlacementCommand.Update(_pointerRead.Current);
         }
     }
 }
