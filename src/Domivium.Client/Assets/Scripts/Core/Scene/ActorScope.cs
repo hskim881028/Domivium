@@ -3,7 +3,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
-using Domivium.Client.Core.Utility;
 using VContainer.Unity;
 
 namespace Domivium.Client.Core.Scene
@@ -19,12 +18,10 @@ namespace Domivium.Client.Core.Scene
 
         public void Initialize(ActorId id, IActorPresenter presenter, Action<ActorScope> onDespawn)
         {
-            gameObject.layer = Layer.Actor;
             ActorId = id;
             _presenter = presenter;
-            _onDespawn = onDespawn;
-
             _presenter.Initialize(transform, Despawn);
+            _onDespawn = onDespawn;
         }
 
         public async UniTask<IActorPresenter> SpawnAsync(ActorParam param)

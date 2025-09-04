@@ -20,6 +20,7 @@ namespace Domivium.Client.Contents.DI.Entry
         public ApplicationEntry(
             NetworkService networkService,
             SceneService sceneService,
+            EnvironmentService environmentService,
             InputDispatcher inputDispatcher,
             ICameraReadModel cameraRead,
             IUINavigation uiNavigation,

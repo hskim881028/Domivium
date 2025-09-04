@@ -1,7 +1,13 @@
-﻿namespace Domivium.Client.Contents.Commands
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
+
+namespace Domivium.Client.Contents.Commands
 {
     public interface IBattleCommand
     {
-        
+        public UniTask InitializeAsync(int stageId);
+        public bool PickCharacter(Vector2 position);
+        public bool UpdateMoveTarget(Vector2 position);
+        public bool SelectCharacter(Vector2 position);
     }
 }

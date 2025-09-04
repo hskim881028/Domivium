@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -6,7 +6,7 @@ namespace Domivium.Client.Contents.Commands
 {
     public interface ITowerPlacementCommand
     {
-        public IReadOnlyCollection<Vector3Int> Initialize(int stageId);
+        public UniTask InitializeAsync(int stageId);
         public void SetGrid(Tilemap tilemap);
         public void Show(int index);
         public bool Hide();

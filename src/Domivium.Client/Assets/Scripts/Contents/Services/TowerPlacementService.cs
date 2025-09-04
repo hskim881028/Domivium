@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Actors;
+using Domivium.Client.Contents.Actors.Contract;
+using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Commands;
 using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.ReadModels;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Provider;
+using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Store;
 using MessagePipe;
 using ObservableCollections;
@@ -19,37 +25,39 @@ namespace Domivium.Client.Contents.Services
 {
     public sealed class TowerPlacementService : ITowerPlacementReadModel, ITowerPlacementCommand, IDisposable
     {
+        private readonly StageMapProvider _stageMapProvider;
         private readonly IStageDirector _director;
+        private readonly IActorSpawner _actorSpawner;
         private readonly IStageMapStore _store;
         private readonly ICameraReadModel _cameraRead;
-        private readonly StageMapProvider _stageMapProvider;
         private readonly ObservableList<Vector3Int> _stagedTower = new();
-        private readonly ObservableDictionary<Vector3Int, bool> _tower = new();
+        private readonly ObservableDictionary<Vector3Int, bool> _previewTower = new();
 
-        private Plane _groundPlane = new(Vector3.up, Vector3.zero);
         private Tilemap _grid;
         private DisposableBag _disposable;
         private bool _isDisposed;
 
         public IReadOnlyObservableList<Vector3Int> StagedTower => _stagedTower;
 
-        public IReadOnlyObservableDictionary<Vector3Int, bool> PreviewTower => _tower;
+        public IReadOnlyObservableDictionary<Vector3Int, bool> PreviewPreviewTower => _previewTower;
 
         public TowerPlacementService(
             StageMapProvider stageMapProvider,
             IStageDirector director,
+            IActorSpawner actorSpawner,
             IStageMapStore store,
             ICameraReadModel cameraRead,
             ISubscriber<SceneMessage> subscriber)
         {
             _stageMapProvider = stageMapProvider;
             _director = director;
+            _actorSpawner = actorSpawner;
             _store = store;
             _cameraRead = cameraRead;
             subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
         }
 
-        public IReadOnlyCollection<Vector3Int> Initialize(int stageId)
+        public async UniTask InitializeAsync(int stageId)
         {
             var tilemap = _stageMapProvider.Get(stageId);
             var cells = new HashSet<Vector3Int>();
@@ -59,13 +67,14 @@ namespace Domivium.Client.Contents.Services
             }
 
             _store.Initialize(tilemap.cellBounds);
-            return cells;
+            var presenter = await _actorSpawner.SpawnAsync(ActorIds.Map, new StageMapParams(cells));
+            if (presenter is StageMapPresenter stageMapPresenter)
+            {
+                _grid = stageMapPresenter.Grid;
+            }
         }
 
-        public void SetGrid(Tilemap tilemap)
-        {
-            _grid = tilemap;
-        }
+        public void SetGrid(Tilemap tilemap) => _grid = tilemap;
 
         public void Show(int index)
         {
@@ -76,7 +85,7 @@ namespace Domivium.Client.Contents.Services
                 _ => new Vector2Int(1, 1)
             };
 
-            _store.Select(size);
+            _store.SetSize(size);
             _director.TrySetMode(StageModes.TowerPlacement);
         }
 
@@ -88,29 +97,29 @@ namespace Domivium.Client.Contents.Services
 
         public bool Update(Vector2 position)
         {
-            var ray = _cameraRead.MainCamera.ScreenPointToRay(position);
-            if (!_groundPlane.Raycast(ray, out var hit)) return true;
+            _previewTower.Clear();
+            if (CoordinateUtils.TryScreenToCell(_cameraRead.MainCamera, _grid, position, out var cell))
+            {
+                _store.GetTower(cell, _previewTower);
+            }
 
-            var worldPosition = ray.GetPoint(hit);
-            var pivot = _grid.WorldToCell(worldPosition);
-            pivot.z = 0;
-            _tower.Clear();
-            _store.GetTower(pivot, _tower);
             return true;
         }
 
         public bool Placement(Vector2 position)
         {
             Update(position);
-            if (_tower.All(x => x.Value))
+
+            if (_previewTower.All(x => x.Value))
             {
                 _stagedTower.Clear();
-                foreach (var (cell, _) in _tower)
+                foreach (var (cell, _) in _previewTower)
                 {
                     _stagedTower.Add(cell);
                 }
 
                 _store.Occupy(_stagedTower);
+                _actorSpawner.SpawnAsync(ActorIds.Tower, new TowerParams(_stagedTower.First())).Forget();
             }
 
             Hide();
@@ -128,7 +137,7 @@ namespace Domivium.Client.Contents.Services
         private void ResetReadModel()
         {
             _stagedTower.Clear();
-            _tower.Clear();
+            _previewTower.Clear();
         }
 
         private void OnSceneMessage(SceneMessage message)

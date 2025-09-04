@@ -4,25 +4,16 @@ using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace Domivium.Client.Contents.Actors
 {
-    public class Character : Actor
+    public class Tower : Actor
     {
-        [SerializeField] private NavMeshAgent _agent;
-
         public override UniTask ShowAsync(CancellationToken token, ActorParam param, bool immediately = false)
         {
-            var p = param.As<CharacterParams>();
+            var p = param.As<TowerParams>();
+            transform.localPosition = new Vector3(p.StartCell.x + 0.5f, 0, p.StartCell.y);
             return base.ShowAsync(token, param, immediately);
-        }
-
-        public void SetTargetPosition(Vector3 position)
-        {
-            _agent.updateUpAxis = false;
-            _agent.updateRotation = false;
-            _agent.SetDestination(position);
         }
     }
 }

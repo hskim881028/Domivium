@@ -36,7 +36,7 @@ namespace Domivium.Client.Editor
         public static void ShowWindow()
         {
             Refresh();
-            EditorSceneManager.OpenScene(EditorConfig.Workspace);
+            EditorSceneManager.OpenScene(EditorConfig.WorkspaceScene);
             GetWindow<UIEditorWindow>("UI Editor");
         }
 

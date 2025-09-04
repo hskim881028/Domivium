@@ -10,9 +10,12 @@ Fill in the sections below with as much detail as possible. Use bullet points fo
 - DB는 PostgreSQL 사용
 - 서버는 MagicOnion패키지를 활용해서 구성
 - 클라이언트는 VContainer패키지를 활용해서 구조 구성
-- 게임 전투 컨텐츠는 Unreal Engine에 있는 Gameplay Ability System와 동일하게 구성.
 - UI는 MVP 구조에 VM을 섞어서 구성.
-- 게임은 x,z축으로 tilemap으로 바닥을 구성하고. 캐릭터와 prop은 Plane mesh로 구성.
+- 전투 스테이지는 x,z축으로 tilemap으로 바닥을 구성
+- 전투 스테이지에 나오는 GameObject는 Monobehaviour를 상속받은 Actor를 상속 받는다.
+- character, monster는 unit을 상속.
+- character, monster는 x,y축 사용한 Plane mesh로 구성. 
+- 게임 전투는 Unreal Engine에 있는 Gameplay Ability System와 동일하게 구성.
 
 ## 2. Goals (What success looks like)
 - G1: 객체 지향 설계의 5원칙 지켜줘. (Single Responsibility Principle, Open Closed Priciple, Listov Substitution Priciple, Interface Segregation Principle, Dependency Inversion Principle)
@@ -50,34 +53,8 @@ Hard constraints, quality attributes, and cross-cutting concerns.
 - 사용자는 UI Manager를 활용해서 UI 사용
 - 유니티 NewInputsystem 사용
 
-## 8. Build, Deployment & Operations
-<!-- - Build targets, pipelines, and CI/CD: … -->
-<!-- - Environments (dev/stage/prod): … -->
-<!-- - Configuration & secrets management: … -->
-<!-- - Telemetry/Logging/Monitoring: … -->
 
-## 9. Testing & Quality
-- Required test types (unit/integration/play-mode/edit-mode): 에디터 관련코드는 빌드실패를 유발하니까 항상 에디터 관련코드는 예외처리가 되어있는지 체크
-<!-- - Coverage expectations: … -->
-<!-- - Manual QA checklists: … -->
-
-## 10. Risks & Assumptions
-<!-- - Key risks and how to mitigate them: … -->
-<!-- - Assumptions that may affect scope or estimates: … -->
-
-## 11. Milestones & Priorities
-<!-- - M1 (date): … [Must-have] -->
-<!-- - M2 (date): … [Should-have] -->
-<!-- - M3 (date): … [Nice-to-have] -->
-
-## 12. Acceptance Criteria
-<!-- - AC1: … -->
-<!-- - AC2: … -->
-
-## 13. Glossary
-- Domivium → Project name
-
-## 14. References
+## 8. References
 - https://dev.epicgames.com/documentation/en-us/unreal-engine/gameplay-ability-system-for-unreal-engine?application_version=5.6
 - https://github.com/GlitchEnzo/NuGetForUnity
 - https://github.com/hadashiA/VContainer

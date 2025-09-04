@@ -14,7 +14,7 @@ namespace Domivium.Client.Core.Actors
 
         protected DisposableBag Disposable;
         protected abstract void OnDispose();
-        public TActor Actor { get; }
+        protected TActor Actor { get; }
 
         protected ActorPresenter(TActor actor)
         {

@@ -4,10 +4,11 @@ using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
+using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace Domivium.Client.Contents.Actors.StageMap
+namespace Domivium.Client.Contents.Actors
 {
     public class StageMap : Actor
     {
@@ -16,6 +17,7 @@ namespace Domivium.Client.Contents.Actors.StageMap
         [SerializeField] private Tilemap _preview;
         [SerializeField] private TileBase _gridBase;
         [SerializeField] private TileBase _towerBase;
+        [SerializeField] private NavMeshSurface _navMeshSurface;
 
         private readonly HashSet<Vector3Int> _tower = new();
 
@@ -32,6 +34,7 @@ namespace Domivium.Client.Contents.Actors.StageMap
                 _preview.SetColor(cell, Color.clear);
             }
 
+            _navMeshSurface.BuildNavMesh();
             return base.ShowAsync(token, param, immediately);
         }
 

@@ -8,12 +8,15 @@ using Domivium.Client.Core.Context;
 using ObservableCollections;
 using R3;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-namespace Domivium.Client.Contents.Actors.StageMap
+namespace Domivium.Client.Contents.Actors
 {
     public sealed class StageMapPresenter : ActorPresenter<StageMap>
     {
         private readonly ITowerPlacementReadModel _read;
+
+        public Tilemap Grid => Actor.Background;
 
         public StageMapPresenter(
             StageMap actor,
@@ -25,13 +28,13 @@ namespace Domivium.Client.Contents.Actors.StageMap
 
             _read = read;
             _read.StagedTower.CollectionChanged += OnChangedStagedTower;
-            _read.PreviewTower.CollectionChanged += OnChangedPreviewTower;
+            _read.PreviewPreviewTower.CollectionChanged += OnChangedPreviewPreviewTower;
         }
 
         protected override void OnDispose()
         {
             _read.StagedTower.CollectionChanged -= OnChangedStagedTower;
-            _read.PreviewTower.CollectionChanged -= OnChangedPreviewTower;
+            _read.PreviewPreviewTower.CollectionChanged -= OnChangedPreviewPreviewTower;
         }
 
         private void OnChangeMode(StageMode mode)
@@ -60,7 +63,7 @@ namespace Domivium.Client.Contents.Actors.StageMap
             }
         }
 
-        private void OnChangedPreviewTower(in NotifyCollectionChangedEventArgs<KeyValuePair<Vector3Int, bool>> e)
+        private void OnChangedPreviewPreviewTower(in NotifyCollectionChangedEventArgs<KeyValuePair<Vector3Int, bool>> e)
         {
             switch (e.Action)
             {

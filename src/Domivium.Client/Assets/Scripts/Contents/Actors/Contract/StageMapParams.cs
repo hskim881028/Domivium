@@ -5,5 +5,8 @@ using UnityEngine;
 namespace Domivium.Client.Contents.Actors.Contract
 {
     public record StageMapParams(IReadOnlyCollection<Vector3Int> Cells) : ActorParam;
-    public record CharacterParams(Vector3Int StartCell) : ActorParam;
+
+    public record CharacterParams : ActorParam;
+
+    public record TowerParams(Vector3Int StartCell) : ActorParam;
 }
