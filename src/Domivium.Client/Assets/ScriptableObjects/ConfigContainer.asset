@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Domivium.Client.DI::Domivium.Client.DI.ConfigContainer
   _localMode: 1
   _serverUrl: http://localhost:5000
+  _masterDB: {fileID: 4900000, guid: 8e29ef66472fab940b8867c06b52834f, type: 3}

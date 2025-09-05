@@ -3,7 +3,7 @@ using UnityEditor.SceneManagement;
 
 namespace Domivium.Client.Editor
 {
-    public class SceneEditor
+    public static class SceneEditor
     {
         [MenuItem("Scenes/Application")]
         public static void ApplicationScene()

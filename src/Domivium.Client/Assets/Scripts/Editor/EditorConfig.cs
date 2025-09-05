@@ -12,12 +12,17 @@ namespace Domivium.Client.Editor
         private const string CoreUISuffix = ".Core.UI";
         private const string ContentsUISuffix = ".Contents.UI";
         private const string UI = "UI";
+        private const string Csv = "Csv";
+        private const string Row = "Row";
 
         // File extensions
+        public const string CSVExtension = ".csv";
         public const string CSharpExtension = ".cs";
         public const string PrefabExtension = ".prefab";
 
         // Folder names
+        private const string DataFolderName = "Data";
+
         private const string ScriptsFolderName = "Scripts";
         private const string PrefabsFolderName = "Prefabs";
         private const string ContentsFolderName = "Contents";
@@ -26,6 +31,7 @@ namespace Domivium.Client.Editor
         private const string GeneratedFolderName = "Generated";
 
         //Keys
+        public const string MasterDBSessionKey = "MASTER_DB_EDITOR_SESSION";
         public const string TypeSessionKey = "UI_EDITOR_SESSION_TYPE";
         public const string NameSessionKey = "UI_EDITOR_SESSION_NAME";
         public const string TypePrefsKey = "UI_EDITOR_PREFS_UI_TYPE";
@@ -38,6 +44,7 @@ namespace Domivium.Client.Editor
         public const string ApplicationScene = "Assets/Scenes/Application.unity";
         public const string WorkspaceScene = "Assets/Scenes/Workspace.unity";
         public const string UIContainer = "Assets/ScriptableObjects/UIContainer.asset";
+        public const string ConfigContainer = "Assets/ScriptableObjects/ConfigContainer.asset";
 
         public const string UIId = "UIId";
 
@@ -47,7 +54,12 @@ namespace Domivium.Client.Editor
 
         private static string RootPath => Application.dataPath;
 
-        public static string PrefabRootPath => Path.Combine(RootPath, PrefabsFolderName, UI);
+        public static string UIPrefabRootPath => Path.Combine(RootPath, PrefabsFolderName, UI);
+
+        public static string MasterDBPath => Path.Combine(RootPath, DataFolderName, "MasterDB.bytes");
+        public static string CsvRootPath => Path.Combine(RootPath, DataFolderName, Csv);
+        public static string RowDataRootPath => Path.Combine(RootPath, ScriptsFolderName, DataFolderName, Row);
+        public static string RowDataNamespace => "Domivium.Client.Data.Row";
 
         private static string Contents => Core.Replace(CoreUISuffix, ContentsUISuffix);
 
