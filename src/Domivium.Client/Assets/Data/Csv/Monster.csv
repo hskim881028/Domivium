@@ -1,0 +1,6 @@
+Id,Job,Health,Attack,Defense,AttackRange,Speed
+int,string,int,int,int,int,int
+1,Melee,200,20,10,2,2
+2,Ranged,100,30,5,1,3
+3,Healer,150,5,5,2,2
+4,Tanker,300,10,15,1,1

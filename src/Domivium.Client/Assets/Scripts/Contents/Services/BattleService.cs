@@ -38,12 +38,25 @@ namespace Domivium.Client.Contents.Services
             IStageDirector director,
             IActorSpawner actorSpawner,
             ICameraReadModel cameraRead,
+            MasterDbService masterDbService,
             ISubscriber<SceneMessage> subscriber)
         {
             _director = director;
             _actorSpawner = actorSpawner;
             _cameraRead = cameraRead;
             subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
+
+            var characterRow = masterDbService.DB.CharacterRowTable.FindById(1);
+            this.Log($"{characterRow.Id} / {characterRow.Attack} / {characterRow.AttackRange} /" +
+                     $" {characterRow.Health} / {characterRow.Defense} / {characterRow.Job} / {characterRow.Speed}");
+
+            var monster = masterDbService.DB.MonsterRowTable.FindById(1);
+            this.Log($"{monster.Id} / {monster.Attack} / {monster.AttackRange} /" +
+                     $" {monster.Health} / {monster.Defense} / {monster.Job} / {monster.Speed}");
+
+            var tw = masterDbService.DB.TowerRowTable.FindById(1);
+            this.Log($"{tw.Id} / {tw.Attack} / {tw.AttackRange} /" +
+                     $" {tw.Health} / {tw.Defense} / {tw.Job}");
         }
 
         public async UniTask InitializeAsync(int stageId)

@@ -15,17 +15,11 @@ using Object = UnityEngine.Object;
 
 namespace Domivium.Client.Editor
 {
-    public class UIEditorWindow : EditorWindow
+    public class UIEditorWindow : EditorWindowBase
     {
         private static UIType _uiType;
         private static Object _uiContainer;
         private static string _uiName = string.Empty;
-
-        private GUIStyle _buttonStyle;
-        private Texture2D _normalTex;
-        private Texture2D _hoverTex;
-        private Texture2D _activeTex;
-        private bool _stylesInitialized;
 
         static UIEditorWindow()
         {
@@ -40,35 +34,25 @@ namespace Domivium.Client.Editor
             GetWindow<UIEditorWindow>("UI Editor");
         }
 
-        private void OnEnable()
+        protected override void OnEnableInternal()
         {
             _uiType = (UIType)SessionState.GetInt(EditorConfig.TypeSessionKey, (int)_uiType);
             _uiName = SessionState.GetString(EditorConfig.NameSessionKey, _uiName);
 
             Refresh();
-            SetStyles();
         }
 
-        private void OnDisable()
+        protected override void OnDisableInternal()
         {
             SessionState.SetInt(EditorConfig.TypeSessionKey, (int)_uiType);
             SessionState.SetString(EditorConfig.NameSessionKey, string.Empty);
             GUI.FocusControl(null);
             EditorGUIUtility.editingTextField = false;
             Repaint();
-
-            if (_normalTex) DestroyImmediate(_normalTex);
-            if (_hoverTex) DestroyImmediate(_hoverTex);
-            if (_activeTex) DestroyImmediate(_activeTex);
-
-            _stylesInitialized = false;
-            _buttonStyle = null;
         }
 
-        private void OnGUI()
+        protected override void OnGUIInternal()
         {
-            SetStyles();
-
             DrawContainerField();
             DrawUITypeSelection();
             DrawUINameField();
@@ -115,34 +99,6 @@ namespace Domivium.Client.Editor
             _uiContainer = AssetDatabase.LoadAssetAtPath<UIContainer>(EditorConfig.UIContainer);
         }
 
-        private void SetStyles()
-        {
-            if (_stylesInitialized) return;
-
-            try
-            {
-                _normalTex = CreateColorTexture(new Color(0.23f, 0.35f, 0.48f));
-                _hoverTex = CreateColorTexture(new Color(0.28f, 0.45f, 0.65f));
-                _activeTex = CreateColorTexture(new Color(0.2f, 0.3f, 0.4f));
-
-                _buttonStyle = new GUIStyle(GUI.skin.button)
-                {
-                    fontSize = 12,
-                    padding = new RectOffset(15, 15, 5, 5),
-                    margin = new RectOffset(5, 5, 5, 5),
-                    normal = { background = _normalTex, textColor = new Color(0.9f, 0.9f, 0.9f) },
-                    hover = { background = _hoverTex, textColor = Color.white },
-                    active = { background = _activeTex, textColor = Color.white }
-                };
-
-                _stylesInitialized = true;
-            }
-            catch (Exception)
-            {
-                _stylesInitialized = false;
-            }
-        }
-
         private static void DrawContainerField()
         {
             _uiContainer = EditorGUILayout.ObjectField("Container", _uiContainer, typeof(UIContainer), false);
@@ -179,12 +135,12 @@ namespace Domivium.Client.Editor
             EditorGUILayout.Space(10);
             using (new EditorGUI.DisabledScope(false))
             {
-                if (GUILayout.Button("Refresh", _buttonStyle))
+                if (GUILayout.Button("Refresh", ButtonStyle))
                 {
                     RefreshSettings();
                 }
 
-                if (GUILayout.Button("Generate", _buttonStyle))
+                if (GUILayout.Button("Generate", ButtonStyle))
                 {
                     GenerateUI();
                 }
@@ -280,7 +236,11 @@ namespace Domivium.Client.Editor
         private static string CreateScriptsFolder(UIType uiType, string uiName)
         {
             var basePath = uiType.ToScriptPath();
-            if (!Directory.Exists(basePath)) Directory.CreateDirectory(basePath);
+            if (!Directory.Exists(basePath))
+            {
+                Directory.CreateDirectory(basePath);
+            }
+
             var folder = Path.Combine(basePath, uiName);
             Directory.CreateDirectory(folder);
 
@@ -690,7 +650,7 @@ namespace Domivium.Client.Editor
                 var container = _uiContainer as UIContainer ?? AssetDatabase.LoadAssetAtPath<UIContainer>(EditorConfig.UIContainer);
                 var collected = new List<UIBehaviour>();
 
-                if (Directory.Exists(EditorConfig.PrefabRootPath))
+                if (Directory.Exists(EditorConfig.UIPrefabRootPath))
                 {
                     var guids = new List<string>();
                     foreach (UIType type in Enum.GetValues(typeof(UIType)))
@@ -719,7 +679,7 @@ namespace Domivium.Client.Editor
                 }
                 else
                 {
-                    Debug.LogWarning($"UI prefabs root not found at: {EditorConfig.PrefabRootPath}");
+                    Debug.LogWarning($"UI prefabs root not found at: {EditorConfig.UIPrefabRootPath}");
                 }
 
                 container.UI.Clear();
@@ -760,17 +720,6 @@ namespace Domivium.Client.Editor
         private static void DisplayDialog(string message, bool isError = false)
         {
             EditorUtility.DisplayDialog(isError ? "Error" : "Success", message, "OK");
-        }
-
-        private Texture2D CreateColorTexture(Color color)
-        {
-            var texture = new Texture2D(1, 1)
-            {
-                hideFlags = HideFlags.HideAndDontSave
-            };
-            texture.SetPixel(0, 0, color);
-            texture.Apply();
-            return texture;
         }
     }
 }

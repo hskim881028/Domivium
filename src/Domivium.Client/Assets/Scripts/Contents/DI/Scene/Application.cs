@@ -46,10 +46,10 @@ namespace Domivium.Client.Contents.DI.Scene
             SecureStore(builder, Lifetime.Singleton);
             Cache(builder, Lifetime.Singleton);
             Network(builder, Lifetime.Singleton);
-            Services(builder, Lifetime.Singleton);
             Input(builder, Lifetime.Singleton);
             Scene(builder, Lifetime.Singleton);
 
+            Services(builder, Lifetime.Singleton);
             Provider(builder, Lifetime.Singleton);
             GlobalActors(builder, Lifetime.Singleton);
             UI(builder, Lifetime.Singleton);
@@ -93,17 +93,6 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<INetworkConnection, NetworkConnection>(lifetime);
         }
 
-        private static void Services(IContainerBuilder builder, Lifetime lifetime)
-        {
-            builder.Register<NetworkService>(lifetime);
-            builder.Register<SceneService>(lifetime);
-            builder.Register<EnvironmentService>(lifetime);
-            builder.Register<CameraService>(lifetime).AsImplementedInterfaces();
-            builder.Register<PointerService>(lifetime).AsImplementedInterfaces();
-            builder.Register<TowerPlacementService>(lifetime).AsImplementedInterfaces();
-            builder.Register<BattleService>(lifetime).AsImplementedInterfaces();
-        }
-
         private static void Input(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<InputDispatcher>(lifetime);
@@ -118,6 +107,18 @@ namespace Domivium.Client.Contents.DI.Scene
         private static void Scene(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<ISceneScopeManager, SceneScopeManager>(lifetime);
+        }
+
+        private void Services(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<MasterDbService>(lifetime).WithParameter(_configContainer.MasterDB);
+            builder.Register<NetworkService>(lifetime);
+            builder.Register<SceneService>(lifetime);
+            builder.Register<EnvironmentService>(lifetime);
+            builder.Register<CameraService>(lifetime).AsImplementedInterfaces();
+            builder.Register<PointerService>(lifetime).AsImplementedInterfaces();
+            builder.Register<TowerPlacementService>(lifetime).AsImplementedInterfaces();
+            builder.Register<BattleService>(lifetime).AsImplementedInterfaces();
         }
 
         private void Provider(IContainerBuilder builder, Lifetime lifetime)
