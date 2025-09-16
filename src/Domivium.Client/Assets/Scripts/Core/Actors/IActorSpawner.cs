@@ -6,6 +6,6 @@ namespace Domivium.Client.Core.Actors
 {
     public interface IActorSpawner : IDisposable
     {
-        public UniTask<IActorPresenter> SpawnAsync(ActorId id, ActorParam param);
+        public UniTask SpawnAsync(ActorId id, ActorParam param);
     }
 }

@@ -13,8 +13,8 @@ namespace Domivium.Client.Core.Actors
             transform.SetParent(parent);
         }
 
-        public virtual UniTask ShowAsync(CancellationToken token, ActorParam param, bool immediately = false) => UniTask.CompletedTask;
+        public virtual UniTask ActivateAsync(CancellationToken token, ActorParam param, bool immediately = false) => UniTask.CompletedTask;
 
-        public virtual UniTask HideAsync(CancellationToken token, bool immediately = false) => UniTask.CompletedTask;
+        public virtual UniTask DeactivateAsync(CancellationToken token, bool immediately = false) => UniTask.CompletedTask;
     }
 }

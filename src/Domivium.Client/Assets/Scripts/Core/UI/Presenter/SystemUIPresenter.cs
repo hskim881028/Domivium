@@ -1,4 +1,5 @@
-﻿using Domivium.Client.Core.UI.Navigation;
+﻿using Domivium.Client.Core.Audio;
+using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.View;
 
 namespace Domivium.Client.Core.UI.Presenter
@@ -9,6 +10,7 @@ namespace Domivium.Client.Core.UI.Presenter
     {
         public abstract UIPriority Priority { get; }
 
-        protected SystemUIPresenter(TView view, IUINavigation navigation) : base(view, navigation) { }
+        protected SystemUIPresenter(TView view, IUINavigation navigation, IAudioController audioController)
+            : base(view, navigation, audioController) { }
     }
 }

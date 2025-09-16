@@ -7,8 +7,6 @@ namespace Domivium.Client.Core.UI
         public const string Static = "Static";
         public const string Stack = "Stack";
         public const string System = "System";
-        public const string UIMapping = "UIMapping";
-        public const string UIIds = "UIIds";
 
         public static string AsActor(this string str) => str.Replace("Presenter", string.Empty);
 

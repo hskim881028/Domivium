@@ -382,27 +382,13 @@ namespace Domivium.Client.Editor
             return result;
         }
 
-        private static int StableId(string name)
-        {
-            unchecked
-            {
-                var h = 2166136261;
-                foreach (var t in name)
-                {
-                    h ^= t;
-                    h *= 16777619;
-                }
-                return (int)(h & 0x3FFFFFFF);
-            }
-        }
-
         private static void GenerateUIIds()
         {
             try
             {
                 var validMap = CollectValidNames();
 
-                var filePath = EditorConfig.GetScriptPath(UIConfig.UIIds);
+                var filePath = EditorConfig.GetGeneratedScriptPath(EditorConfig.UI, EditorConfig.UIIds);
                 var genDir = Path.GetDirectoryName(filePath);
                 if (!string.IsNullOrEmpty(genDir) && !Directory.Exists(genDir))
                 {
@@ -411,9 +397,9 @@ namespace Domivium.Client.Editor
 
                 var sb = new StringBuilder();
                 sb.AppendLine(EditorConfig.StartGenerate);
-                sb.AppendLine(EditorConfig.UsingCore);
+                sb.AppendLine(EditorConfig.UsingUICore);
                 sb.AppendLine();
-                sb.AppendLine(EditorConfig.NamespaceGenerated);
+                sb.AppendLine(EditorConfig.UINamespaceGenerated);
                 sb.AppendLine("{");
 
                 WriteClass(sb, UIType.System, validMap[UIType.System]);
@@ -438,7 +424,7 @@ namespace Domivium.Client.Editor
             }
             catch (Exception ex)
             {
-                Debug.LogError($"❌ UpdateUIIds failed: {ex.Message}\n{ex}");
+                Debug.LogError($"❌ Update UIIds failed: {ex.Message}\n{ex}");
                 throw;
             }
         }
@@ -449,7 +435,7 @@ namespace Domivium.Client.Editor
             {
                 var validMap = CollectValidNames();
 
-                var filePath = EditorConfig.GetScriptPath(UIConfig.UIMapping);
+                var filePath = EditorConfig.GetGeneratedScriptPath(EditorConfig.UI, EditorConfig.UIMapping);
                 var genDir = Path.GetDirectoryName(filePath);
                 if (!string.IsNullOrEmpty(genDir) && !Directory.Exists(genDir))
                 {
@@ -536,13 +522,13 @@ namespace Domivium.Client.Editor
                 sb.AppendLine(EditorConfig.StartGenerate);
                 sb.AppendLine(EditorConfig.UsingSystem);
                 sb.AppendLine(EditorConfig.UsingGeneric);
-                sb.AppendLine(EditorConfig.UsingCore);
+                sb.AppendLine(EditorConfig.UsingUICore);
                 sb.AppendLine();
-                sb.AppendLine(EditorConfig.NamespaceGenerated);
+                sb.AppendLine(EditorConfig.UINamespaceGenerated);
                 sb.AppendLine("{");
-                sb.AppendLine($"\t{EditorConfig.MappingStaticClass}");
+                sb.AppendLine($"\t{EditorConfig.UIMappingClass}");
                 sb.AppendLine("\t{");
-                sb.AppendLine($"\t\t{EditorConfig.MappingDictionary} ");
+                sb.AppendLine($"\t\t{EditorConfig.UIMappingDictionary} ");
                 sb.AppendLine("\t\t{");
 
                 foreach (UIType type in Enum.GetValues(typeof(UIType)))
@@ -602,7 +588,7 @@ namespace Domivium.Client.Editor
             }
             catch (Exception ex)
             {
-                Debug.LogError($"❌ UpdateUIMapping failed: {ex.Message}\n{ex}");
+                Debug.LogError($"❌ Update UIMapping failed: {ex.Message}\n{ex}");
                 throw;
             }
         }
@@ -687,7 +673,7 @@ namespace Domivium.Client.Editor
                 {
                     container.UI.Add(view);
                 }
-
+                
                 EditorUtility.SetDirty(container);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
@@ -701,7 +687,7 @@ namespace Domivium.Client.Editor
 
         private static void WriteClass(StringBuilder sb, UIType type, List<string> names)
         {
-            var className = $"{type}UIId";
+            var className = $"{type}{nameof(UIId)}";
             sb.AppendLine($"\tpublic static class {className}");
             sb.AppendLine("\t{");
 
@@ -709,8 +695,8 @@ namespace Domivium.Client.Editor
             {
                 foreach (var uiName in names.OrderBy(n => n))
                 {
-                    var id = StableId(uiName);
-                    sb.AppendLine($"\t\tpublic static UIId {uiName} = {id};");
+                    var id = EditorUtils.StableId(uiName);
+                    sb.AppendLine($"\t\tpublic static {nameof(UIId)} {uiName} = {id};");
                 }
             }
 

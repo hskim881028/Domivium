@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.View;
 
@@ -9,10 +10,10 @@ namespace Domivium.Client.Core.UI.Presenter
         where TMessage : IUIMessage
     {
         protected abstract HashSet<UILayer> Layer { get; }
-
         public abstract UIPriority Priority { get; }
 
-        protected StaticUIPresenter(TView view, IUINavigation navigation) : base(view, navigation) { }
+        protected StaticUIPresenter(TView view, IUINavigation navigation, IAudioController audioController)
+            : base(view, navigation, audioController) { }
 
         public bool HasLayer(UILayer layer) => Layer.Contains(layer);
     }

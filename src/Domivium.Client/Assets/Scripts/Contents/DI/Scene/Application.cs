@@ -1,4 +1,6 @@
 ﻿using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.Audio.Generated;
+using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.DI.Container;
 using Domivium.Client.Contents.DI.Entry;
 using Domivium.Client.Contents.Director;
@@ -8,6 +10,8 @@ using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI.Generated;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Audio;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Input;
@@ -36,6 +40,7 @@ namespace Domivium.Client.Contents.DI.Scene
         [SerializeField] private UIContainer _uiContainer;
         [SerializeField] private StageActorContainer _stageActorContainer;
         [SerializeField] private StageMapContainer _stageMapContainer;
+        [SerializeField] private AudioContainer _audioContainer;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -51,10 +56,12 @@ namespace Domivium.Client.Contents.DI.Scene
 
             Services(builder, Lifetime.Singleton);
             Provider(builder, Lifetime.Singleton);
+            Audio(builder, Lifetime.Singleton);
             GlobalActors(builder, Lifetime.Singleton);
             UI(builder, Lifetime.Singleton);
             Actor(builder, Lifetime.Singleton);
             Stage(builder, Lifetime.Singleton);
+            Battle(builder, Lifetime.Singleton);
 
             builder.Register<ApplicationEntry>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
         }
@@ -70,6 +77,8 @@ namespace Domivium.Client.Contents.DI.Scene
             var options = builder.RegisterMessagePipe();
             builder.RegisterMessageBroker<SceneMessage>(options);
             builder.RegisterMessageBroker<SceneUIReadyMessage>(options);
+            builder.RegisterMessageBroker<SpawnerMessage>(options);
+            builder.RegisterMessageBroker<BattleCueMessage>(options);
         }
 
         private static void SecureStore(IContainerBuilder builder, Lifetime lifetime)
@@ -115,6 +124,8 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<NetworkService>(lifetime);
             builder.Register<SceneService>(lifetime);
             builder.Register<EnvironmentService>(lifetime);
+            builder.Register<UnitService>(lifetime);
+            builder.Register<VfxService>(lifetime);
             builder.Register<CameraService>(lifetime).AsImplementedInterfaces();
             builder.Register<PointerService>(lifetime).AsImplementedInterfaces();
             builder.Register<TowerPlacementService>(lifetime).AsImplementedInterfaces();
@@ -126,11 +137,18 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<StageMapProvider>(lifetime).WithParameter(_stageMapContainer.Tilemaps);
         }
 
+        private void Audio(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<IAudioController, AudioController>(lifetime).WithParameter(AudioMapping.Names);
+            builder.Register<IAudioSpawner, AudioSpawner>(lifetime).WithParameter(_audioContainer.Resources);
+        }
+
         private void GlobalActors(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.RegisterComponentInNewPrefab(_globalActorContainer.InputEventSystem, lifetime).UnderTransform(transform);
             builder.RegisterComponentInNewPrefab(_globalActorContainer.CameraRig, lifetime).UnderTransform(transform);
             builder.RegisterComponentInNewPrefab(_globalActorContainer.EnvironmentRig, lifetime).UnderTransform(transform);
+            builder.RegisterComponentInNewPrefab(_globalActorContainer.AudioRig, lifetime).UnderTransform(transform);
         }
 
         private void UI(IContainerBuilder builder, Lifetime lifetime)
@@ -155,6 +173,13 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<StageContext>(lifetime);
             builder.Register<IStageDirector, StageDirector>(lifetime);
             builder.Register<IStageMapStore, StageMapStore>(lifetime);
+        }
+
+        private void Battle(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<IBattleEffectPool, BattleEffectPool>(lifetime);
+            builder.Register<IBattleAbilityFactory, BattleAbilityFactory>(lifetime);
+            builder.Register<IBattleCuePlayer, BattleCuePlayer>(lifetime);
         }
     }
 }

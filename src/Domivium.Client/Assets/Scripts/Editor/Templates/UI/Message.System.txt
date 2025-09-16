@@ -2,8 +2,5 @@
 
 namespace {{NAMESPACE}}
 {
-    public interface {{INTERFACE_NAME}} : IUIMessage
-    {
-        
-    }
+    public interface {{INTERFACE_NAME}} : IUIMessage { }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Exceptions;
 using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Navigation;
@@ -19,11 +20,12 @@ namespace Domivium.Client.Core.UI.Presenter
 
         protected readonly TView View;
         protected readonly IUINavigation Navigation;
+        protected readonly IAudioController AudioController;
         protected DisposableBag Disposable;
 
         public virtual bool DeactivateBehindView { get; }
 
-        protected UIPresenter(TView view, IUINavigation navigation)
+        protected UIPresenter(TView view, IUINavigation navigation, IAudioController audioController)
         {
             if (this is not TMessage message)
             {
@@ -33,6 +35,7 @@ namespace Domivium.Client.Core.UI.Presenter
             View = view;
             View.AttachMessage(message);
             Navigation = navigation;
+            AudioController = audioController;
         }
 
         public void Dispose()

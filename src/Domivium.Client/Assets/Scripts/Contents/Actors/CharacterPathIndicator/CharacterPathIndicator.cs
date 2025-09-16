@@ -14,10 +14,10 @@ namespace Domivium.Client.Contents.Actors
         private Vector3 _targetPosition;
         private bool _isPicked;
 
-        public override UniTask ShowAsync(CancellationToken token, ActorParam param, bool immediately = false)
+        public override UniTask ActivateAsync(CancellationToken token, ActorParam param, bool immediately = false)
         {
             Release();
-            return base.ShowAsync(token, param, immediately);
+            return base.ActivateAsync(token, param, immediately);
         }
 
         public void SetCharacter(Transform character)

@@ -15,9 +15,12 @@ namespace Domivium.Client.Core.Scene
         private bool _isDespawn;
 
         public ActorId ActorId { get; private set; }
+        
+        public Guid ScopeId { get; private set; }
 
         public void Initialize(ActorId id, IActorPresenter presenter, Action<ActorScope> onDespawn)
         {
+            ScopeId = Guid.NewGuid();
             ActorId = id;
             _presenter = presenter;
             _presenter.Initialize(transform, Despawn);
@@ -28,7 +31,7 @@ namespace Domivium.Client.Core.Scene
         {
             _isDespawn = false;
             gameObject.SetActive(true);
-            await _presenter.ShowAsync(_cts.Token, param);
+            await _presenter.ActivateAsync(_cts.Token, param);
             return _presenter;
         }
 

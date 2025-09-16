@@ -1,4 +1,5 @@
-﻿using Domivium.Client.Core.UI.Contract;
+﻿using Domivium.Client.Core.Audio;
+using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.View;
 
@@ -8,7 +9,8 @@ namespace Domivium.Client.Core.UI.Presenter
         where TView : StackUIView<TMessage>
         where TMessage : IUIMessage
     {
-        protected StackUIPresenter(TView view, IUINavigation navigation) : base(view, navigation) { }
+        protected StackUIPresenter(TView view, IUINavigation navigation, IAudioController audioController)
+            : base(view, navigation, audioController) { }
 
         protected void Close(UIResult result) { }
     }

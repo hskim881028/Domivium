@@ -1,6 +1,6 @@
-Id,Job,Health,Attack,Defense,AttackRange,Speed
-int,string,int,int,int,int,int
-1,Melee,200,20,10,2,2
-2,Ranged,100,30,5,1,3
-3,Healer,150,5,5,2,2
-4,Tanker,300,10,15,1,1
+Id,Job,Health,Attack,Defense,AttackRange,DetectionRange,Speed,CriticalRate,CriticalDamage
+int,string,int,int,int,percent,percent,percent,percent,percent
+1,Melee,200,20,10,100,2000,200,0,0
+2,Ranged,100,30,5,200,2000,300,0,0
+3,Healer,150,5,5,200,2000,200,0,0
+4,Tanker,300,10,15,100,2000,100,0,0

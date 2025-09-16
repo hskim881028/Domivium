@@ -13,7 +13,7 @@ namespace Domivium.Client.Core.Actors
         private bool _isDisposed;
 
         protected DisposableBag Disposable;
-        protected abstract void OnDispose();
+
         protected TActor Actor { get; }
 
         protected ActorPresenter(TActor actor)
@@ -27,14 +27,14 @@ namespace Domivium.Client.Core.Actors
             Actor.Initialize(parent, onDespawn);
         }
 
-        public virtual async UniTask ShowAsync(CancellationToken token, ActorParam param, bool immediately = false)
+        public virtual async UniTask ActivateAsync(CancellationToken token, ActorParam param, bool immediately = false)
         {
-            await Actor.ShowAsync(token, param, immediately);
+            await Actor.ActivateAsync(token, param, immediately);
         }
 
-        public virtual async UniTask HideAsync(CancellationToken token, bool immediately = false)
+        public virtual async UniTask DeactivateAsync(CancellationToken token, bool immediately = false)
         {
-            await Actor.HideAsync(token, immediately);
+            await Actor.DeactivateAsync(token, immediately);
             _onDespawn?.Invoke();
         }
 
@@ -46,5 +46,7 @@ namespace Domivium.Client.Core.Actors
             _isDisposed = true;
             Disposable.Dispose();
         }
+
+        protected abstract void OnDispose();
     }
 }
