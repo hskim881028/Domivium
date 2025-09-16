@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Domivium.Client.Core.Message;
 
 namespace Domivium.Client.Core.Input
 {
-    public sealed class InputRouter : IDisposable
+    public sealed class InputRouter : Disposable
     {
         private readonly List<IInputConsumer> _consumers = new();
-        private bool _isDisposed;
 
         public void Register(IInputConsumer consumer)
         {
@@ -21,11 +19,6 @@ namespace Domivium.Client.Core.Input
             Sort();
         }
 
-        private void Sort()
-        {
-            _consumers.Sort((a, b) => a.Priority.CompareTo(b.Priority));
-        }
-
         public void OnInput(InputMessage message)
         {
             foreach (var consumer in _consumers)
@@ -37,12 +30,14 @@ namespace Domivium.Client.Core.Input
             }
         }
 
-        public void Dispose()
+        protected override void OnDispose()
         {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
             _consumers.Clear();
+        }
+
+        private void Sort()
+        {
+            _consumers.Sort((a, b) => a.Priority.CompareTo(b.Priority));
         }
     }
 }

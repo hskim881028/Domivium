@@ -10,7 +10,7 @@ namespace Domivium.Client.Data.Stat
         public static readonly StatId Defense = 2;
         public static readonly StatId AttackRange = 3;
         public static readonly StatId DetectionRange = 4;
-        public static readonly StatId Speed = 5; 
+        public static readonly StatId Speed = 5;
         public static readonly StatId CriticalRate = 6;
         public static readonly StatId CriticalDamage = 7;
         public static readonly StatId StatCount = 8;

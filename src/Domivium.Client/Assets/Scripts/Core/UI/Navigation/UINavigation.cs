@@ -8,19 +8,16 @@ using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Presenter;
 using MessagePipe;
 using R3;
-using DisposableBag = R3.DisposableBag;
 
 namespace Domivium.Client.Core.UI.Navigation
 {
-    public sealed class UINavigation : IUINavigation
+    public sealed class UINavigation : Disposable, IUINavigation
     {
         private readonly IUINavigationNodePool _navigationNodePool;
         private readonly IUIManager _uiManager;
         private readonly Stack<IUINavigationNode> _stackNodes = new();
         private readonly HashSet<IUINavigationNode> _staticNodes = new();
         private readonly HashSet<IUINavigationNode> _systemNodes = new();
-        private DisposableBag _disposable;
-        private bool _isDisposed;
 
         public UINavigation(
             IUINavigationNodePool navigationNodePool,
@@ -29,7 +26,7 @@ namespace Domivium.Client.Core.UI.Navigation
         {
             _navigationNodePool = navigationNodePool;
             _uiManager = uiManager;
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
+            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public bool HasOpenSystemUI => _systemNodes.Count > 0;
@@ -146,14 +143,6 @@ namespace Domivium.Client.Core.UI.Navigation
             await HidePresenterAsync(presenter, node, result, immediately);
             _navigationNodePool.Return(node);
             return true;
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
-            _disposable.Dispose();
         }
 
         private async UniTask<IUIHandle> ShowPresenterAsync(

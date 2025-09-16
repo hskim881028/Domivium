@@ -1,7 +1,4 @@
 ﻿namespace Domivium.Client.Contents.Services
 {
-    public class VfxService
-    {
-        
-    }
+    public class VfxService : Disposable { }
 }

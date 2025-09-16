@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Domivium.Client.Core.Input
+﻿namespace Domivium.Client.Core.Input
 {
-    public interface IInputComposition : IDisposable { }
+    public interface IInputComposition { }
 }

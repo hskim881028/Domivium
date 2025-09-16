@@ -15,7 +15,7 @@ namespace Domivium.Client.Core.Scene
         private bool _isDespawn;
 
         public ActorId ActorId { get; private set; }
-        
+
         public Guid ScopeId { get; private set; }
 
         public void Initialize(ActorId id, IActorPresenter presenter, Action<ActorScope> onDespawn)

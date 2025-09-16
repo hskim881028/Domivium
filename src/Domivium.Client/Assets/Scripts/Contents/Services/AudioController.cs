@@ -9,11 +9,10 @@ using MessagePipe;
 using R3;
 using UnityEngine;
 using UnityEngine.Audio;
-using DisposableBag = R3.DisposableBag;
 
 namespace Domivium.Client.Contents.Services
 {
-    public sealed class AudioController : IAudioController, IDisposable
+    public sealed class AudioController : Disposable, IAudioController
     {
         private const string MuteKey = "_MUTE_KEY";
         private const string VolumeKey = "_VOLUME_KEY";
@@ -27,15 +26,13 @@ namespace Domivium.Client.Contents.Services
         private AudioSource _ui;
 
         private CancellationTokenSource _cts = new();
-        private DisposableBag _disposable;
-        private bool _isDisposed;
 
         private readonly Dictionary<AudioParam, bool> _groupMutes = new()
         {
             { AudioParam.Master, PlayerPrefs.GetInt($"{AudioParam.Master}{MuteKey}", 0) > 0 },
             { AudioParam.BGM, PlayerPrefs.GetInt($"{AudioParam.BGM}{MuteKey}", 0) > 0 },
             { AudioParam.SFX, PlayerPrefs.GetInt($"{AudioParam.SFX}{MuteKey}", 0) > 0 },
-            { AudioParam.UI, PlayerPrefs.GetInt($"{AudioParam.UI}{MuteKey}", 0) > 0 },
+            { AudioParam.UI, PlayerPrefs.GetInt($"{AudioParam.UI}{MuteKey}", 0) > 0 }
         };
 
         private readonly Dictionary<AudioParam, float> _groupVolumes = new()
@@ -55,7 +52,7 @@ namespace Domivium.Client.Contents.Services
             _audioRig = audioRig;
             _names = names;
             _spawner = spawner;
-            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
+            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
             Reset();
         }
 
@@ -100,15 +97,11 @@ namespace Domivium.Client.Contents.Services
             _ui.Play();
         }
 
-        public void Dispose()
+        protected override void OnDispose()
         {
-            if (_isDisposed) return;
-
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
-            _isDisposed = true;
-            _disposable.Dispose();
         }
 
         private async UniTaskVoid PlayBgmAsync(AudioId id)
@@ -134,10 +127,7 @@ namespace Domivium.Client.Contents.Services
             _sfx.Remove(source);
         }
 
-        private AudioSource Get(AudioMixerGroup group, AudioId id, float sourceVolume = 1, bool loop = false)
-        {
-            return _spawner.Get(group, _names[id], sourceVolume, loop);
-        }
+        private AudioSource Get(AudioMixerGroup group, AudioId id, float sourceVolume = 1, bool loop = false) => _spawner.Get(group, _names[id], sourceVolume, loop);
 
         private void Return(AudioSource source)
         {

@@ -26,7 +26,7 @@ namespace Domivium.Client.Contents.Actors
         {
             var p = param.As<UnitParams>();
             var row = p.CharacterRow;
-            
+
             BattleSystem.Reset();
 
             foreach (var ability in p.Abilities)

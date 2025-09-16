@@ -7,7 +7,7 @@ using MagicOnion;
 
 namespace Domivium.Client.Contents.Services
 {
-    public sealed class NetworkService : IDisposable
+    public sealed class NetworkService
     {
         private readonly INetworkConnection _networkConnection;
 
@@ -15,8 +15,6 @@ namespace Domivium.Client.Contents.Services
         {
             _networkConnection = networkConnection;
         }
-
-        public void Dispose() { }
 
         public void Connect()
         {

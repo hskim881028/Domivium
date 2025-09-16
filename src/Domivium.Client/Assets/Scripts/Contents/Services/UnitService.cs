@@ -8,30 +8,18 @@ using Domivium.Client.Core.Message;
 using MessagePipe;
 using R3;
 using UnityEngine.InputSystem;
-using DisposableBag = R3.DisposableBag;
 
 namespace Domivium.Client.Contents.Services
 {
-    public sealed class UnitService : IDisposable
+    public sealed class UnitService : Disposable
     {
         private readonly Dictionary<Guid, IUnitPresenter> _character = new();
         private readonly Dictionary<Guid, IUnitPresenter> _tower = new();
         private readonly Dictionary<Guid, IUnitPresenter> _monster = new();
 
-        private DisposableBag _disposable;
-        private bool _isDisposed;
-
         public UnitService(ISubscriber<SpawnerMessage> subscriber)
         {
-            subscriber.Subscribe(OnSpawnerMessage).AddTo(ref _disposable);
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
-            _disposable.Dispose();
+            subscriber.Subscribe(OnSpawnerMessage).AddTo(ref DisposableBag);
         }
 
         public void Tick(float deltaTime)

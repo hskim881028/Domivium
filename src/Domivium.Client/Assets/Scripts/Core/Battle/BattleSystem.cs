@@ -46,10 +46,7 @@ namespace Domivium.Client.Core.Battle
             _abilitySpecs.Add(ability.Id, ability);
         }
 
-        public bool TryActivateAbility(BattleAbilityId id)
-        {
-            return _abilitySpecs.TryGetValue(id, out var spec) && spec.TryActivate(this);
-        }
+        public bool TryActivateAbility(BattleAbilityId id) => _abilitySpecs.TryGetValue(id, out var spec) && spec.TryActivate(this);
 
         public void ActivateEffect(BattleEffectSpec spec)
         {

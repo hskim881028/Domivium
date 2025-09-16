@@ -34,7 +34,7 @@ namespace Domivium.Client.Contents.DI.Entry
 
             _sceneService = sceneService;
             _uiNavigation = uiNavigation;
-            sceneUIReadySubscriber.Subscribe(OnSceneUIReady).AddTo(ref Disposable);
+            sceneUIReadySubscriber.Subscribe(OnSceneUIReady).AddTo(ref DisposableBag);
         }
 
         protected override void OnStart()

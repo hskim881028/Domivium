@@ -13,7 +13,7 @@ namespace Domivium.Client.Contents.Director
     {
         public StageDirector(StageContext stageContext, ISubscriber<SceneMessage> subscriber) : base(stageContext)
         {
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref Disposable);
+            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public override bool TrySetMode(StageMode mode)

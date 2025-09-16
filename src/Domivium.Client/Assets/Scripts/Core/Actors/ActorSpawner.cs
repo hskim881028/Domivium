@@ -10,12 +10,11 @@ using MessagePipe;
 using R3;
 using VContainer;
 using VContainer.Unity;
-using DisposableBag = R3.DisposableBag;
 using Object = UnityEngine.Object;
 
 namespace Domivium.Client.Core.Actors
 {
-    public sealed class ActorSpawner : IActorSpawner
+    public sealed class ActorSpawner : Disposable, IActorSpawner
     {
         private const int MaxPoolPerActor = 16;
 
@@ -26,8 +25,6 @@ namespace Domivium.Client.Core.Actors
 
         private ActorRootScope _root;
         private SceneMessageType _sceneMessageType;
-        private DisposableBag _disposable;
-        private bool _isDisposed;
 
         public ActorSpawner(
             Dictionary<ActorId, (Type presenter, Type view)> container,
@@ -38,15 +35,7 @@ namespace Domivium.Client.Core.Actors
             _container = container;
             _prefabs = prefabs;
             _publisher = publisher;
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
-            _disposable.Dispose();
+            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTask SpawnAsync(ActorId id, ActorParam param)

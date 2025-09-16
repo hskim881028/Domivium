@@ -673,7 +673,7 @@ namespace Domivium.Client.Editor
                 {
                     container.UI.Add(view);
                 }
-                
+
                 EditorUtility.SetDirty(container);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);

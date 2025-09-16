@@ -17,15 +17,12 @@ namespace Domivium.Client.Core.Battle
             BattleSystem source,
             BattleAbility ability,
             Transform unit,
-            int damage = 0)
+            int damage = 0) => new()
         {
-            return new BattleContext
-            {
-                Source = source,
-                Ability = ability,
-                Unit = unit,
-                Damage = damage
-            };
-        }
+            Source = source,
+            Ability = ability,
+            Unit = unit,
+            Damage = damage
+        };
     }
 }

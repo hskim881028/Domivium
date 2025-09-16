@@ -16,20 +16,16 @@ using Domivium.Client.Core.Utility;
 using MessagePipe;
 using R3;
 using UnityEngine;
-using DisposableBag = R3.DisposableBag;
 
 namespace Domivium.Client.Contents.Services
 {
-    public sealed class BattleService : IBattleReadModel, IBattleCommand, IDisposable
+    public sealed class BattleService : Disposable, IBattleReadModel, IBattleCommand
     {
         private readonly IStageDirector _director;
         private readonly IActorSpawner _actorSpawner;
         private readonly ICameraReadModel _cameraRead;
         private readonly IBattleAbilityFactory _abilityFactory;
         private readonly MasterDbService _masterDbService;
-
-        private DisposableBag _disposable;
-        private bool _isDisposed;
 
         private readonly ReactiveProperty<Transform> _pickedCharacter = new();
         private readonly ReactiveProperty<Vector3> _previewPosition = new();
@@ -52,7 +48,7 @@ namespace Domivium.Client.Contents.Services
             _cameraRead = cameraRead;
             _abilityFactory = abilityFactory;
             _masterDbService = masterDbService;
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
+            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTask InitializeAsync(int stageId)
@@ -100,14 +96,6 @@ namespace Domivium.Client.Contents.Services
             _previewPosition.Value = Vector3.zero;
             _pickedCharacter.Value = null;
             return true;
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
-            _disposable.Dispose();
         }
 
         private void OnSceneMessage(SceneMessage message)

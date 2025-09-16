@@ -2,5 +2,5 @@
 
 namespace Domivium.Client.Core.Actors
 {
-    public interface IActorPresenter : IActorActivatable, IDisposable { }
+    public interface IActorPresenter : IActorActivatable { }
 }

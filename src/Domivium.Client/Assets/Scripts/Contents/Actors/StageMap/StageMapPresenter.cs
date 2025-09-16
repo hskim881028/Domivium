@@ -24,7 +24,7 @@ namespace Domivium.Client.Contents.Actors
             ITowerPlacementReadModel read)
             : base(actor)
         {
-            stageContext.Mode.Subscribe(OnChangeMode).AddTo(ref Disposable);
+            stageContext.Mode.Subscribe(OnChangeMode).AddTo(ref DisposableBag);
 
             _read = read;
             _read.StagedTower.CollectionChanged += OnChangedStagedTower;

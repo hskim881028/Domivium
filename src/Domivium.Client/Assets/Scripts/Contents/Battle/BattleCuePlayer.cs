@@ -5,16 +5,13 @@ using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Message;
 using MessagePipe;
 using R3;
-using DisposableBag = R3.DisposableBag;
 
 namespace Domivium.Client.Contents.Battle
 {
-    public class BattleCuePlayer : IBattleCuePlayer
+    public class BattleCuePlayer : Disposable, IBattleCuePlayer
     {
         private readonly IAudioController _audioController;
         private readonly VfxService _vfxService;
-        private bool _isDisposed;
-        private DisposableBag _disposable;
 
         public BattleCuePlayer(
             IAudioController audioController,
@@ -23,15 +20,7 @@ namespace Domivium.Client.Contents.Battle
         {
             _audioController = audioController;
             _vfxService = vfxService;
-            subscriber.Subscribe(OnCueMessage).AddTo(ref _disposable);
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
-            _disposable.Dispose();
+            subscriber.Subscribe(OnCueMessage).AddTo(ref DisposableBag);
         }
 
         private void OnCueMessage(BattleCueMessage message)

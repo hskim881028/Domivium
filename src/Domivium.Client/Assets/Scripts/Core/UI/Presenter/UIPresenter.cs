@@ -6,22 +6,19 @@ using Domivium.Client.Core.Exceptions;
 using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.View;
-using R3;
 using UnityEngine;
 
 namespace Domivium.Client.Core.UI.Presenter
 {
-    public class UIPresenter<TView, TMessage> : IUIPresenter, IDisposable
+    public class UIPresenter<TView, TMessage> : Disposable, IUIPresenter
         where TView : IUIView<TMessage>
         where TMessage : IUIMessage
     {
         private bool _initialized;
-        private bool _isDisposed;
 
         protected readonly TView View;
         protected readonly IUINavigation Navigation;
         protected readonly IAudioController AudioController;
-        protected DisposableBag Disposable;
 
         public virtual bool DeactivateBehindView { get; }
 
@@ -36,14 +33,6 @@ namespace Domivium.Client.Core.UI.Presenter
             View.AttachMessage(message);
             Navigation = navigation;
             AudioController = audioController;
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
-            Disposable.Dispose();
         }
 
         public void SetParent(Transform parent)

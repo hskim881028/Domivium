@@ -1,13 +1,11 @@
-﻿using System;
-using R3;
+﻿using R3;
 
 namespace Domivium.Client.Core.Context
 {
-    public sealed class StageContext : IDisposable
+    public sealed class StageContext : Disposable
     {
         private readonly ReactiveProperty<StageMode> _mode = new(StageMode.Idle);
         private readonly ReactiveProperty<StagePhase> _phase = new(StagePhase.Idle);
-        private bool _isDisposed;
 
         public ReadOnlyReactiveProperty<StageMode> Mode => _mode;
         public ReadOnlyReactiveProperty<StagePhase> Phase => _phase;
@@ -22,11 +20,8 @@ namespace Domivium.Client.Core.Context
             _phase.Value = phase;
         }
 
-        public void Dispose()
+        protected override void OnDispose()
         {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
             _mode?.Dispose();
             _phase?.Dispose();
         }

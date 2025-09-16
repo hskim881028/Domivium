@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Domivium.Client.Core.Battle
+﻿namespace Domivium.Client.Core.Battle
 {
-    public interface IBattleCuePlayer : IDisposable { }
+    public interface IBattleCuePlayer { }
 }

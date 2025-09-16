@@ -94,11 +94,8 @@ namespace Domivium.Client.Editor
             return nsDecl;
         }
 
-        public static string ToAudioResourcePath(this AudioParam param)
-        {
-            return Path.Combine(RootPath, AudioFolderName, param.AsPrimitive());
-        }
-        
+        public static string ToAudioResourcePath(this AudioParam param) => Path.Combine(RootPath, AudioFolderName, param.AsPrimitive());
+
         public static string ToScriptPath(this UIType uiType)
         {
             var typeFolder = uiType switch

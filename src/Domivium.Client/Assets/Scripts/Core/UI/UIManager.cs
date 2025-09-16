@@ -9,11 +9,10 @@ using MessagePipe;
 using R3;
 using VContainer;
 using VContainer.Unity;
-using DisposableBag = R3.DisposableBag;
 
 namespace Domivium.Client.Core.UI
 {
-    public sealed class UIManager : IUIManager
+    public sealed class UIManager : Disposable, IUIManager
     {
         private readonly LifetimeScope _rooLifetimeScope;
         private readonly Dictionary<UIId, (Type presenter, Type view)> _uiContainer;
@@ -22,9 +21,7 @@ namespace Domivium.Client.Core.UI
         private readonly IPublisher<SceneUIReadyMessage> _publisher;
         private readonly Dictionary<Type, UICanvasScope> _canvas = new();
         private readonly Dictionary<UIId, UIScope> _ui = new();
-        private DisposableBag _disposable;
         private UIRootScope _uiRoot;
-        private bool _isDisposed;
 
         public UIManager(
             LifetimeScope rooLifetimeScope,
@@ -39,7 +36,7 @@ namespace Domivium.Client.Core.UI
             _uisByLayer = uisByLayer;
             _prefabs = prefabs;
             _publisher = publisher;
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
+            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public HashSet<UIId> GetStaticUI(UILayer layer) => _uisByLayer.TryGetValue(layer, out var uis) ? uis.ToHashSet() : new HashSet<UIId>();
@@ -76,13 +73,9 @@ namespace Domivium.Client.Core.UI
             _ui.Remove(id);
         }
 
-        public void Dispose()
+        protected override void OnDispose()
         {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
             Clear();
-            _disposable.Dispose();
         }
 
         private void Clear()

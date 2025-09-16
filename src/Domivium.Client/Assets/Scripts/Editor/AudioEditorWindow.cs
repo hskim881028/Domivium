@@ -121,7 +121,7 @@ namespace Domivium.Client.Editor
                 {
                     Directory.CreateDirectory(genDir);
                 }
-                
+
                 var sb = new StringBuilder();
                 sb.AppendLine(EditorConfig.StartGenerate);
                 sb.AppendLine(EditorConfig.UsingGeneric);
@@ -133,7 +133,7 @@ namespace Domivium.Client.Editor
                 sb.AppendLine("\t{");
                 sb.AppendLine($"\t\t{EditorConfig.AudioMappingDictionary} ");
                 sb.AppendLine("\t\t{");
-                
+
                 var resources = CollectResources();
                 foreach (var (param, dic) in resources)
                 {
@@ -144,12 +144,12 @@ namespace Domivium.Client.Editor
                         sb.AppendLine($"\t\t\t{{ {className}.{key}, \"{value}\" }},");
                     }
                 }
-                
+
                 sb.AppendLine("\t\t};");
                 sb.AppendLine("\t}");
                 sb.AppendLine("}");
                 sb.AppendLine(EditorConfig.EndGenerate);
-                
+
                 AssetDatabase.StartAssetEditing();
                 try
                 {
@@ -185,7 +185,7 @@ namespace Domivium.Client.Editor
                 foreach (var file in Directory.GetFiles(resourcePath))
                 {
                     if (Path.GetExtension(file).Equals(".meta", StringComparison.OrdinalIgnoreCase)) continue;
-                    
+
                     var name = Path.GetFileNameWithoutExtension(file);
                     if (string.IsNullOrEmpty(name)) continue;
 

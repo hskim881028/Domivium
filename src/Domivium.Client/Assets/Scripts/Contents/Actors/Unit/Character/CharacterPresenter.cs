@@ -11,7 +11,7 @@ namespace Domivium.Client.Contents.Actors
             IBattleReadModel read)
             : base(actor)
         {
-            read.TargetPosition.Subscribe(actor.SetTargetPosition).AddTo(ref Disposable);
+            read.TargetPosition.Subscribe(actor.SetTargetPosition).AddTo(ref DisposableBag);
         }
 
         protected override void OnSpeedStatChanged()
@@ -20,7 +20,5 @@ namespace Domivium.Client.Contents.Actors
             Actor.SetSpeed(speed);
             base.OnSpeedStatChanged();
         }
-
-        protected override void OnDispose() { }
     }
 }

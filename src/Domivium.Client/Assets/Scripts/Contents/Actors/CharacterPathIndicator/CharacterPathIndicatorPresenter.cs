@@ -11,10 +11,8 @@ namespace Domivium.Client.Contents.Actors
             IBattleReadModel read)
             : base(actor)
         {
-            read.PickedCharacter.Subscribe(actor.SetCharacter).AddTo(ref Disposable);
-            read.PreviewPosition.Subscribe(actor.SetTargetPosition).AddTo(ref Disposable);
+            read.PickedCharacter.Subscribe(actor.SetCharacter).AddTo(ref DisposableBag);
+            read.PreviewPosition.Subscribe(actor.SetTargetPosition).AddTo(ref DisposableBag);
         }
-
-        protected override void OnDispose() { }
     }
 }

@@ -9,12 +9,11 @@ using VContainer.Unity;
 namespace Domivium.Client.Core.Scene
 {
     [UsedImplicitly]
-    public sealed class SceneScopeManager : ISceneScopeManager
+    public sealed class SceneScopeManager : Disposable, ISceneScopeManager
     {
         private readonly LifetimeScope _root;
         private readonly IPublisher<SceneMessage> _publisher;
         private SceneScope _current;
-        private bool _isDisposed;
 
         public SceneScopeManager(LifetimeScope root, IPublisher<SceneMessage> publisher)
         {
@@ -35,11 +34,8 @@ namespace Domivium.Client.Core.Scene
             _publisher.Publish(SceneMessage.Load(_current));
         }
 
-        public void Dispose()
+        protected override void OnDispose()
         {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
             Unload();
         }
 

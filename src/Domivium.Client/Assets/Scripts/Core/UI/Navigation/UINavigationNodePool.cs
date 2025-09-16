@@ -2,10 +2,9 @@
 
 namespace Domivium.Client.Core.UI.Navigation
 {
-    public sealed class UINavigationNodePool : IUINavigationNodePool
+    public sealed class UINavigationNodePool : Disposable, IUINavigationNodePool
     {
         private readonly Queue<IUINavigationNode> _pool = new();
-        private bool _isDisposed;
 
         public IUINavigationNode Get(UIId id)
         {
@@ -24,12 +23,8 @@ namespace Domivium.Client.Core.UI.Navigation
             _pool.Enqueue(node);
         }
 
-        public void Dispose()
+        protected override void OnDispose()
         {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
-
             foreach (var node in _pool)
             {
                 node.Dispose();

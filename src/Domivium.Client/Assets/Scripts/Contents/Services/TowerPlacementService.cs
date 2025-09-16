@@ -19,11 +19,10 @@ using ObservableCollections;
 using R3;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using DisposableBag = R3.DisposableBag;
 
 namespace Domivium.Client.Contents.Services
 {
-    public sealed class TowerPlacementService : ITowerPlacementReadModel, ITowerPlacementCommand, IDisposable
+    public sealed class TowerPlacementService : Disposable, ITowerPlacementReadModel, ITowerPlacementCommand
     {
         private readonly StageMapProvider _stageMapProvider;
         private readonly IStageDirector _director;
@@ -34,8 +33,6 @@ namespace Domivium.Client.Contents.Services
         private readonly ObservableDictionary<Vector3Int, bool> _previewTower = new();
 
         private Tilemap _grid;
-        private DisposableBag _disposable;
-        private bool _isDisposed;
 
         public IReadOnlyObservableList<Vector3Int> StagedTower => _stagedTower;
 
@@ -55,8 +52,8 @@ namespace Domivium.Client.Contents.Services
             _actorSpawner = actorSpawner;
             _store = store;
             _cameraRead = cameraRead;
-            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
-            spawnerSubscriber.Subscribe(OnSpawnerMessage).AddTo(ref _disposable);
+            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
+            spawnerSubscriber.Subscribe(OnSpawnerMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTask InitializeAsync(int stageId)
@@ -122,14 +119,6 @@ namespace Domivium.Client.Contents.Services
 
             Hide();
             return true;
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
-            _disposable.Dispose();
         }
 
         private void ResetReadModel()

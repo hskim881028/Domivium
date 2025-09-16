@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Domivium.Client.Core.Scene
+﻿namespace Domivium.Client.Core.Scene
 {
-    public interface ISceneScopeManager : IDisposable
+    public interface ISceneScopeManager
     {
         public void LoadScope<T>(SceneScopeId sceneScopeId) where T : SceneScope;
     }

@@ -1,15 +1,10 @@
-﻿using System;
-using Domivium.Client.Core.Context;
-using R3;
+﻿using Domivium.Client.Core.Context;
 
 namespace Domivium.Client.Core.Director
 {
-    public abstract class StageDirectorBase : IStageDirector, IDisposable
+    public abstract class StageDirectorBase : Disposable, IStageDirector
     {
         private readonly StageContext _stageContext;
-        private bool _isDisposed;
-
-        protected DisposableBag Disposable;
 
         protected StageMode Mode => _stageContext.Mode.CurrentValue;
 
@@ -27,13 +22,5 @@ namespace Domivium.Client.Core.Director
         public abstract bool TrySetMode(StageMode mode);
 
         public abstract bool TrySetPhase(StagePhase phase);
-
-        public void Dispose()
-        {
-            if (_isDisposed) return;
-
-            _isDisposed = true;
-            Disposable.Dispose();
-        }
     }
 }
