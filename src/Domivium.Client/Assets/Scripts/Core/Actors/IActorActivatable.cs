@@ -9,7 +9,7 @@ namespace Domivium.Client.Core.Actors
     public interface IActorActivatable
     {
         public void Initialize(Transform parent, Action onDespawn);
-        public UniTask ShowAsync(CancellationToken token, ActorParam param, bool immediately = false);
-        public UniTask HideAsync(CancellationToken token, bool immediately = false);
+        public UniTask ActivateAsync(CancellationToken token, ActorParam param, bool immediately = false);
+        public UniTask DeactivateAsync(CancellationToken token, bool immediately = false);
     }
 }

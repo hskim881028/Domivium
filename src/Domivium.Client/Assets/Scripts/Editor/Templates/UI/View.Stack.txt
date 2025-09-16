@@ -2,8 +2,5 @@
 
 namespace {{NAMESPACE}}
 {
-    public class {{VIEW_NAME}} : {{UI_TYPE}}UIView<{{MESSAGE_NAME}}>
-    {
-        
-    }
+    public class {{VIEW_NAME}} : {{UI_TYPE}}UIView<{{MESSAGE_NAME}}> { }
 }

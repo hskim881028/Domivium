@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.UI;
 using UnityEngine;
 
@@ -9,9 +10,6 @@ namespace Domivium.Client.Editor
     public static class EditorConfig
     {
         // Namespace suffixes
-        private const string CoreUISuffix = ".Core.UI";
-        private const string ContentsUISuffix = ".Contents.UI";
-        private const string UI = "UI";
         private const string Csv = "Csv";
         private const string Row = "Row";
 
@@ -23,6 +21,7 @@ namespace Domivium.Client.Editor
         // Folder names
         private const string DataFolderName = "Data";
 
+        private const string AudioFolderName = "Audio";
         private const string ScriptsFolderName = "Scripts";
         private const string PrefabsFolderName = "Prefabs";
         private const string ContentsFolderName = "Contents";
@@ -44,13 +43,20 @@ namespace Domivium.Client.Editor
         public const string ApplicationScene = "Assets/Scenes/Application.unity";
         public const string WorkspaceScene = "Assets/Scenes/Workspace.unity";
         public const string UIContainer = "Assets/ScriptableObjects/UIContainer.asset";
+        public const string AudioContainer = "Assets/ScriptableObjects/AudioContainer.asset";
         public const string ConfigContainer = "Assets/ScriptableObjects/ConfigContainer.asset";
 
-        public const string UIId = "UIId";
+        public const string UI = "UI";
+        public const string Audio = "Audio";
+        public const string UIIds = "UIIds";
+        public const string AudioIds = "AudioIds";
+        public const string UIMapping = "UIMapping";
+        public const string AudioMapping = "AudioMapping";
 
         private static readonly string System = typeof(Type).Namespace;
         private static readonly string SystemGeneric = typeof(Dictionary<,>).Namespace;
-        private static readonly string Core = typeof(UIConfig).Namespace;
+        private static readonly string UICore = typeof(UIId).Namespace;
+        private static readonly string AudioCore = typeof(AudioId).Namespace;
 
         private static string RootPath => Application.dataPath;
 
@@ -61,20 +67,26 @@ namespace Domivium.Client.Editor
         public static string RowDataRootPath => Path.Combine(RootPath, ScriptsFolderName, DataFolderName, Row);
         public static string RowDataNamespace => "Domivium.Client.Data.Row";
 
-        private static string Contents => Core.Replace(CoreUISuffix, ContentsUISuffix);
+        private static string UIContents => UICore.Replace(".Core.UI", ".Contents.UI");
+        private static string AudioContents => AudioCore.Replace(".Core.Audio", ".Contents.Audio");
 
-        public static readonly string NamespaceGenerated = $"namespace {Contents}.Generated";
+        public static readonly string UINamespaceGenerated = $"namespace {UIContents}.Generated";
+        public static readonly string AudioNamespaceGenerated = $"namespace {AudioContents}.Generated";
+
         public static readonly string UsingSystem = $"using {System};";
         public static readonly string UsingGeneric = $"using {SystemGeneric};";
-        public static readonly string UsingCore = $"using {Core};";
+        public static readonly string UsingUICore = $"using {UICore};";
+        public static readonly string UsingAudioCore = $"using {AudioCore};";
 
-        public static readonly string MappingStaticClass = $"public static class {UIConfig.UIMapping}";
-        public static readonly string MappingDictionary = $"public static readonly Dictionary<{nameof(UIId)}, ({nameof(Type)} presenter, {nameof(Type)} view)> UI = new()";
+        public static readonly string UIMappingClass = $"public static class {UIMapping}";
+        public static readonly string AudioMappingClass = $"public static class {AudioMapping}";
 
+        public static readonly string UIMappingDictionary = $"public static readonly Dictionary<{nameof(UIId)}, ({nameof(Type)} presenter, {nameof(Type)} view)> UI = new()";
+        public static readonly string AudioMappingDictionary = $"public static readonly Dictionary<{nameof(AudioId)}, string> Names = new()";
 
         public static string GetContentsNamespaceName(UIType uiType)
         {
-            var nsDecl = $"namespace {Contents}.{uiType.ToString()}";
+            var nsDecl = $"namespace {UIContents}.{uiType.ToString()}";
             const string keyword = "namespace ";
             if (nsDecl.StartsWith(keyword, StringComparison.Ordinal))
                 return nsDecl.Substring(keyword.Length);
@@ -82,6 +94,11 @@ namespace Domivium.Client.Editor
             return nsDecl;
         }
 
+        public static string ToAudioResourcePath(this AudioParam param)
+        {
+            return Path.Combine(RootPath, AudioFolderName, param.AsPrimitive());
+        }
+        
         public static string ToScriptPath(this UIType uiType)
         {
             var typeFolder = uiType switch
@@ -112,7 +129,7 @@ namespace Domivium.Client.Editor
 
         public static string ToMessage(this UIType uiType, string prefix) => $"I{prefix}{uiType}{UI}Message";
 
-        public static string GetScriptPath(string scriptName) => Path.Combine(RootPath, ScriptsFolderName, ContentsFolderName, UI, GeneratedFolderName, $"{scriptName}{CSharpExtension}");
+        public static string GetGeneratedScriptPath(string folderName, string scriptName) => Path.Combine(RootPath, ScriptsFolderName, ContentsFolderName, folderName, GeneratedFolderName, $"{scriptName}{CSharpExtension}");
 
         public static string ToAssetsRelative(string absolutePath)
         {

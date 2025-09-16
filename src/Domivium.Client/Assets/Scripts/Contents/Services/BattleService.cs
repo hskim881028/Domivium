@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Commands;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Utility;
@@ -22,6 +25,8 @@ namespace Domivium.Client.Contents.Services
         private readonly IStageDirector _director;
         private readonly IActorSpawner _actorSpawner;
         private readonly ICameraReadModel _cameraRead;
+        private readonly IBattleAbilityFactory _abilityFactory;
+        private readonly MasterDbService _masterDbService;
 
         private DisposableBag _disposable;
         private bool _isDisposed;
@@ -38,30 +43,24 @@ namespace Domivium.Client.Contents.Services
             IStageDirector director,
             IActorSpawner actorSpawner,
             ICameraReadModel cameraRead,
+            IBattleAbilityFactory abilityFactory,
             MasterDbService masterDbService,
             ISubscriber<SceneMessage> subscriber)
         {
             _director = director;
             _actorSpawner = actorSpawner;
             _cameraRead = cameraRead;
+            _abilityFactory = abilityFactory;
+            _masterDbService = masterDbService;
             subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
-
-            var characterRow = masterDbService.DB.CharacterRowTable.FindById(1);
-            this.Log($"{characterRow.Id} / {characterRow.Attack} / {characterRow.AttackRange} /" +
-                     $" {characterRow.Health} / {characterRow.Defense} / {characterRow.Job} / {characterRow.Speed}");
-
-            var monster = masterDbService.DB.MonsterRowTable.FindById(1);
-            this.Log($"{monster.Id} / {monster.Attack} / {monster.AttackRange} /" +
-                     $" {monster.Health} / {monster.Defense} / {monster.Job} / {monster.Speed}");
-
-            var tw = masterDbService.DB.TowerRowTable.FindById(1);
-            this.Log($"{tw.Id} / {tw.Attack} / {tw.AttackRange} /" +
-                     $" {tw.Health} / {tw.Defense} / {tw.Job}");
         }
 
         public async UniTask InitializeAsync(int stageId)
         {
-            await _actorSpawner.SpawnAsync(ActorIds.Character, new CharacterParams());
+            var characterRow = _masterDbService.DB.CharacterRowTable.FindById(1);
+            var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
+            var abilities = new List<BattleAbilitySpec> { ability };
+            await _actorSpawner.SpawnAsync(ActorIds.Character, new UnitParams(characterRow, abilities));
             await _actorSpawner.SpawnAsync(ActorIds.CharacterPathIndicator, ActorParam.Empty);
         }
 

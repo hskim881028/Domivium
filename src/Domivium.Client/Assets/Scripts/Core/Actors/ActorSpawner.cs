@@ -19,23 +19,25 @@ namespace Domivium.Client.Core.Actors
     {
         private const int MaxPoolPerActor = 16;
 
-        private ActorRootScope _root;
-
         private readonly Dictionary<ActorId, (Type presenter, Type view)> _container;
         private readonly List<Actor> _prefabs;
+        private readonly IPublisher<SpawnerMessage> _publisher;
         private readonly Dictionary<ActorId, Queue<ActorScope>> _pool = new();
 
+        private ActorRootScope _root;
+        private SceneMessageType _sceneMessageType;
         private DisposableBag _disposable;
         private bool _isDisposed;
-        private SceneMessageType _sceneMessageType;
 
         public ActorSpawner(
             Dictionary<ActorId, (Type presenter, Type view)> container,
             List<Actor> prefabs,
+            IPublisher<SpawnerMessage> publisher,
             ISubscriber<SceneMessage> subscriber)
         {
             _container = container;
             _prefabs = prefabs;
+            _publisher = publisher;
             subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
         }
 
@@ -47,11 +49,12 @@ namespace Domivium.Client.Core.Actors
             _disposable.Dispose();
         }
 
-        public async UniTask<IActorPresenter> SpawnAsync(ActorId id, ActorParam param)
+        public async UniTask SpawnAsync(ActorId id, ActorParam param)
         {
             if (TryGet(id, out var scope))
             {
-                return await scope.SpawnAsync(param);
+                await scope.SpawnAsync(param);
+                return;
             }
 
             var (presenterType, viewType) = _container[id];
@@ -70,7 +73,7 @@ namespace Domivium.Client.Core.Actors
             var presenter = (IActorPresenter)child.Container.Resolve(presenterType);
             child.Initialize(id, presenter, Despawn);
             await child.SpawnAsync(param);
-            return presenter;
+            _publisher.Publish(SpawnerMessage.Spawn(child, presenter));
         }
 
         private void OnSceneMessage(SceneMessage message)
@@ -109,6 +112,8 @@ namespace Domivium.Client.Core.Actors
 
         private void Despawn(ActorScope scope)
         {
+            _publisher.Publish(SpawnerMessage.Despawn(scope));
+
             if (_sceneMessageType == SceneMessageType.Unload)
             {
                 Object.Destroy(scope.gameObject);

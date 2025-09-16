@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.Presenter;
@@ -9,6 +10,11 @@ namespace {{NAMESPACE}}
     {
         protected override HashSet<UILayer> Layer { get; }
         public override UIPriority Priority { get; }
-        public {{PRESENTER_NAME}}({{VIEW_NAME}} view, IUINavigation navigation) : base(view, navigation) { }
+        
+        public {{PRESENTER_NAME}}(
+            {{VIEW_NAME}} view,
+            IUINavigation navigation,
+            IAudioController audioController)
+            : base(view, navigation, audioController) { }
     }
 }

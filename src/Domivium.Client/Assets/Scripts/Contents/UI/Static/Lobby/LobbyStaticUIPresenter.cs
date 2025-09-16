@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.DI;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core;
+using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.Presenter;
@@ -23,8 +24,9 @@ namespace Domivium.Client.Contents.UI.Static
         public LobbyStaticUIPresenter(
             LobbyStaticUIView view,
             IUINavigation navigation,
+            IAudioController audioController,
             NetworkService networkService,
-            SceneService sceneService) : base(view, navigation)
+            SceneService sceneService) : base(view, navigation, audioController)
         {
             _networkService = networkService;
             _sceneService = sceneService;

@@ -47,14 +47,16 @@ namespace Domivium.Client.Contents.Services
             IActorSpawner actorSpawner,
             IStageMapStore store,
             ICameraReadModel cameraRead,
-            ISubscriber<SceneMessage> subscriber)
+            ISubscriber<SceneMessage> sceneSubscriber,
+            ISubscriber<SpawnerMessage> spawnerSubscriber)
         {
             _stageMapProvider = stageMapProvider;
             _director = director;
             _actorSpawner = actorSpawner;
             _store = store;
             _cameraRead = cameraRead;
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
+            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref _disposable);
+            spawnerSubscriber.Subscribe(OnSpawnerMessage).AddTo(ref _disposable);
         }
 
         public async UniTask InitializeAsync(int stageId)
@@ -67,11 +69,7 @@ namespace Domivium.Client.Contents.Services
             }
 
             _store.Initialize(tilemap.cellBounds);
-            var presenter = await _actorSpawner.SpawnAsync(ActorIds.Map, new StageMapParams(cells));
-            if (presenter is StageMapPresenter stageMapPresenter)
-            {
-                _grid = stageMapPresenter.Grid;
-            }
+            await _actorSpawner.SpawnAsync(ActorIds.Map, new ActorParams(cells));
         }
 
         public void SetGrid(Tilemap tilemap) => _grid = tilemap;
@@ -148,6 +146,24 @@ namespace Domivium.Client.Contents.Services
                 case SceneMessageType.Load:
                     ResetReadModel();
                     _store.Reset();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void OnSpawnerMessage(SpawnerMessage message)
+        {
+            switch (message.Type)
+            {
+                case SpawnerMessageType.Spawn:
+                    if (message.Presenter is StageMapPresenter stageMapPresenter)
+                    {
+                        _grid = stageMapPresenter.Grid;
+                    }
+
+                    break;
+                case SpawnerMessageType.Despawn:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

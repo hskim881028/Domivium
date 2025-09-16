@@ -190,7 +190,7 @@ namespace Domivium.Client.Editor
                 case "long": return ("long", "");
                 case "bool": return ("bool", "");
                 case "string": return ("string", "");
-                case "permyriad": return ("int", "permyriad");
+                case "percent": return ("int", "percent");
                 case "double": return ("double", "");
                 case "float": return ("float", "");
                 default:
@@ -317,7 +317,7 @@ namespace Domivium.Client.Editor
 
                     object value = token switch
                     {
-                        "int" or "permyriad" => int.Parse(valStr),
+                        "int" or "percent" => int.Parse(valStr),
                         "long" => long.Parse(valStr),
                         "float" => float.Parse(valStr),
                         "double" => double.Parse(valStr),

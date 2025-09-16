@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3504e265c4084b09bb59f62af38b2a32, type: 3}
+  m_Name: AudioContainer
+  m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.DI.Container.AudioContainer
+  _resources:
+  - {fileID: 8300000, guid: cd1035904226cd04097e9f035812aba5, type: 3}
+  - {fileID: 8300000, guid: f3ee1a1312fec124788ae7ac752587cb, type: 3}
+  - {fileID: 8300000, guid: 881e3f52c86c94f26a60718d35627cd8, type: 3}
+  - {fileID: 8300000, guid: d46323e22e74e46baa241cbf48c85671, type: 3}
+  - {fileID: 8300000, guid: 32d4b1811dda14a6cb9e059ee8ad17d2, type: 3}

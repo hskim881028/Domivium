@@ -12,8 +12,11 @@ namespace Domivium.Client.Data.Row
 		public int Health { get; set; }
 		public int Attack { get; set; }
 		public int Defense { get; set; }
-		public int AttackRange { get; set; }
-		public int Speed { get; set; }
+		public int AttackRange { get; set; } // percent
+		public int DetectionRange { get; set; } // percent
+		public int Speed { get; set; } // percent
+		public int CriticalRate { get; set; } // percent
+		public int CriticalDamage { get; set; } // percent
 	}
 }
 // </auto-generated>
