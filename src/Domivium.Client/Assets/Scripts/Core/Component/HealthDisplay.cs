@@ -1,27 +1,40 @@
-﻿using TMPro;
+﻿using System;
+using Domivium.Client.Core.Utility;
+using TMPro;
 using UnityEngine;
 
 namespace Domivium.Client.Core.Component
 {
-    public class HealthDisplay : MonoBehaviour
+    public sealed class HealthDisplay : MonoBehaviour
     {
+        private static readonly int FillID = Shader.PropertyToID("_Fill");
+
         [SerializeField] private MeshRenderer _meshRenderer;
         [SerializeField] private TextMeshPro _text;
 
-        private readonly int _fillShaderPropertyID = Shader.PropertyToID("_Fill");
-
-        private Material _material;
+        private readonly char[] _buf = new char[32];
+        private MaterialPropertyBlock _mpb;
 
         private void Awake()
         {
-            _material = _meshRenderer.material;
+            _mpb = new MaterialPropertyBlock();
+            var length = TextWriteUtility.WriteIntGrouped(int.MinValue, _buf, ',');
+            _text.SetCharArray(_buf, 0, length);
+            _text.ForceMeshUpdate();
+            _text.SetCharArray(Array.Empty<char>(), 0, 0);
         }
 
         public void Set(int current, int max)
         {
             var ratio = (float)current / max;
-            _material.SetFloat(_fillShaderPropertyID, ratio);
-            _text.text = $"{current:N0}/{max:N0}";
+            _meshRenderer.GetPropertyBlock(_mpb);
+            _mpb.SetFloat(FillID, ratio);
+            _meshRenderer.SetPropertyBlock(_mpb);
+
+            var length = TextWriteUtility.WriteIntGrouped(current, _buf, ',');
+            _buf[length++] = '/';
+            length += TextWriteUtility.WriteIntGrouped(max, _buf, length, ',');
+            _text.SetCharArray(_buf, 0, length);
         }
     }
 }

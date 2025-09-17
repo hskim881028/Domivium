@@ -26,7 +26,7 @@ namespace Domivium.Client.Contents.Actors
         private async UniTaskVoid DespawnAsync(float despawnTime, CancellationToken token)
         {
             await Awaitable.WaitForSecondsAsync(despawnTime, token);
-            TagSet.Add(ActorTag.Despawn);
+            TagSet.SetState(StateTag.Despawn);
         }
     }
 }

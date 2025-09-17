@@ -48,6 +48,8 @@ namespace Domivium.Client.Contents.Actors
 
         public virtual void Tick(float deltaTime)
         {
+            if (TagSet.State.CurrentValue == StateTag.Die || TagSet.State.CurrentValue == StateTag.Despawn) return;
+
             BattleSystem.Tick(deltaTime);
             Actor.Tick(deltaTime);
         }

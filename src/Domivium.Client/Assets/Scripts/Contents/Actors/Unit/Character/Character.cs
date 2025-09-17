@@ -11,11 +11,11 @@ namespace Domivium.Client.Contents.Actors
         {
             _agent.updateUpAxis = false;
             _agent.updateRotation = false;
-            base.Initialize(parent);            
+            base.Initialize(parent);
         }
 
         public void SetSpeed(int speed)
-        {            
+        {
             _agent.speed = speed * Constant.Percent;
         }
 

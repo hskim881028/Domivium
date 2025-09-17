@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI;
@@ -39,6 +40,7 @@ namespace Domivium.Client.Contents.DI.Entry
 
         protected override void OnStart()
         {
+            DOTween.SetTweensCapacity(512, 64);
             Application.targetFrameRate = 60;
             _sceneService.Load(SceneScopeIds.Title);
         }

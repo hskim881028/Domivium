@@ -9,6 +9,7 @@ namespace Domivium.Client.Core.Battle
         protected readonly IBattleEffectPool EffectPool;
         protected abstract IReadOnlyCollection<ActorTag> RequiredTags { get; }
         protected abstract IReadOnlyCollection<ActorTag> BlockedTags { get; }
+        protected abstract IReadOnlyCollection<ActorTag> BlockedStateTags { get; }
         public abstract BattleAbilityId Id { get; }
         public abstract float Cooldown { get; }
         public abstract BattleCueId CueId { get; }
@@ -20,7 +21,14 @@ namespace Domivium.Client.Core.Battle
 
         public abstract void Activate(IReadOnlyList<BattleSystem> targets, in BattleContext context);
 
-        public bool PassesTagRequirements(IReadOnlyCollection<ActorTag> tags)
-            => RequiredTags.All(tags.Contains) && BlockedTags.All(t => !tags.Contains(t));
+        public bool PassesTagRequirements(ActorTag state, IReadOnlyCollection<ActorTag> tags)
+        {
+            if (BlockedStateTags.Contains(state))
+            {
+                return false;
+            }
+
+            return RequiredTags.All(tags.Contains) && BlockedTags.All(t => !tags.Contains(t));
+        }
     }
 }

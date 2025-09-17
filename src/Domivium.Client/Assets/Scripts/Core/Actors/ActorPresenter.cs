@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Message;
 using MessagePipe;
 using ObservableCollections;
+using R3;
 using UnityEngine;
 
 namespace Domivium.Client.Core.Actors
@@ -22,6 +22,9 @@ namespace Domivium.Client.Core.Actors
             Id = id;
             Actor = actor;
             TagPublisher = tagPublisher;
+
+            TagSet.Subscribe(OnChangedTags);
+            TagSet.State.Subscribe(OnChangedStateTag).AddTo(ref DisposableBag);
         }
 
         public virtual void Initialize(Transform parent)
@@ -32,39 +35,26 @@ namespace Domivium.Client.Core.Actors
         public virtual async UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             TagSet.Clear();
-            TagSet.Subscribe(OnChangedTags);
             await Actor.ActivateAsync(token, param);
         }
 
         public virtual void Deactivate()
         {
-            TagSet.Unsubscribe(OnChangedTags);
             TagSet.Clear();
             Actor.Deactivate();
         }
 
-        protected virtual void OnChangedTags(in NotifyCollectionChangedEventArgs<ActorTag> e)
+        protected override void OnDispose()
         {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    if (e.NewItem == ActorTag.Die)
-                    {
-                        TagPublisher.Publish(ActorTagMessage.Create(ActorTag.Die, Id));
-                    }
-                    else if (e.NewItem == ActorTag.Despawn)
-                    {
-                        TagPublisher.Publish(ActorTagMessage.Create(ActorTag.Despawn, Id));
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Replace:
-                case NotifyCollectionChangedAction.Reset:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            TagSet.Unsubscribe(OnChangedTags);
+            base.OnDispose();
         }
+
+        protected virtual void OnChangedStateTag(ActorTag tag)
+        {
+            TagPublisher.Publish(ActorTagMessage.Create(tag, Id));
+        }
+
+        protected virtual void OnChangedTags(in NotifyCollectionChangedEventArgs<ActorTag> e) { }
     }
 }

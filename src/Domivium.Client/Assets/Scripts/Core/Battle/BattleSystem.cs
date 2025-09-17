@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Data.Stat;
 using UnityEngine;
@@ -14,6 +13,7 @@ namespace Domivium.Client.Core.Battle
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
         private readonly TagSet _tagSet;
 
+        public ActorTag State => _tagSet.State.CurrentValue;
         public IReadOnlyCollection<ActorTag> Tags => _tagSet.Tags;
         public Transform Unit { get; }
         public StatSet Stat { get; }
@@ -63,23 +63,9 @@ namespace Domivium.Client.Core.Battle
 
         public void Tick(float deltaTime)
         {
-            if (_tagSet.Contains(ActorTag.Die)) return;
-
             UpdateAbilities(deltaTime);
             UpdateEffects(deltaTime);
             UpdateAttributeSet();
-
-            if (Gauge.Current(StatId.Health) < 150)
-            {
-                _tagSet.Add(ActorTag.Die);
-                Test().Forget();
-            }
-        }
-
-        private async UniTaskVoid Test()
-        {
-            await Awaitable.WaitForSecondsAsync(1);
-            _tagSet.Add(ActorTag.Despawn);
         }
 
         private void UpdateAttributeSet()

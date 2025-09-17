@@ -74,7 +74,7 @@ namespace Domivium.Client.Core.Battle
             _onDeactivate.Invoke(this);
         }
 
-        private bool CanActivate(BattleSystem asc) => _effect.PassesTagRequirements(asc.Tags);
+        private bool CanActivate(BattleSystem asc) => _effect.PassesTagRequirements(asc.State, asc.Tags);
 
         private void ResetInternal(BattleEffect effect)
         {

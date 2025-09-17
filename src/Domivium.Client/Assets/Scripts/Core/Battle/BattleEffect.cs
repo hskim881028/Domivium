@@ -12,9 +12,10 @@ namespace Domivium.Client.Core.Battle
         private readonly List<BattleGaugeModifier> _gaugeModifiers = new();
         private readonly List<BattleGaugeModifier> _gaugePeriodicModifiers = new();
         private BattleContext _context;
-        
+
         protected abstract IReadOnlyCollection<ActorTag> RequiredTags { get; }
         protected abstract IReadOnlyCollection<ActorTag> BlockedTags { get; }
+        protected abstract IReadOnlyCollection<ActorTag> BlockedStateTags { get; }
         public abstract BattleEffectId Id { get; }
         public abstract float Duration { get; }
         public abstract float PeriodicInterval { get; }
@@ -45,8 +46,16 @@ namespace Domivium.Client.Core.Battle
             _gaugePeriodicModifiers.Clear();
         }
 
-        public bool PassesTagRequirements(IReadOnlyCollection<ActorTag> tags)
-            => RequiredTags.All(tags.Contains) && BlockedTags.All(t => !tags.Contains(t));
+        public bool PassesTagRequirements(ActorTag state, IReadOnlyCollection<ActorTag> tags)
+        {
+            if (BlockedStateTags.Contains(state))
+            {
+                return false;
+            }
+
+            return RequiredTags.All(tags.Contains) && BlockedTags.All(t => !tags.Contains(t));
+        }
+
 
         protected void AddStatModifier(StatId id, int value, StatChannel channel)
         {

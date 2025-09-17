@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Message;
-using Domivium.Client.Core.Utility;
 using MessagePipe;
 using R3;
 using UnityEngine.InputSystem;
@@ -102,11 +102,11 @@ namespace Domivium.Client.Contents.Manager
 
         private void OnActorTagMessage(ActorTagMessage message)
         {
-            if (message.Tag == ActorTag.Die)
+            if (message.Tag == StateTag.Die)
             {
                 _pendingRemoves.Enqueue(message.Id);
             }
-            else if (message.Tag == ActorTag.Despawn)
+            else if (message.Tag == StateTag.Despawn)
             {
                 if (_pendingDespawns.Remove(message.Id, out var onDespawn))
                 {

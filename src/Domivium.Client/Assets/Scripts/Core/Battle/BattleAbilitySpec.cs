@@ -45,8 +45,8 @@ namespace Domivium.Client.Core.Battle
         private bool CanActivate(BattleSystem target)
         {
             if (_cooldown > 0f) return false;
-            
-            if (!_ability.PassesTagRequirements(target.Tags)) return false;
+
+            if (!_ability.PassesTagRequirements(target.State, target.Tags)) return false;
 
             // todo: 공격 범위등등 조건 다 체크.
 
