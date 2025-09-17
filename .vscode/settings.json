@@ -1,0 +1,15 @@
+{
+    "chatgpt.openOnStartup": false,
+    "dotnet.preferCSharpExtension": true,
+    "dotnet.defaultSolution": "Domivium.sln",
+
+  "search.exclude": {
+    "Library": true,
+    "Logs": true,
+    "Temp": true,
+    "Obj": true,
+    "Build": true,
+    "Builds": true
+  },
+  "editor.defaultFormatter": "visualstudiotoolsforunity.vstuc"
+}
