@@ -31,6 +31,7 @@ namespace Domivium.Client.Core.UI.Navigation
             }
 
             _pool.Clear();
+            base.OnDispose();
         }
     }
 }

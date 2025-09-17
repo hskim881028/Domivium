@@ -76,6 +76,7 @@ namespace Domivium.Client.Core.UI
         protected override void OnDispose()
         {
             Clear();
+            base.OnDispose();
         }
 
         private void Clear()

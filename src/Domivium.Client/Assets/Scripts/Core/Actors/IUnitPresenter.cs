@@ -2,7 +2,7 @@
 
 namespace Domivium.Client.Core.Actors
 {
-    public interface IUnitPresenter : IUnitUpdater
+    public interface IUnitPresenter : ITicker
     {
         public BattleSystem BattleSystem { get; }
     }

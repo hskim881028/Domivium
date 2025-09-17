@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Data.Stat;
 using UnityEngine;
 
@@ -10,19 +12,22 @@ namespace Domivium.Client.Core.Battle
         private readonly List<BattleEffectSpec> _effectSpecs = new();
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
-        private readonly HashSet<BattleTag> _tags = new();
+        private readonly TagSet _tagSet;
 
+        public IReadOnlyCollection<ActorTag> Tags => _tagSet.Tags;
         public Transform Unit { get; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
-        public IReadOnlyCollection<BattleTag> Tags => _tags;
 
-        public BattleSystem(Transform unit)
+        public BattleSystem(TagSet tagSet, Transform unit)
         {
+            _tagSet = tagSet;
             Unit = unit;
             Stat = new StatSet();
             Gauge = new GaugeSet(Stat);
         }
+
+        public BattleContext CreateBattleContext(BattleAbility ability) => new() { Source = this, Unit = Unit, Ability = ability };
 
         public void Reset()
         {
@@ -36,7 +41,6 @@ namespace Domivium.Client.Core.Battle
             _effectSpecs.Clear();
             _statModifiers.Clear();
             _gaugeModifiers.Clear();
-            _tags.Clear();
             Stat.Clear();
             Gauge.Clear();
         }
@@ -59,9 +63,23 @@ namespace Domivium.Client.Core.Battle
 
         public void Tick(float deltaTime)
         {
+            if (_tagSet.Contains(ActorTag.Die)) return;
+
             UpdateAbilities(deltaTime);
             UpdateEffects(deltaTime);
             UpdateAttributeSet();
+
+            if (Gauge.Current(StatId.Health) < 150)
+            {
+                _tagSet.Add(ActorTag.Die);
+                Test().Forget();
+            }
+        }
+
+        private async UniTaskVoid Test()
+        {
+            await Awaitable.WaitForSecondsAsync(1);
+            _tagSet.Add(ActorTag.Despawn);
         }
 
         private void UpdateAttributeSet()
@@ -128,19 +146,19 @@ namespace Domivium.Client.Core.Battle
             }
         }
 
-        private void AddTags(IReadOnlyCollection<BattleTag> tags)
+        private void AddTags(IReadOnlyCollection<ActorTag> tags)
         {
             foreach (var tag in tags)
             {
-                _tags.Add(tag);
+                _tagSet.Add(tag);
             }
         }
 
-        private void RemoveTags(IReadOnlyCollection<BattleTag> tags)
+        private void RemoveTags(IReadOnlyCollection<ActorTag> tags)
         {
             foreach (var tag in tags)
             {
-                _tags.Remove(tag);
+                _tagSet.Remove(tag);
             }
         }
     }

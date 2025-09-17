@@ -36,7 +36,7 @@ namespace Domivium.Client.Contents.Services
 
         public IReadOnlyObservableList<Vector3Int> StagedTower => _stagedTower;
 
-        public IReadOnlyObservableDictionary<Vector3Int, bool> PreviewPreviewTower => _previewTower;
+        public IReadOnlyObservableDictionary<Vector3Int, bool> PreviewTower => _previewTower;
 
         public TowerPlacementService(
             StageMapProvider stageMapProvider,
@@ -45,7 +45,7 @@ namespace Domivium.Client.Contents.Services
             IStageMapStore store,
             ICameraReadModel cameraRead,
             ISubscriber<SceneMessage> sceneSubscriber,
-            ISubscriber<SpawnerMessage> spawnerSubscriber)
+            ISubscriber<SpawnActorMessage> spawnerSubscriber)
         {
             _stageMapProvider = stageMapProvider;
             _director = director;
@@ -141,21 +141,11 @@ namespace Domivium.Client.Contents.Services
             }
         }
 
-        private void OnSpawnerMessage(SpawnerMessage message)
+        private void OnSpawnerMessage(SpawnActorMessage message)
         {
-            switch (message.Type)
+            if (message.Presenter is StageMapPresenter stageMapPresenter)
             {
-                case SpawnerMessageType.Spawn:
-                    if (message.Presenter is StageMapPresenter stageMapPresenter)
-                    {
-                        _grid = stageMapPresenter.Grid;
-                    }
-
-                    break;
-                case SpawnerMessageType.Despawn:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                _grid = stageMapPresenter.Grid;
             }
         }
     }

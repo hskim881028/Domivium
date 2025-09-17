@@ -24,6 +24,7 @@ namespace Domivium.Client.Core.Context
         {
             _mode?.Dispose();
             _phase?.Dispose();
+            base.OnDispose();
         }
     }
 }

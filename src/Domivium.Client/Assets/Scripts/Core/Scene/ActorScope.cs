@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
@@ -9,50 +8,30 @@ namespace Domivium.Client.Core.Scene
 {
     public class ActorScope : LifetimeScope
     {
-        private IActorPresenter _presenter;
-        private Action<ActorScope> _onDespawn;
-        private CancellationTokenSource _cts = new();
         private bool _isDespawn;
 
-        public ActorId ActorId { get; private set; }
+        public IActorPresenter Presenter { get; private set; }
 
-        public Guid ScopeId { get; private set; }
-
-        public void Initialize(ActorId id, IActorPresenter presenter, Action<ActorScope> onDespawn)
+        public void Initialize(IActorPresenter presenter)
         {
-            ScopeId = Guid.NewGuid();
-            ActorId = id;
-            _presenter = presenter;
-            _presenter.Initialize(transform, Despawn);
-            _onDespawn = onDespawn;
+            Presenter = presenter;
+            Presenter.Initialize(transform);
         }
 
-        public async UniTask<IActorPresenter> SpawnAsync(ActorParam param)
+        public async UniTask SpawnAsync(ActorParam param, CancellationToken token)
         {
             _isDespawn = false;
             gameObject.SetActive(true);
-            await _presenter.ActivateAsync(_cts.Token, param);
-            return _presenter;
+            await Presenter.ActivateAsync(token, param);
         }
 
-        private void Despawn()
+        public void Despawn()
         {
             if (_isDespawn) return;
 
             _isDespawn = true;
-            _cts.Cancel();
-            _cts.Dispose();
-            _cts = new CancellationTokenSource();
+            Presenter.Deactivate();
             gameObject.SetActive(false);
-            _onDespawn?.Invoke(this);
-        }
-
-        protected override void OnDestroy()
-        {
-            _cts.Cancel();
-            _cts.Dispose();
-            _cts = null;
-            base.OnDestroy();
         }
     }
 }

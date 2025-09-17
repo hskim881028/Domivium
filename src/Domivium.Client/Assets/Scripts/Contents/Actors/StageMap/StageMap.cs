@@ -23,7 +23,7 @@ namespace Domivium.Client.Contents.Actors
 
         public Tilemap Background => _background;
 
-        public override UniTask ActivateAsync(CancellationToken token, ActorParam param, bool immediately = false)
+        public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             foreach (var cell in param.As<ActorParams>().Cells)
             {
@@ -35,7 +35,7 @@ namespace Domivium.Client.Contents.Actors
             }
 
             _navMeshSurface.BuildNavMesh();
-            return base.ActivateAsync(token, param, immediately);
+            return base.ActivateAsync(token, param);
         }
 
         public void SetActivePreviewGrid(bool value)

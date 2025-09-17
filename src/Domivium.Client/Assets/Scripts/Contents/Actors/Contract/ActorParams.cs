@@ -11,4 +11,5 @@ namespace Domivium.Client.Contents.Actors.Contract
     public record UnitParams(CharacterRow CharacterRow, IReadOnlyList<BattleAbilitySpec> Abilities) : ActorParam;
 
     public record TowerParams(Vector3Int StartCell) : ActorParam;
+    public record DamageTextParams(Vector3 Position, int Damage, float DespawnTime) : ActorParam;
 }

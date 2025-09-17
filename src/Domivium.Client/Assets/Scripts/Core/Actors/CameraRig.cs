@@ -1,34 +1,15 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Rendering.Universal;
-using VContainer;
+﻿using UnityEngine;
 
 namespace Domivium.Client.Core.Actors
 {
     public sealed class CameraRig : Actor
     {
-        public Camera MainCamera { get; private set; }
+        [SerializeField] private Camera _main;
+        [SerializeField] private Camera _vfx;
+        [SerializeField] private Camera _ui;
 
-        public Camera UICamera { get; private set; }
-
-        [Inject]
-        public void Construct()
-        {
-            var cameras = GetComponentsInChildren<Camera>();
-            foreach (var cam in cameras)
-            {
-                switch (cam.GetUniversalAdditionalCameraData().renderType)
-                {
-                    case CameraRenderType.Base:
-                        MainCamera = cam;
-                        break;
-                    case CameraRenderType.Overlay:
-                        UICamera = cam;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
+        public Camera Main => _main;
+        public Camera VFX => _vfx;
+        public Camera UI => _ui;
     }
 }

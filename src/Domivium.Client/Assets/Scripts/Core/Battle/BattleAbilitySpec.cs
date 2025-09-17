@@ -25,7 +25,8 @@ namespace Domivium.Client.Core.Battle
 
             _cooldown = _ability.Cooldown;
 
-            var context = BattleContext.Create(target, _ability, target.Unit, 0);
+            var context = target.CreateBattleContext(_ability);
+            // var context = BattleContext.Create(target, _ability, target.Unit, 0);
             // var targets = ResolveTargets();              // 능력 정의 기반 타겟팅
             // var enemies = TargetingService.GetUnitsInRadius(owner.Position, ability.Radius, TargetType.Enemy);
             _ability.Activate(new List<BattleSystem> { target }, in context);
@@ -44,7 +45,7 @@ namespace Domivium.Client.Core.Battle
         private bool CanActivate(BattleSystem target)
         {
             if (_cooldown > 0f) return false;
-
+            
             if (!_ability.PassesTagRequirements(target.Tags)) return false;
 
             // todo: 공격 범위등등 조건 다 체크.

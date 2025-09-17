@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors.Contract;
 using UnityEngine;
@@ -8,8 +7,8 @@ namespace Domivium.Client.Core.Actors
 {
     public interface IActorActivatable
     {
-        public void Initialize(Transform parent, Action onDespawn);
-        public UniTask ActivateAsync(CancellationToken token, ActorParam param, bool immediately = false);
-        public UniTask DeactivateAsync(CancellationToken token, bool immediately = false);
+        public void Initialize(Transform parent);
+        public UniTask ActivateAsync(CancellationToken token, ActorParam param);
+        public void Deactivate();
     }
 }

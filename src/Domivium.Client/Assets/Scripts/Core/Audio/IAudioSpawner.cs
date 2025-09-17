@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Audio;
 
-namespace Domivium.Client.Core.Actors
+namespace Domivium.Client.Core.Audio
 {
     public interface IAudioSpawner
     {

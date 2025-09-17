@@ -33,6 +33,8 @@ namespace Domivium.Client.Contents.Battle
             {
                 _audioController.PlaySFX(SFXAudioId.Damaged);
             }
+            
+            _vfxService.Spawn(message.CueId, message.Context);
         }
     }
 }

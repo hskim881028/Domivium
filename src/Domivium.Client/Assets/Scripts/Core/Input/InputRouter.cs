@@ -33,6 +33,7 @@ namespace Domivium.Client.Core.Input
         protected override void OnDispose()
         {
             _consumers.Clear();
+            base.OnDispose();
         }
 
         private void Sort()

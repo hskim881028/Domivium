@@ -5,24 +5,23 @@ using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Message;
 using Domivium.Client.Data.Stat;
-using UnityEngine;
+using MessagePipe;
 
 namespace Domivium.Client.Contents.Actors
 {
     public abstract class UnitPresenter<TUnit> : ActorPresenter<TUnit>, IUnitPresenter where TUnit : Unit
     {
-        public BattleSystem BattleSystem { get; private set; }
+        public BattleSystem BattleSystem { get; }
 
-        protected UnitPresenter(TUnit unit) : base(unit) { }
-
-        public override void Initialize(Transform parent, Action onDespawn)
+        protected UnitPresenter(Guid id, TUnit actor, IPublisher<ActorTagMessage> tagPublisher)
+            : base(id, actor, tagPublisher)
         {
-            BattleSystem = new BattleSystem(Actor.transform);
-            base.Initialize(parent, onDespawn);
+            BattleSystem = new BattleSystem(TagSet, Actor.transform);
         }
 
-        public override UniTask ActivateAsync(CancellationToken token, ActorParam param, bool immediately = false)
+        public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             var p = param.As<UnitParams>();
             var row = p.CharacterRow;
@@ -44,7 +43,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Stat.Register(StatId.CriticalDamage, row.CriticalDamage, OnCriticalDamageStatChanged);
 
             BattleSystem.Gauge.Register(StatId.Health, row.Health, OnHealthGaugeChanged);
-            return base.ActivateAsync(token, param, immediately);
+            return base.ActivateAsync(token, param);
         }
 
         public virtual void Tick(float deltaTime)

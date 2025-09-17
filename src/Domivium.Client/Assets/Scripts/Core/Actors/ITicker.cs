@@ -1,6 +1,6 @@
 ﻿namespace Domivium.Client.Core.Actors
 {
-    public interface IUnitUpdater
+    public interface ITicker
     {
         public void Tick(float deltaTime);
     }

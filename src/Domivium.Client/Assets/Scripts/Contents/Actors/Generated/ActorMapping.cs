@@ -11,7 +11,8 @@ namespace Domivium.Client.Contents.Actors.Generated
             { ActorIds.Map, (typeof(StageMapPresenter), typeof(StageMap)) },
             { ActorIds.Tower, (typeof(TowerPresenter), typeof(Tower)) },
             { ActorIds.Character, (typeof(CharacterPresenter), typeof(Character)) },
-            { ActorIds.CharacterPathIndicator, (typeof(CharacterPathIndicatorPresenter), typeof(CharacterPathIndicator)) }
+            { ActorIds.CharacterPathIndicator, (typeof(CharacterPathIndicatorPresenter), typeof(CharacterPathIndicator)) },
+            { ActorIds.DamageText, (typeof(DamageTextPresenter), typeof(DamageText)) }
         };
     }
 }

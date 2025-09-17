@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
 using Domivium.Client.Core.UI;
+using Domivium.Client.Core.Utility;
 using MessagePipe;
 using R3;
 using VContainer;
@@ -19,50 +20,100 @@ namespace Domivium.Client.Core.Actors
         private const int MaxPoolPerActor = 16;
 
         private readonly Dictionary<ActorId, (Type presenter, Type view)> _container;
-        private readonly List<Actor> _prefabs;
-        private readonly IPublisher<SpawnerMessage> _publisher;
-        private readonly Dictionary<ActorId, Queue<ActorScope>> _pool = new();
+        private readonly Dictionary<Type, Actor> _prefabs = new();
+        private readonly IPublisher<SpawnActorMessage> _publisher;
+        private readonly Dictionary<ActorId, Queue<(Guid id, ActorScope scope)>> _pool = new();
+        private readonly Dictionary<Guid, (ActorId actorId, ActorScope scope)> _activeActors = new();
 
         private ActorRootScope _root;
         private SceneMessageType _sceneMessageType;
+        private CancellationTokenSource _cts = new();
 
         public ActorSpawner(
             Dictionary<ActorId, (Type presenter, Type view)> container,
             List<Actor> prefabs,
-            IPublisher<SpawnerMessage> publisher,
+            IPublisher<SpawnActorMessage> publisher,
             ISubscriber<SceneMessage> subscriber)
         {
+            this.Log();
             _container = container;
-            _prefabs = prefabs;
+            foreach (var prefab in prefabs)
+            {
+                _prefabs[prefab.GetType()] = prefab;
+            }
+
             _publisher = publisher;
             subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
-        public async UniTask SpawnAsync(ActorId id, ActorParam param)
+        public async UniTask SpawnAsync(ActorId actorId, ActorParam param)
         {
-            if (TryGet(id, out var scope))
+            if (TryGet(actorId, out var actor))
             {
-                await scope.SpawnAsync(param);
+                await SpawnInternalAsync(actor.scope, actor.scope.Presenter, actor.id, actorId, param);
                 return;
             }
 
-            var (presenterType, viewType) = _container[id];
-            var child = _root.CreateChild<ActorScope>(builder =>
+            var (presenterType, viewType) = _container[actorId];
+            var id = Guid.NewGuid();
+            var actorScope = _root.CreateChild<ActorScope>(builder =>
                 {
-                    var prefab = _prefabs.FirstOrDefault(p => viewType.IsAssignableFrom(p.GetType()));
-                    if (prefab == null)
+                    if (!_prefabs.TryGetValue(viewType, out var prefab))
                     {
-                        throw new InvalidOperationException($"Actor prefab not found for view type {viewType.FullName}. Make sure it is listed in ActorContainer.");
+                        throw new InvalidOperationException($"Actor prefab not found for view type {viewType.FullName}. Check ActorContainer list.");
                     }
+
                     builder.RegisterComponentInNewPrefab(prefab, Lifetime.Singleton).AsSelf();
-                    builder.Register(presenterType, Lifetime.Singleton);
+                    builder.Register(presenterType, Lifetime.Singleton).WithParameter(id);
                 },
                 $"{presenterType.Name.AsActor()}(Scope)");
 
-            var presenter = (IActorPresenter)child.Container.Resolve(presenterType);
-            child.Initialize(id, presenter, Despawn);
-            await child.SpawnAsync(param);
-            _publisher.Publish(SpawnerMessage.Spawn(child, presenter));
+            var presenter = (IActorPresenter)actorScope.Container.Resolve(presenterType);
+            actorScope.Initialize(presenter);
+            await SpawnInternalAsync(actorScope, presenter, id, actorId, param);
+        }
+
+        protected override void OnDispose()
+        {
+            Clear();
+            base.OnDispose();
+        }
+
+        private async UniTask SpawnInternalAsync(
+            ActorScope scope,
+            IActorPresenter presenter,
+            Guid id,
+            ActorId actorId,
+            ActorParam param)
+        {
+            await scope.SpawnAsync(param, _cts.Token);
+            _activeActors.Add(id, (actorId, scope));
+            _publisher.Publish(SpawnActorMessage.Create(id, actorId, presenter, Return));
+        }
+
+        private void Return(Guid id)
+        {
+            if (_sceneMessageType == SceneMessageType.Unload) return;
+
+            if (!_activeActors.Remove(id, out var value))
+            {
+                throw new InvalidOperationException($"Actor scope not found for scope: {id}");
+            }
+
+            if (!_pool.ContainsKey(value.actorId))
+            {
+                _pool.Add(value.actorId, new Queue<(Guid, ActorScope)>());
+            }
+
+            if (_pool[value.actorId].Count < MaxPoolPerActor)
+            {
+                value.scope.Despawn();
+                _pool[value.actorId].Enqueue((id, value.scope));
+            }
+            else
+            {
+                Object.Destroy(value.scope.gameObject);
+            }
         }
 
         private void OnSceneMessage(SceneMessage message)
@@ -71,9 +122,10 @@ namespace Domivium.Client.Core.Actors
             switch (_sceneMessageType)
             {
                 case SceneMessageType.Unload:
-                    _pool.Clear();
+                    Clear();
                     break;
                 case SceneMessageType.Load:
+                    _cts = new CancellationTokenSource();
                     _root = message.SceneScope.ActorRootScope;
                     break;
                 default:
@@ -81,48 +133,31 @@ namespace Domivium.Client.Core.Actors
             }
         }
 
-        private bool TryGet(ActorId id, out ActorScope scope)
+        private bool TryGet(ActorId actorId, out (Guid id, ActorScope scope) actor)
         {
-            if (!_pool.TryGetValue(id, out var queue))
+            if (!_pool.TryGetValue(actorId, out var queue))
             {
-                _pool.Add(id, new Queue<ActorScope>());
-                queue = _pool[id];
+                _pool.Add(actorId, new Queue<(Guid, ActorScope)>());
+                queue = _pool[actorId];
             }
 
             if (queue.Count > 0)
             {
-                scope = queue.Dequeue();
+                actor = queue.Dequeue();
                 return true;
             }
 
-            scope = null;
+            actor = default;
             return false;
         }
 
-        private void Despawn(ActorScope scope)
+        private void Clear()
         {
-            _publisher.Publish(SpawnerMessage.Despawn(scope));
-
-            if (_sceneMessageType == SceneMessageType.Unload)
-            {
-                Object.Destroy(scope.gameObject);
-                return;
-            }
-
-            if (!_pool.TryGetValue(scope.ActorId, out var queue))
-            {
-                _pool.Add(scope.ActorId, new Queue<ActorScope>());
-                queue = _pool[scope.ActorId];
-            }
-
-            if (queue.Count < MaxPoolPerActor)
-            {
-                queue.Enqueue(scope);
-            }
-            else
-            {
-                Object.Destroy(scope.gameObject);
-            }
+            _cts.Cancel();
+            _cts.Dispose();
+            _cts = null;
+            _activeActors.Clear();
+            _pool.Clear();
         }
     }
 }

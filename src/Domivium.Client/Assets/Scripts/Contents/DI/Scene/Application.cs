@@ -1,4 +1,5 @@
 ﻿using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.Audio;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.DI.Container;
@@ -6,6 +7,7 @@ using Domivium.Client.Contents.DI.Entry;
 using Domivium.Client.Contents.Director;
 using Domivium.Client.Contents.Input.Composition;
 using Domivium.Client.Contents.Input.Consumer;
+using Domivium.Client.Contents.Manager;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI.Generated;
 using Domivium.Client.Core;
@@ -53,6 +55,7 @@ namespace Domivium.Client.Contents.DI.Scene
             Network(builder, Lifetime.Singleton);
             Input(builder, Lifetime.Singleton);
             Scene(builder, Lifetime.Singleton);
+            Manager(builder, Lifetime.Singleton);
 
             Services(builder, Lifetime.Singleton);
             Provider(builder, Lifetime.Singleton);
@@ -77,8 +80,9 @@ namespace Domivium.Client.Contents.DI.Scene
             var options = builder.RegisterMessagePipe();
             builder.RegisterMessageBroker<SceneMessage>(options);
             builder.RegisterMessageBroker<SceneUIReadyMessage>(options);
-            builder.RegisterMessageBroker<SpawnerMessage>(options);
+            builder.RegisterMessageBroker<SpawnActorMessage>(options);
             builder.RegisterMessageBroker<BattleCueMessage>(options);
+            builder.RegisterMessageBroker<ActorTagMessage>(options);
         }
 
         private static void SecureStore(IContainerBuilder builder, Lifetime lifetime)
@@ -118,13 +122,17 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<ISceneScopeManager, SceneScopeManager>(lifetime);
         }
 
+        private static void Manager(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<ActorManager>(lifetime);
+        }
+
         private void Services(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<MasterDbService>(lifetime).WithParameter(_configContainer.MasterDB);
             builder.Register<NetworkService>(lifetime);
             builder.Register<SceneService>(lifetime);
             builder.Register<EnvironmentService>(lifetime);
-            builder.Register<UnitService>(lifetime);
             builder.Register<VfxService>(lifetime);
             builder.Register<CameraService>(lifetime).AsImplementedInterfaces();
             builder.Register<PointerService>(lifetime).AsImplementedInterfaces();

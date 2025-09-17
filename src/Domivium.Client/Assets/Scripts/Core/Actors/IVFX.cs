@@ -1,4 +1,4 @@
 ﻿namespace Domivium.Client.Core.Actors
 {
-    public interface IUnit : ITicker { }
+    public interface IVFX : ITicker { }
 }

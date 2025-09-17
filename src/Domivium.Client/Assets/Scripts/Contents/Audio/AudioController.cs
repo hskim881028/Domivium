@@ -10,7 +10,7 @@ using R3;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace Domivium.Client.Contents.Services
+namespace Domivium.Client.Contents.Audio
 {
     public sealed class AudioController : Disposable, IAudioController
     {
@@ -102,6 +102,7 @@ namespace Domivium.Client.Contents.Services
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
+            base.OnDispose();
         }
 
         private async UniTaskVoid PlayBgmAsync(AudioId id)

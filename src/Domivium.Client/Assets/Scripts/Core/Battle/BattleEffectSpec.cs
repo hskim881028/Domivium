@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Message;
 using MessagePipe;
 
@@ -15,7 +16,7 @@ namespace Domivium.Client.Core.Battle
 
         public BattleEffectId Id => _effect.Id;
 
-        public IReadOnlyCollection<BattleTag> GrantedTags => _effect.GrantedTags;
+        public IReadOnlyCollection<ActorTag> GrantedTags => _effect.GrantedTags;
         public IReadOnlyList<BattleStatModifier> StatModifiers => _effect.StatModifiers;
         public IReadOnlyList<BattleStatModifier> StatPeriodicModifiers => _effect.StatPeriodicModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugeModifiers => _effect.GaugeModifiers;

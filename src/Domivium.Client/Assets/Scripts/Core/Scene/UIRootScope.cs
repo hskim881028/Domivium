@@ -26,7 +26,7 @@ namespace Domivium.Client.Core.Scene
             var cameraSet = Parent.Container.Resolve<CameraRig>();
             _canvas = GetComponent<Canvas>();
             _canvas.renderMode = RenderMode.ScreenSpaceCamera;
-            _canvas.worldCamera = cameraSet.UICamera;
+            _canvas.worldCamera = cameraSet.UI;
             _canvas.vertexColorAlwaysGammaSpace = true;
 
             _canvasScaler = GetComponent<CanvasScaler>();

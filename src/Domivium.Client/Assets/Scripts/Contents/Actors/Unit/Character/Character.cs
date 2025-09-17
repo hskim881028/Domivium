@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 namespace Domivium.Client.Contents.Actors
@@ -8,15 +7,15 @@ namespace Domivium.Client.Contents.Actors
     {
         [SerializeField] private NavMeshAgent _agent;
 
-        public override void Initialize(Transform parent, Action onDespawn)
+        public override void Initialize(Transform parent)
         {
             _agent.updateUpAxis = false;
             _agent.updateRotation = false;
-            base.Initialize(parent, onDespawn);
+            base.Initialize(parent);            
         }
 
         public void SetSpeed(int speed)
-        {
+        {            
             _agent.speed = speed * Constant.Percent;
         }
 

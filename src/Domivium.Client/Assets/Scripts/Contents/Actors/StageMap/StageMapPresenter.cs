@@ -5,6 +5,8 @@ using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Context;
+using Domivium.Client.Core.Message;
+using MessagePipe;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -19,22 +21,25 @@ namespace Domivium.Client.Contents.Actors
         public Tilemap Grid => Actor.Background;
 
         public StageMapPresenter(
+            Guid id,
             StageMap actor,
+            IPublisher<ActorTagMessage> tagPublisher,
             StageContext stageContext,
             ITowerPlacementReadModel read)
-            : base(actor)
+            : base(id, actor, tagPublisher)
         {
             stageContext.Mode.Subscribe(OnChangeMode).AddTo(ref DisposableBag);
 
             _read = read;
             _read.StagedTower.CollectionChanged += OnChangedStagedTower;
-            _read.PreviewPreviewTower.CollectionChanged += OnChangedPreviewPreviewTower;
+            _read.PreviewTower.CollectionChanged += OnChangedPreviewTower;
         }
 
         protected override void OnDispose()
         {
             _read.StagedTower.CollectionChanged -= OnChangedStagedTower;
-            _read.PreviewPreviewTower.CollectionChanged -= OnChangedPreviewPreviewTower;
+            _read.PreviewTower.CollectionChanged -= OnChangedPreviewTower;
+            base.OnDispose();
         }
 
         private void OnChangeMode(StageMode mode)
@@ -63,7 +68,7 @@ namespace Domivium.Client.Contents.Actors
             }
         }
 
-        private void OnChangedPreviewPreviewTower(in NotifyCollectionChangedEventArgs<KeyValuePair<Vector3Int, bool>> e)
+        private void OnChangedPreviewTower(in NotifyCollectionChangedEventArgs<KeyValuePair<Vector3Int, bool>> e)
         {
             switch (e.Action)
             {

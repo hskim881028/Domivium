@@ -9,5 +9,6 @@ namespace Domivium.Client.Contents.Actors.Generated
         public static ActorId Character = 2;
         public static ActorId Monster = 3;
         public static ActorId CharacterPathIndicator = 4;
+        public static ActorId DamageText = 5;
     }
 }

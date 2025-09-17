@@ -8,9 +8,9 @@ namespace Domivium.Client.Contents.Services
     {
         private readonly CameraRig _cameraRig;
 
-        public Camera MainCamera => _cameraRig.MainCamera;
+        public Camera MainCamera => _cameraRig.Main;
 
-        public Camera UICamera => _cameraRig.UICamera;
+        public Camera UICamera => _cameraRig.UI;
 
         public CameraService(CameraRig cameraRig)
         {

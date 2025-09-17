@@ -8,11 +8,11 @@ namespace Domivium.Client.Contents.Actors
 {
     public class Tower : Unit
     {
-        public override UniTask ActivateAsync(CancellationToken token, ActorParam param, bool immediately = false)
+        public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             var p = param.As<TowerParams>();
             transform.localPosition = new Vector3(p.StartCell.x + 0.5f, 0, p.StartCell.y);
-            return base.ActivateAsync(token, param, immediately);
+            return base.ActivateAsync(token, param);
         }
     }
 }

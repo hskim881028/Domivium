@@ -2,6 +2,7 @@
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.Commands;
 using Domivium.Client.Contents.Context;
+using Domivium.Client.Contents.Manager;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
@@ -20,7 +21,7 @@ namespace Domivium.Client.Contents.DI.Entry
         private readonly IStageDirector _stageDirector;
         private readonly ITowerPlacementCommand _towerPlacementCommand;
         private readonly IBattleCommand _battleCommand;
-        private readonly UnitService _unitService;
+        private readonly ActorManager _actorManager;
 
         public StageEntry(
             IInputComposition inputComposition,
@@ -29,12 +30,12 @@ namespace Domivium.Client.Contents.DI.Entry
             IAudioController audioController,
             ITowerPlacementCommand towerPlacementCommand,
             IBattleCommand battleCommand,
-            UnitService unitService)
+            ActorManager actorManager)
         {
             _stageDirector = stageDirector;
             _towerPlacementCommand = towerPlacementCommand;
             _battleCommand = battleCommand;
-            _unitService = unitService;
+            _actorManager = actorManager;
             audioController.PlayBGM(BGMAudioId.Stage);
         }
 
@@ -57,7 +58,7 @@ namespace Domivium.Client.Contents.DI.Entry
 
         public void Tick()
         {
-            _unitService.Tick(Time.deltaTime);
+            _actorManager.Tick(Time.deltaTime);
         }
     }
 }

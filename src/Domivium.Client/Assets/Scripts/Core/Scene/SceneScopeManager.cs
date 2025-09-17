@@ -37,6 +37,7 @@ namespace Domivium.Client.Core.Scene
         protected override void OnDispose()
         {
             Unload();
+            base.OnDispose();
         }
 
         private void Unload()

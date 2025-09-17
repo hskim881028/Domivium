@@ -37,6 +37,7 @@ namespace Domivium.Client.Contents.Input.Composition
             Router.Unregister(_systemUIInputConsumer);
             Router.Unregister(_staticUIInputConsumer);
             Router.Unregister(_stackUIInputConsumer);
+            base.OnDispose();
         }
     }
 }

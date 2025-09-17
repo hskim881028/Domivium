@@ -27,6 +27,7 @@ namespace Domivium.Client.Contents.Input.Composition
         {
             Router.Unregister(_towerPlacementInputConsumer);
             Router.Unregister(_battleInputConsumer);
+            base.OnDispose();
         }
     }
 }
