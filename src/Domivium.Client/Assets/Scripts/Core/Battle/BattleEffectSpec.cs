@@ -33,7 +33,7 @@ namespace Domivium.Client.Core.Battle
             ResetInternal(_effect);
         }
 
-        public void Reset(in BattleContext context)
+        public void Reset(BattleContext context)
         {
             _effect.Reset(context);
             ResetInternal(_effect);
@@ -47,13 +47,12 @@ namespace Domivium.Client.Core.Battle
 
         public bool TryActivate(BattleSystem target)
         {
-            if (!CanActivate(target))
+            if (!_effect.TryActivate(target))
             {
                 _onDeactivate.Invoke(this);
                 return false;
             }
 
-            _effect.Activate(target);
             _cuePublisher.Publish(BattleCueMessage.Emit(_effect.CueId, _effect.Context));
             return true;
         }
@@ -73,8 +72,6 @@ namespace Domivium.Client.Core.Battle
             _cuePublisher.Publish(BattleCueMessage.Emit(_effect.DeactivateCueId, _effect.Context));
             _onDeactivate.Invoke(this);
         }
-
-        private bool CanActivate(BattleSystem asc) => _effect.PassesTagRequirements(asc.State, asc.Tags);
 
         private void ResetInternal(BattleEffect effect)
         {

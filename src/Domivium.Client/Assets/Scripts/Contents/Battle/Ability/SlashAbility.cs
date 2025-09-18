@@ -16,13 +16,13 @@ namespace Domivium.Client.Contents.Battle.Ability
 
         public SlashAbility(IBattleEffectPool effectPool) : base(effectPool) { }
 
-        public override void Activate(IReadOnlyList<BattleSystem> targets, in BattleContext context)
+        protected override bool OnActivate(BattleSystem source, ref BattleContext context)
         {
-            foreach (var target in targets)
-            {
-                var effect = EffectPool.Get(BattleEffectIds.Damage, context);
-                target.ActivateEffect(effect);
-            }
+            context.Ability = this;
+            var effect = EffectPool.Get(BattleEffectIds.Damage, context); // 이펙트 새 것 가져옴. context는 복사본 넣어줌
+            source.ActivateEffect(effect);
+            
+            return true;
         }
     }
 }

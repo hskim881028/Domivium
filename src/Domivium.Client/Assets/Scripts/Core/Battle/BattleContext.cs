@@ -6,7 +6,7 @@ namespace Domivium.Client.Core.Battle
     {
         public BattleSystem Source { get; init; }
         public Transform Unit { get; init; }
-        public BattleAbility Ability { get; init; }
+        public BattleAbility Ability { get; set; }
         public int Damage { get; set; }
     }
 }

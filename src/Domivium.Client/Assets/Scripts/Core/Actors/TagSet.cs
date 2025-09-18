@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ObservableCollections;
+﻿using ObservableCollections;
 using R3;
 
 namespace Domivium.Client.Core.Actors
@@ -10,7 +9,6 @@ namespace Domivium.Client.Core.Actors
         private readonly ObservableHashSet<ActorTag> _tags = new();
 
         public ReadOnlyReactiveProperty<ActorTag> State => _state;
-        public IReadOnlyCollection<ActorTag> Tags => _tags;
 
         public void SetState(ActorTag tag) => _state.Value = tag;
 

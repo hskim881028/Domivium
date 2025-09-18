@@ -35,8 +35,6 @@ namespace Domivium.Client.Core.Battle
             _context = context;
         }
 
-        public abstract void Activate(BattleSystem owner);
-
         public void Reset(BattleContext context)
         {
             _context = context;
@@ -45,18 +43,14 @@ namespace Domivium.Client.Core.Battle
             _gaugeModifiers.Clear();
             _gaugePeriodicModifiers.Clear();
         }
-
-        public bool PassesTagRequirements(ActorTag state, IReadOnlyCollection<ActorTag> tags)
+        
+        public bool TryActivate(BattleSystem source)
         {
-            if (BlockedStateTags.Contains(state))
-            {
-                return false;
-            }
-
-            return RequiredTags.All(tags.Contains) && BlockedTags.All(t => !tags.Contains(t));
+            return PassesTagRequirements(source.TagSet) && OnActivate(source);
         }
 
-
+        protected abstract bool OnActivate(BattleSystem source);
+        
         protected void AddStatModifier(StatId id, int value, StatChannel channel)
         {
             _statModifiers.Add(new BattleStatModifier(id, value, channel));
@@ -75,6 +69,26 @@ namespace Domivium.Client.Core.Battle
         protected void AddGaugePeriodicModifier(StatId id, int value, GaugeChannel channel)
         {
             _gaugePeriodicModifiers.Add(new BattleGaugeModifier(id, value, channel));
+        }
+        
+        private bool PassesTagRequirements(TagSet tagSet)
+        {
+            if (BlockedStateTags.Contains(tagSet.State.CurrentValue))
+            {
+                return false;
+            }
+
+            foreach (var tag in BlockedTags)
+            {
+                if (tagSet.Contains(tag)) return false;
+            }
+
+            foreach (var tag in RequiredTags)
+            {
+                if (!tagSet.Contains(tag)) return false;
+            }
+
+            return true;
         }
     }
 }

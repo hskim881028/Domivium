@@ -18,7 +18,7 @@ namespace Domivium.Client.Core.Component
         private void Awake()
         {
             _mpb = new MaterialPropertyBlock();
-            var length = TextWriteUtility.WriteIntGrouped(int.MinValue, _buf, ',');
+            var length = TextWriteUtils.WriteIntGrouped(int.MinValue, _buf, ',');
             _text.SetCharArray(_buf, 0, length);
             _text.ForceMeshUpdate();
             _text.SetCharArray(Array.Empty<char>(), 0, 0);
@@ -31,9 +31,9 @@ namespace Domivium.Client.Core.Component
             _mpb.SetFloat(FillID, ratio);
             _meshRenderer.SetPropertyBlock(_mpb);
 
-            var length = TextWriteUtility.WriteIntGrouped(current, _buf, ',');
+            var length = TextWriteUtils.WriteIntGrouped(current, _buf, ',');
             _buf[length++] = '/';
-            length += TextWriteUtility.WriteIntGrouped(max, _buf, length, ',');
+            length += TextWriteUtils.WriteIntGrouped(max, _buf, length, ',');
             _text.SetCharArray(_buf, 0, length);
         }
     }

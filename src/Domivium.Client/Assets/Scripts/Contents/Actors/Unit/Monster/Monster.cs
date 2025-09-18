@@ -1,4 +1,4 @@
 ﻿namespace Domivium.Client.Contents.Actors
 {
-    public class Character : Agent { }
+    public class Monster : Agent { }
 }

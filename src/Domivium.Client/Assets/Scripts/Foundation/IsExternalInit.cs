@@ -1,6 +1,7 @@
-﻿using System.ComponentModel;
+﻿// ReSharper disable CheckNamespace
 
-// ReSharper disable CheckNamespace
+using System.ComponentModel;
+
 namespace System.Runtime.CompilerServices
 {
     [EditorBrowsable(EditorBrowsableState.Never)]

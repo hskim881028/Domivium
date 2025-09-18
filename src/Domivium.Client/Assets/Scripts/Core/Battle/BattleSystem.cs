@@ -11,23 +11,22 @@ namespace Domivium.Client.Core.Battle
         private readonly List<BattleEffectSpec> _effectSpecs = new();
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
-        private readonly TagSet _tagSet;
 
-        public ActorTag State => _tagSet.State.CurrentValue;
-        public IReadOnlyCollection<ActorTag> Tags => _tagSet.Tags;
+        public ActorTag State => TagSet.State.CurrentValue;
+        public TagSet TagSet { get; }
         public Transform Unit { get; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
 
-        public BattleSystem(TagSet tagSet, Transform unit)
+        public BattleSystem(TagSet tagSetSet, Transform unit)
         {
-            _tagSet = tagSet;
+            TagSet = tagSetSet;
             Unit = unit;
             Stat = new StatSet();
             Gauge = new GaugeSet(Stat);
         }
 
-        public BattleContext CreateBattleContext(BattleAbility ability) => new() { Source = this, Unit = Unit, Ability = ability };
+        public BattleContext CreateBattleContext() => new() { Source = this, Unit = Unit };
 
         public void Reset()
         {
@@ -136,7 +135,7 @@ namespace Domivium.Client.Core.Battle
         {
             foreach (var tag in tags)
             {
-                _tagSet.Add(tag);
+                TagSet.Add(tag);
             }
         }
 
@@ -144,7 +143,7 @@ namespace Domivium.Client.Core.Battle
         {
             foreach (var tag in tags)
             {
-                _tagSet.Remove(tag);
+                TagSet.Remove(tag);
             }
         }
     }

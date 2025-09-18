@@ -95,7 +95,7 @@ namespace Domivium.Client.Contents.Actors
 
         private void SetText(int damage)
         {
-            var length = TextWriteUtility.WriteIntToBuffer(damage, _buf);
+            var length = TextWriteUtils.WriteIntToBuffer(damage, _buf);
             _text.SetCharArray(_buf, 0, length);
         }
     }

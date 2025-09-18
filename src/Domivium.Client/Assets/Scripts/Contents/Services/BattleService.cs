@@ -21,11 +21,11 @@ namespace Domivium.Client.Contents.Services
 {
     public sealed class BattleService : Disposable, IBattleReadModel, IBattleCommand
     {
+        private readonly MasterDbService _masterDbService;
         private readonly IStageDirector _director;
         private readonly IActorSpawner _actorSpawner;
-        private readonly ICameraReadModel _cameraRead;
         private readonly IBattleAbilityFactory _abilityFactory;
-        private readonly MasterDbService _masterDbService;
+        private readonly ICameraReadModel _cameraRead;
 
         private readonly ReactiveProperty<Transform> _pickedCharacter = new();
         private readonly ReactiveProperty<Vector3> _previewPosition = new();
@@ -36,28 +36,33 @@ namespace Domivium.Client.Contents.Services
         public ReadOnlyReactiveProperty<Vector3> TargetPosition => _targetPosition;
 
         public BattleService(
+            MasterDbService masterDbService,
             IStageDirector director,
             IActorSpawner actorSpawner,
-            ICameraReadModel cameraRead,
             IBattleAbilityFactory abilityFactory,
-            MasterDbService masterDbService,
+            ICameraReadModel cameraRead,
             ISubscriber<SceneMessage> subscriber)
         {
+            _masterDbService = masterDbService;
             _director = director;
             _actorSpawner = actorSpawner;
-            _cameraRead = cameraRead;
             _abilityFactory = abilityFactory;
-            _masterDbService = masterDbService;
+            _cameraRead = cameraRead;
             subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTask InitializeAsync(int stageId)
         {
             var characterRow = _masterDbService.DB.CharacterRowTable.FindById(1);
-            var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbilitySpec> { ability };
-            await _actorSpawner.SpawnAsync(ActorIds.Character, new UnitParams(characterRow, abilities));
+            var characterAbilities = new List<BattleAbilitySpec> { _abilityFactory.Create(BattleAbilityIds.Slash) };
+            var characterContext = new UnitContext(characterRow);
+            await _actorSpawner.SpawnAsync(ActorIds.Character, new UnitParams(characterContext, characterAbilities));
             await _actorSpawner.SpawnAsync(ActorIds.CharacterPathIndicator, ActorParam.Empty);
+
+            var monsterRow = _masterDbService.DB.MonsterRowTable.FindById(1);
+            var monsterAbilities = new List<BattleAbilitySpec> { _abilityFactory.Create(BattleAbilityIds.Slash) };
+            var monsterContext = new UnitContext(monsterRow);
+            await _actorSpawner.SpawnAsync(ActorIds.Monster, new UnitParams(monsterContext, monsterAbilities));
         }
 
         public bool PickCharacter(Vector2 position)

@@ -5,10 +5,12 @@ using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Commands;
 using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Provider;
@@ -24,9 +26,11 @@ namespace Domivium.Client.Contents.Services
 {
     public sealed class TowerPlacementService : Disposable, ITowerPlacementReadModel, ITowerPlacementCommand
     {
+        private readonly MasterDbService _masterDbService;
         private readonly StageMapProvider _stageMapProvider;
         private readonly IStageDirector _director;
         private readonly IActorSpawner _actorSpawner;
+        private readonly IBattleAbilityFactory _abilityFactory;
         private readonly IStageMapStore _store;
         private readonly ICameraReadModel _cameraRead;
         private readonly ObservableList<Vector3Int> _stagedTower = new();
@@ -39,17 +43,21 @@ namespace Domivium.Client.Contents.Services
         public IReadOnlyObservableDictionary<Vector3Int, bool> PreviewTower => _previewTower;
 
         public TowerPlacementService(
+            MasterDbService masterDbService,
             StageMapProvider stageMapProvider,
             IStageDirector director,
             IActorSpawner actorSpawner,
+            IBattleAbilityFactory abilityFactory,
             IStageMapStore store,
             ICameraReadModel cameraRead,
             ISubscriber<SceneMessage> sceneSubscriber,
             ISubscriber<SpawnActorMessage> spawnerSubscriber)
         {
+            _masterDbService = masterDbService;
             _stageMapProvider = stageMapProvider;
             _director = director;
             _actorSpawner = actorSpawner;
+            _abilityFactory = abilityFactory;
             _store = store;
             _cameraRead = cameraRead;
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
@@ -114,7 +122,12 @@ namespace Domivium.Client.Contents.Services
                 }
 
                 _store.Occupy(_stagedTower);
-                _actorSpawner.SpawnAsync(ActorIds.Tower, new TowerParams(_stagedTower.First())).Forget();
+
+                var row = _masterDbService.DB.TowerRowTable.FindById(1);
+                var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
+                var abilities = new List<BattleAbilitySpec> { ability };
+                var unitContext = new UnitContext(row);
+                _actorSpawner.SpawnAsync(ActorIds.Tower, new TowerParams(_stagedTower.First(), unitContext, abilities)).Forget();
             }
 
             Hide();

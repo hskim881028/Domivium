@@ -24,7 +24,7 @@ namespace Domivium.Client.Contents.Actors
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             var p = param.As<UnitParams>();
-            var row = p.CharacterRow;
+            var row = p.UnitContext;
 
             BattleSystem.Reset();
 

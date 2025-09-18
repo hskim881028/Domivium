@@ -21,11 +21,12 @@ namespace Domivium.Client.Contents.Battle.Effect
 
         public DamageEffect(BattleContext context) : base(context) { }
 
-        public override void Activate(BattleSystem owner)
+        protected override bool OnActivate(BattleSystem owner)
         {
             var damage = BattleCalculator.GetDamage(Context.Source.Stat, owner.Stat);
             Context.Damage = damage;
             AddGaugeModifier(StatId.Health, -damage, GaugeChannel.Add);
+            return true;
         }
     }
 }

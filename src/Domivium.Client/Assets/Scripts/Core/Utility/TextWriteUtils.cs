@@ -2,7 +2,7 @@
 
 namespace Domivium.Client.Core.Utility
 {
-    public static class TextWriteUtility
+    public static class TextWriteUtils
     {
         public static int WriteIntToBuffer(int value, char[] buf)
         {

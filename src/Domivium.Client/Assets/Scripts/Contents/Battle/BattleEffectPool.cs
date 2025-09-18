@@ -17,7 +17,7 @@ namespace Domivium.Client.Contents.Battle
             _cuePublisher = cuePublisher;
         }
 
-        public BattleEffectSpec Get(BattleEffectId id, in BattleContext context)
+        public BattleEffectSpec Get(BattleEffectId id, BattleContext context)
         {
             if (!_specs.ContainsKey(id))
             {
@@ -45,7 +45,7 @@ namespace Domivium.Client.Contents.Battle
             _specs[spec.Id].Enqueue(spec);
         }
 
-        private static BattleEffect CreateEffect(BattleEffectId id, in BattleContext context)
+        private static BattleEffect CreateEffect(BattleEffectId id, BattleContext context)
         {
             if (id == BattleEffectIds.Damage)
             {

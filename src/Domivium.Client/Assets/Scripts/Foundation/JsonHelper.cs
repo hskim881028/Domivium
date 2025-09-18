@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿// ReSharper disable CheckNamespace
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-// ReSharper disable CheckNamespace
 public static class JsonHelper
 {
     public static string ExtractKey(object target, string key)

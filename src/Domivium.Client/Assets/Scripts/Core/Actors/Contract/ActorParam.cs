@@ -1,4 +1,6 @@
-﻿namespace Domivium.Client.Core.Actors.Contract
+﻿using UnityEngine;
+
+namespace Domivium.Client.Core.Actors.Contract
 {
     public record ActorParam
     {
@@ -11,6 +13,7 @@
         {
             if (param is T casted) return casted;
 
+            Debug.LogError($"{param.GetType().Name} is not {typeof(T).Name}");
             return null;
         }
     }
