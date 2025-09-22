@@ -1,32 +1,38 @@
 using System.Collections.Generic;
-using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Actors.Unit;
+using Domivium.Client.Core.State;
 using Domivium.Client.Data.Stat;
+using ObservableCollections;
+using R3;
 using UnityEngine;
 
 namespace Domivium.Client.Core.Battle
 {
-    public sealed class BattleSystem
+    public sealed class BattleSystem : IBattleSystem
     {
+        private readonly ObservableHashSet<BattleTag> _tags = new();
         private readonly Dictionary<BattleAbilityId, BattleAbilitySpec> _abilitySpecs = new();
         private readonly List<BattleEffectSpec> _effectSpecs = new();
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
+        private readonly ReadOnlyReactiveProperty<StateTag> _state;
 
-        public ActorTag State => TagSet.State.CurrentValue;
-        public TagSet TagSet { get; }
-        public Transform Unit { get; }
+        public UnitType Type { get; private set; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
+        public Transform Unit { get; }
+        public Vector3 UnitPosition => Unit.position;
+        public StateTag State => _state.CurrentValue;
 
-        public BattleSystem(TagSet tagSetSet, Transform unit)
+        public BattleSystem(Transform unit, ReadOnlyReactiveProperty<StateTag> state)
         {
-            TagSet = tagSetSet;
             Unit = unit;
             Stat = new StatSet();
             Gauge = new GaugeSet(Stat);
+            _state = state;
         }
 
-        public BattleContext CreateBattleContext() => new() { Source = this, Unit = Unit };
+        public bool Contains(BattleTag tag) => _tags.Contains(tag);
 
         public void Reset()
         {
@@ -44,12 +50,17 @@ namespace Domivium.Client.Core.Battle
             Gauge.Clear();
         }
 
+        public void SetType(UnitType type)
+        {
+            Type = type;
+        }
+
         public void GrantAbility(BattleAbilitySpec ability)
         {
             _abilitySpecs.Add(ability.Id, ability);
         }
 
-        public bool TryActivateAbility(BattleAbilityId id) => _abilitySpecs.TryGetValue(id, out var spec) && spec.TryActivate(this);
+        public bool TryActivateAbility(BattleAbilityId id, ref BattleAbilityContext context) => _abilitySpecs.TryGetValue(id, out var spec) && spec.TryActivate(ref context);
 
         public void ActivateEffect(BattleEffectSpec spec)
         {
@@ -131,19 +142,19 @@ namespace Domivium.Client.Core.Battle
             }
         }
 
-        private void AddTags(IReadOnlyCollection<ActorTag> tags)
+        private void AddTags(IReadOnlyCollection<BattleTag> tags)
         {
             foreach (var tag in tags)
             {
-                TagSet.Add(tag);
+                _tags.Add(tag);
             }
         }
 
-        private void RemoveTags(IReadOnlyCollection<ActorTag> tags)
+        private void RemoveTags(IReadOnlyCollection<BattleTag> tags)
         {
             foreach (var tag in tags)
             {
-                TagSet.Remove(tag);
+                _tags.Remove(tag);
             }
         }
     }

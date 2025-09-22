@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Message;
 using MessagePipe;
 
@@ -16,7 +15,7 @@ namespace Domivium.Client.Core.Battle
 
         public BattleEffectId Id => _effect.Id;
 
-        public IReadOnlyCollection<ActorTag> GrantedTags => _effect.GrantedTags;
+        public IReadOnlyCollection<BattleTag> GrantedTags => _effect.GrantedBattleTags;
         public IReadOnlyList<BattleStatModifier> StatModifiers => _effect.StatModifiers;
         public IReadOnlyList<BattleStatModifier> StatPeriodicModifiers => _effect.StatPeriodicModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugeModifiers => _effect.GaugeModifiers;
@@ -33,7 +32,7 @@ namespace Domivium.Client.Core.Battle
             ResetInternal(_effect);
         }
 
-        public void Reset(BattleContext context)
+        public void Reset(ref BattleEffectContext context)
         {
             _effect.Reset(context);
             ResetInternal(_effect);
@@ -53,7 +52,7 @@ namespace Domivium.Client.Core.Battle
                 return false;
             }
 
-            _cuePublisher.Publish(BattleCueMessage.Emit(_effect.CueId, _effect.Context));
+            _cuePublisher.Publish(BattleCueMessage.Emit(_effect.CueId, BattleCueContext.Create(_effect.Context)));
             return true;
         }
 
@@ -63,13 +62,13 @@ namespace Domivium.Client.Core.Battle
             if (_periodicInterval > 0) return false;
 
             _periodicInterval = _effect.PeriodicInterval;
-            _cuePublisher.Publish(BattleCueMessage.Emit(_effect.PeriodicCueId, _effect.Context));
+            _cuePublisher.Publish(BattleCueMessage.Emit(_effect.PeriodicCueId, BattleCueContext.Create(_effect.Context)));
             return true;
         }
 
         public void Deactivate(bool hideCue = false)
         {
-            _cuePublisher.Publish(BattleCueMessage.Emit(_effect.DeactivateCueId, _effect.Context));
+            _cuePublisher.Publish(BattleCueMessage.Emit(_effect.DeactivateCueId, BattleCueContext.Create(_effect.Context)));
             _onDeactivate.Invoke(this);
         }
 

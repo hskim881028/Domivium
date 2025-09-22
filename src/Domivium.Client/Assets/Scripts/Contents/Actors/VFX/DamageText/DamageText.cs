@@ -31,7 +31,8 @@ namespace Domivium.Client.Contents.Actors
         private Vector3 _basePos;
         private Vector3 _currentPosition;
 
-        public override void Initialize(Transform parent)
+
+        public override void Initialize(Guid id, Transform parent)
         {
             SetText(int.MinValue);
             _text.ForceMeshUpdate();
@@ -56,7 +57,7 @@ namespace Domivium.Client.Contents.Actors
                 .Pause()
                 .Append(_axis.DOShakePosition(0.8f, Shake).SetRecyclable(true));
 
-            base.Initialize(parent);
+            base.Initialize(id, parent);
         }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
@@ -91,6 +92,13 @@ namespace Domivium.Client.Contents.Actors
             _text.color = Color.clear;
             _text.SetCharArray(Array.Empty<char>(), 0, 0);
             base.Deactivate();
+        }
+
+        protected override void OnDestroyInternal()
+        {
+            _punch?.Kill();
+            _shake?.Kill();
+            base.OnDestroyInternal();
         }
 
         private void SetText(int damage)

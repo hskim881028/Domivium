@@ -1,5 +1,4 @@
-﻿using Domivium.Client.Core.Utility;
-using Domivium.Shared.Common;
+﻿using Domivium.Shared.Common;
 using Domivium.Shared.Response;
 
 namespace Domivium.Client.Network
@@ -10,7 +9,8 @@ namespace Domivium.Client.Network
         {
             if (response.StatusCode == StatusCode.Success) return true;
 
-            ZLog.StatusCodeException(response.StatusCode);
+            var message = StatusCodeMapper.ToMessage(response.StatusCode);
+            ZLog.StatusCodeException(message);
             return false;
         }
     }

@@ -29,14 +29,14 @@ namespace Domivium.Client.Core.UI
             Dictionary<UILayer, HashSet<UIId>> uisByLayer,
             List<UIBehaviour> prefabs,
             IPublisher<SceneUIReadyMessage> publisher,
-            ISubscriber<SceneMessage> subscriber)
+            ISubscriber<SceneMessage> sceneSubscriber)
         {
             _rooLifetimeScope = rooLifetimeScope;
             _uiContainer = uiContainer;
             _uisByLayer = uisByLayer;
             _prefabs = prefabs;
             _publisher = publisher;
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
+            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public HashSet<UIId> GetStaticUI(UILayer layer) => _uisByLayer.TryGetValue(layer, out var uis) ? uis.ToHashSet() : new HashSet<UIId>();

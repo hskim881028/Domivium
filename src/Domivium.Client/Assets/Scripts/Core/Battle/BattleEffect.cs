@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.State;
 using Domivium.Client.Data.Stat;
 
 namespace Domivium.Client.Core.Battle
@@ -11,11 +11,11 @@ namespace Domivium.Client.Core.Battle
         private readonly List<BattleStatModifier> _statPeriodicModifiers = new();
         private readonly List<BattleGaugeModifier> _gaugeModifiers = new();
         private readonly List<BattleGaugeModifier> _gaugePeriodicModifiers = new();
-        private BattleContext _context;
+        private BattleEffectContext _context;
 
-        protected abstract IReadOnlyCollection<ActorTag> RequiredTags { get; }
-        protected abstract IReadOnlyCollection<ActorTag> BlockedTags { get; }
-        protected abstract IReadOnlyCollection<ActorTag> BlockedStateTags { get; }
+        protected abstract IReadOnlyCollection<BattleTag> RequiredBattleTags { get; }
+        protected abstract IReadOnlyCollection<BattleTag> BlockedBattleTags { get; }
+        protected abstract IReadOnlyCollection<StateTag> BlockedStateTags { get; }
         public abstract BattleEffectId Id { get; }
         public abstract float Duration { get; }
         public abstract float PeriodicInterval { get; }
@@ -23,19 +23,19 @@ namespace Domivium.Client.Core.Battle
         public abstract BattleCueId PeriodicCueId { get; }
         public abstract BattleCueId DeactivateCueId { get; }
 
-        public ref BattleContext Context => ref _context;
-        public abstract IReadOnlyCollection<ActorTag> GrantedTags { get; }
+        public ref BattleEffectContext Context => ref _context;
+        public abstract IReadOnlyCollection<BattleTag> GrantedBattleTags { get; }
         public IReadOnlyList<BattleStatModifier> StatModifiers => _statModifiers;
         public IReadOnlyList<BattleStatModifier> StatPeriodicModifiers => _statPeriodicModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugeModifiers => _gaugeModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugePeriodicModifiers => _gaugePeriodicModifiers;
 
-        protected BattleEffect(BattleContext context)
+        protected BattleEffect(ref BattleEffectContext context)
         {
             _context = context;
         }
 
-        public void Reset(BattleContext context)
+        public void Reset(BattleEffectContext context)
         {
             _context = context;
             _statModifiers.Clear();
@@ -43,14 +43,11 @@ namespace Domivium.Client.Core.Battle
             _gaugeModifiers.Clear();
             _gaugePeriodicModifiers.Clear();
         }
-        
-        public bool TryActivate(BattleSystem source)
-        {
-            return PassesTagRequirements(source.TagSet) && OnActivate(source);
-        }
+
+        public bool TryActivate(BattleSystem source) => PassesTagRequirements(source) && OnActivate(source);
 
         protected abstract bool OnActivate(BattleSystem source);
-        
+
         protected void AddStatModifier(StatId id, int value, StatChannel channel)
         {
             _statModifiers.Add(new BattleStatModifier(id, value, channel));
@@ -70,22 +67,22 @@ namespace Domivium.Client.Core.Battle
         {
             _gaugePeriodicModifiers.Add(new BattleGaugeModifier(id, value, channel));
         }
-        
-        private bool PassesTagRequirements(TagSet tagSet)
+
+        private bool PassesTagRequirements(BattleSystem source)
         {
-            if (BlockedStateTags.Contains(tagSet.State.CurrentValue))
+            if (BlockedStateTags.Contains(source.State))
             {
                 return false;
             }
 
-            foreach (var tag in BlockedTags)
+            foreach (var tag in BlockedBattleTags)
             {
-                if (tagSet.Contains(tag)) return false;
+                if (source.Contains(tag)) return false;
             }
 
-            foreach (var tag in RequiredTags)
+            foreach (var tag in RequiredBattleTags)
             {
-                if (!tagSet.Contains(tag)) return false;
+                if (!source.Contains(tag)) return false;
             }
 
             return true;

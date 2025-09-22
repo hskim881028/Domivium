@@ -1,13 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace Domivium.Client.Contents.Commands
 {
     public interface ITowerPlacementCommand
     {
         public UniTask InitializeAsync(int stageId);
-        public void SetGrid(Tilemap tilemap);
         public void Show(int index);
         public bool Hide();
         public bool Update(Vector2 position);

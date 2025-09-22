@@ -308,6 +308,9 @@ MonoBehaviour:
   _attackRangeCircle: {fileID: 1191194645257785314}
   _detectionRangeCircle: {fileID: 4397155678803210688}
   _agent: {fileID: 3156907658369696949}
+  _meshRenderer:
+  - {fileID: 6869492130458750921}
+  - {fileID: 1339608516013825571}
 --- !u!1001 &5013521996758474581
 PrefabInstance:
   m_ObjectHideFlags: 0

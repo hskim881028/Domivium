@@ -6,7 +6,6 @@ using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
 using Domivium.Client.Core.UI;
-using Domivium.Client.Core.Utility;
 using MessagePipe;
 using R3;
 using VContainer;
@@ -33,9 +32,8 @@ namespace Domivium.Client.Core.Actors
             Dictionary<ActorId, (Type presenter, Type view)> container,
             List<Actor> prefabs,
             IPublisher<SpawnActorMessage> publisher,
-            ISubscriber<SceneMessage> subscriber)
+            ISubscriber<SceneMessage> sceneSubscriber)
         {
-            this.Log();
             _container = container;
             foreach (var prefab in prefabs)
             {
@@ -43,7 +41,7 @@ namespace Domivium.Client.Core.Actors
             }
 
             _publisher = publisher;
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
+            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTask SpawnAsync(ActorId actorId, ActorParam param)
@@ -54,8 +52,14 @@ namespace Domivium.Client.Core.Actors
                 return;
             }
 
+            var actorScope = CreateActor(actorId);
+            await SpawnInternalAsync(actorScope, actorScope.Presenter, actorScope.Id, actorId, param);
+        }
+
+        private ActorScope CreateActor(ActorId actorId)
+        {
             var (presenterType, viewType) = _container[actorId];
-            var id = Guid.NewGuid();
+
             var actorScope = _root.CreateChild<ActorScope>(builder =>
                 {
                     if (!_prefabs.TryGetValue(viewType, out var prefab))
@@ -64,13 +68,14 @@ namespace Domivium.Client.Core.Actors
                     }
 
                     builder.RegisterComponentInNewPrefab(prefab, Lifetime.Singleton).AsSelf();
-                    builder.Register(presenterType, Lifetime.Singleton).WithParameter(id);
+                    builder.Register(presenterType, Lifetime.Singleton);
                 },
                 $"{presenterType.Name.AsActor()}(Scope)");
 
+            var id = Guid.NewGuid();
             var presenter = (IActorPresenter)actorScope.Container.Resolve(presenterType);
-            actorScope.Initialize(presenter);
-            await SpawnInternalAsync(actorScope, presenter, id, actorId, param);
+            actorScope.Initialize(id, presenter);
+            return actorScope;
         }
 
         protected override void OnDispose()

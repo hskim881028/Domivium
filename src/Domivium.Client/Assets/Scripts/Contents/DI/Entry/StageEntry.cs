@@ -1,9 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.Commands;
 using Domivium.Client.Contents.Context;
-using Domivium.Client.Contents.Manager;
-using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Director;
@@ -49,16 +48,19 @@ namespace Domivium.Client.Contents.DI.Entry
 
         private async UniTaskVoid RunAsync(StageConfig cfg)
         {
+            _stageDirector.TrySetPhase(StagePhases.PreparingWave);
             await _towerPlacementCommand.InitializeAsync(cfg.StageId); //data 만들기
             await _battleCommand.InitializeAsync(cfg.StageId);
 
             _stageDirector.TrySetMode(StageModes.Battle);
-            _stageDirector.TrySetPhase(StagePhases.PreparingWave);
+            _stageDirector.TrySetPhase(StagePhases.RunningWave);
         }
 
         public void Tick()
         {
-            _actorManager.Tick(Time.deltaTime);
+            var dt = Time.deltaTime;
+            _actorManager.Tick(dt);
+            _stageDirector.Tick(dt);
         }
     }
 }

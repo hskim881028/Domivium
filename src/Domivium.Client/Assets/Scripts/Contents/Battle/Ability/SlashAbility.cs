@@ -1,27 +1,26 @@
 ﻿using System.Collections.Generic;
-using Domivium.Client.Contents.Actors;
+using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.State;
 
 namespace Domivium.Client.Contents.Battle.Ability
 {
     public class SlashAbility : BattleAbility
     {
-        protected override IReadOnlyCollection<ActorTag> RequiredTags => ActorTags.Empty;
-        protected override IReadOnlyCollection<ActorTag> BlockedTags => ActorTags.Empty;
-        protected override IReadOnlyCollection<ActorTag> BlockedStateTags => ActorTags.DefaultBlockedTag;
+        protected override IReadOnlyCollection<BattleTag> RequiredBattleTags => BattleTags.Empty;
+        protected override IReadOnlyCollection<BattleTag> BlockedBattleTags => BattleTags.Empty;
+        protected override IReadOnlyCollection<StateTag> BlockedStateTags => StateTags.DefaultBlockedTag;
         public override BattleAbilityId Id => BattleAbilityIds.Slash;
-        public override float Cooldown => 0;
+        public override float Cooldown => 0.2f;
         public override BattleCueId CueId => BattleCueIds.Slash;
 
-        public SlashAbility(IBattleEffectPool effectPool) : base(effectPool) { }
+        public SlashAbility(IBattleEffectPool effectPool, IActorFinder actorFinder) : base(effectPool, actorFinder) { }
 
-        protected override bool OnActivate(BattleSystem source, ref BattleContext context)
+        protected override bool OnActivate(ref BattleAbilityContext context)
         {
-            context.Ability = this;
-            var effect = EffectPool.Get(BattleEffectIds.Damage, context); // 이펙트 새 것 가져옴. context는 복사본 넣어줌
-            source.ActivateEffect(effect);
-            
+            var effect = EffectPool.Get(BattleEffectIds.Damage, context, this);
+            context.Target.ActivateEffect(effect);
             return true;
         }
     }

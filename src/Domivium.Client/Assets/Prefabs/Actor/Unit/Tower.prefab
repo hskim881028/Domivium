@@ -157,6 +157,9 @@ MonoBehaviour:
   _healthDisplay: {fileID: 2609093167959249594}
   _attackRangeCircle: {fileID: 7081169199137424886}
   _detectionRangeCircle: {fileID: 2485250403645469815}
+  _agent: {fileID: 0}
+  _meshRenderer:
+  - {fileID: 7537560705267365758}
 --- !u!1 &9062926091357488549
 GameObject:
   m_ObjectHideFlags: 0

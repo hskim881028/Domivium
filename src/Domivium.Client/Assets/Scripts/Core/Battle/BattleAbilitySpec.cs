@@ -18,15 +18,14 @@ namespace Domivium.Client.Core.Battle
             _cooldown = ability.Cooldown;
         }
 
-        public bool TryActivate(BattleSystem target)
+        public bool TryActivate(ref BattleAbilityContext context)
         {
             if (_cooldown > 0f) return false;
 
-            var context = target.CreateBattleContext();
-            if (!_ability.TryActivate(target, ref context)) return false;
+            if (!_ability.TryActivate(ref context)) return false;
 
             _cooldown = _ability.Cooldown;
-            _cuePublisher.Publish(BattleCueMessage.Emit(_ability.CueId, in context));
+            _cuePublisher.Publish(BattleCueMessage.Emit(_ability.CueId, BattleCueContext.Create(context)));
             return true;
         }
 

@@ -1,21 +1,22 @@
 {
-  "name": "Domivium.Client.Network",
-  "rootNamespace": "Domivium.Client",
-  "references": [
-    "VContainer",
-    "MagicOnion.Unity",
-    "Cysharp.Net.Http.YetAnotherHttpHandler",
-    "Domivium.Shared.Client",
-    "Domivium.Client.Core",
-    "Domivium.Client.Data"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": [],
-  "allowUnsafeCode": false,
-  "overrideReferences": false,
-  "precompiledReferences": [],
-  "autoReferenced": true,
-  "defineConstraints": [],
-  "versionDefines": [],
-  "noEngineReferences": false
+    "name": "Domivium.Client.Network",
+    "rootNamespace": "Domivium.Client",
+    "references": [
+        "VContainer",
+        "MagicOnion.Unity",
+        "Cysharp.Net.Http.YetAnotherHttpHandler",
+        "Domivium.Shared.Client",
+        "Domivium.Client.Core",
+        "Domivium.Client.Data",
+        "Domivium.Client.Foundation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

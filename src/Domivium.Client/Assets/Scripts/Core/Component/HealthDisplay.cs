@@ -7,7 +7,7 @@ namespace Domivium.Client.Core.Component
 {
     public sealed class HealthDisplay : MonoBehaviour
     {
-        private static readonly int FillID = Shader.PropertyToID("_Fill");
+        private static readonly int FillId = Shader.PropertyToID("_Fill");
 
         [SerializeField] private MeshRenderer _meshRenderer;
         [SerializeField] private TextMeshPro _text;
@@ -28,7 +28,7 @@ namespace Domivium.Client.Core.Component
         {
             var ratio = (float)current / max;
             _meshRenderer.GetPropertyBlock(_mpb);
-            _mpb.SetFloat(FillID, ratio);
+            _mpb.SetFloat(FillId, ratio);
             _meshRenderer.SetPropertyBlock(_mpb);
 
             var length = TextWriteUtils.WriteIntGrouped(current, _buf, ',');

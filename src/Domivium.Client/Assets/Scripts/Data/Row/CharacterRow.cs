@@ -9,9 +9,11 @@ namespace Domivium.Client.Data.Row
 	{
 		[PrimaryKey] public int Id { get; set; }
 		public string Job { get; set; } = string.Empty;
+		public string Target { get; set; } = string.Empty;
 		public int Health { get; set; }
 		public int Attack { get; set; }
 		public int Defense { get; set; }
+		public int HitRange { get; set; } // percent
 		public int AttackRange { get; set; } // percent
 		public int DetectionRange { get; set; } // percent
 		public int Speed { get; set; } // percent

@@ -40,7 +40,7 @@ namespace Domivium.Client.Contents.DI.Entry
 
         protected override void OnStart()
         {
-            DOTween.SetTweensCapacity(512, 64);
+            DOTween.SetTweensCapacity(512, 256);
             Application.targetFrameRate = 60;
             _sceneService.Load(SceneScopeIds.Title);
         }

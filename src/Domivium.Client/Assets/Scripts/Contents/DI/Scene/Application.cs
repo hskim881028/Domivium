@@ -1,13 +1,14 @@
-﻿using Domivium.Client.Contents.Actors.Generated;
+﻿using Domivium.Client.Contents.Actors;
+using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Audio;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.DI.Container;
 using Domivium.Client.Contents.DI.Entry;
 using Domivium.Client.Contents.Director;
+using Domivium.Client.Contents.Factory;
 using Domivium.Client.Contents.Input.Composition;
 using Domivium.Client.Contents.Input.Consumer;
-using Domivium.Client.Contents.Manager;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI.Generated;
 using Domivium.Client.Core;
@@ -16,6 +17,7 @@ using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Director;
+using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Provider;
@@ -55,7 +57,6 @@ namespace Domivium.Client.Contents.DI.Scene
             Network(builder, Lifetime.Singleton);
             Input(builder, Lifetime.Singleton);
             Scene(builder, Lifetime.Singleton);
-            Manager(builder, Lifetime.Singleton);
 
             Services(builder, Lifetime.Singleton);
             Provider(builder, Lifetime.Singleton);
@@ -65,6 +66,7 @@ namespace Domivium.Client.Contents.DI.Scene
             Actor(builder, Lifetime.Singleton);
             Stage(builder, Lifetime.Singleton);
             Battle(builder, Lifetime.Singleton);
+            State(builder, Lifetime.Singleton);
 
             builder.Register<ApplicationEntry>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
         }
@@ -82,7 +84,7 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.RegisterMessageBroker<SceneUIReadyMessage>(options);
             builder.RegisterMessageBroker<SpawnActorMessage>(options);
             builder.RegisterMessageBroker<BattleCueMessage>(options);
-            builder.RegisterMessageBroker<ActorTagMessage>(options);
+            builder.RegisterMessageBroker<ActorStateMessage>(options);
         }
 
         private static void SecureStore(IContainerBuilder builder, Lifetime lifetime)
@@ -122,11 +124,6 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<ISceneScopeManager, SceneScopeManager>(lifetime);
         }
 
-        private static void Manager(IContainerBuilder builder, Lifetime lifetime)
-        {
-            builder.Register<ActorManager>(lifetime);
-        }
-
         private void Services(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<MasterDbService>(lifetime).WithParameter(_configContainer.MasterDB);
@@ -134,6 +131,7 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<SceneService>(lifetime);
             builder.Register<EnvironmentService>(lifetime);
             builder.Register<VfxService>(lifetime);
+            builder.Register<CoordinateService>(lifetime);
             builder.Register<CameraService>(lifetime).AsImplementedInterfaces();
             builder.Register<PointerService>(lifetime).AsImplementedInterfaces();
             builder.Register<TowerPlacementService>(lifetime).AsImplementedInterfaces();
@@ -171,6 +169,8 @@ namespace Domivium.Client.Contents.DI.Scene
 
         private void Actor(IContainerBuilder builder, Lifetime lifetime)
         {
+            builder.Register<ActorManager>(lifetime);
+            builder.Register<IActorFinder, ActorFinder>(lifetime);
             builder.Register<IActorSpawner, ActorSpawner>(lifetime)
                 .WithParameter(ActorMapping.Actor)
                 .WithParameter(_stageActorContainer.Actor);
@@ -188,6 +188,11 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<IBattleEffectPool, BattleEffectPool>(lifetime);
             builder.Register<IBattleAbilityFactory, BattleAbilityFactory>(lifetime);
             builder.Register<IBattleCuePlayer, BattleCuePlayer>(lifetime);
+        }
+
+        private void State(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<ISystemFactory, SystemFactory>(lifetime);
         }
     }
 }

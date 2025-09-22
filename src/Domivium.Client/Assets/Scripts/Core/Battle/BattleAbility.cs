@@ -1,46 +1,46 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.State;
 
 namespace Domivium.Client.Core.Battle
 {
     public abstract class BattleAbility
     {
         protected readonly IBattleEffectPool EffectPool;
-        protected abstract IReadOnlyCollection<ActorTag> RequiredTags { get; }
-        protected abstract IReadOnlyCollection<ActorTag> BlockedTags { get; }
-        protected abstract IReadOnlyCollection<ActorTag> BlockedStateTags { get; }
+        protected readonly IActorFinder ActorFinder;
+        protected abstract IReadOnlyCollection<BattleTag> RequiredBattleTags { get; }
+        protected abstract IReadOnlyCollection<BattleTag> BlockedBattleTags { get; }
+        protected abstract IReadOnlyCollection<StateTag> BlockedStateTags { get; }
         public abstract BattleAbilityId Id { get; }
         public abstract float Cooldown { get; }
         public abstract BattleCueId CueId { get; }
 
-        protected BattleAbility(IBattleEffectPool effectPool)
+        protected BattleAbility(IBattleEffectPool effectPool, IActorFinder actorFinder)
         {
             EffectPool = effectPool;
+            ActorFinder = actorFinder;
         }
 
-        public bool TryActivate(BattleSystem source, ref BattleContext context)
-        {
-            return PassesTagRequirements(source.TagSet) && OnActivate(source, ref context);
-        }
+        public bool TryActivate(ref BattleAbilityContext abilityContext) => PassesTagRequirements(abilityContext.Source) && OnActivate(ref abilityContext);
 
-        protected abstract bool OnActivate(BattleSystem source, ref BattleContext context);
+        protected abstract bool OnActivate(ref BattleAbilityContext context);
 
-        private bool PassesTagRequirements(TagSet tagSet)
+        private bool PassesTagRequirements(IBattleSystem source)
         {
-            if (BlockedStateTags.Contains(tagSet.State.CurrentValue))
+            if (BlockedStateTags.Contains(source.State))
             {
                 return false;
             }
 
-            foreach (var tag in BlockedTags)
+            foreach (var tag in BlockedBattleTags)
             {
-                if (tagSet.Contains(tag)) return false;
+                if (source.Contains(tag)) return false;
             }
 
-            foreach (var tag in RequiredTags)
+            foreach (var tag in RequiredBattleTags)
             {
-                if (!tagSet.Contains(tag)) return false;
+                if (!source.Contains(tag)) return false;
             }
 
             return true;

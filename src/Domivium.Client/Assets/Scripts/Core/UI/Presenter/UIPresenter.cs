@@ -26,7 +26,7 @@ namespace Domivium.Client.Core.UI.Presenter
         {
             if (this is not TMessage message)
             {
-                throw new Exception($"");
+                throw new InvalidOperationException($"returned {GetType().Name}, expected {typeof(TMessage).Name}");
             }
 
             View = view;

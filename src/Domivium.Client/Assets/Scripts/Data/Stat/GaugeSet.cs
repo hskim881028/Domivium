@@ -50,6 +50,8 @@ namespace Domivium.Client.Data.Stat
         {
             for (var i = 0; i < StatId.StatCount; i++)
             {
+                if (_onChanged[i] == null) continue;
+
                 _onChanged[i] = null;
                 Set(i, 0);
             }

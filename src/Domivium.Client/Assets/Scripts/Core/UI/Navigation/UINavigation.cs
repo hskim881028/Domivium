@@ -22,11 +22,11 @@ namespace Domivium.Client.Core.UI.Navigation
         public UINavigation(
             IUINavigationNodePool navigationNodePool,
             IUIManager uiManager,
-            ISubscriber<SceneMessage> subscriber)
+            ISubscriber<SceneMessage> sceneSubscriber)
         {
             _navigationNodePool = navigationNodePool;
             _uiManager = uiManager;
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
+            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public bool HasOpenSystemUI => _systemNodes.Count > 0;

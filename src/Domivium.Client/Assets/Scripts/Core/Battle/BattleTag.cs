@@ -1,7 +1,7 @@
 ﻿using UnitGenerator;
 
-namespace Domivium.Client.Core.Actors
+namespace Domivium.Client.Core.Battle
 {
     [UnitOf(typeof(int), UnitGenerateOptions.ImplicitOperator | UnitGenerateOptions.Comparable)]
-    public readonly partial struct ActorTag { }
+    public readonly partial struct BattleTag { }
 }

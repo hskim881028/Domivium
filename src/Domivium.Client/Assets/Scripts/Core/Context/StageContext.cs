@@ -4,11 +4,17 @@ namespace Domivium.Client.Core.Context
 {
     public sealed class StageContext : Disposable
     {
-        private readonly ReactiveProperty<StageMode> _mode = new(StageMode.Idle);
-        private readonly ReactiveProperty<StagePhase> _phase = new(StagePhase.Idle);
+        private readonly ReactiveProperty<StageMode> _mode;
+        private readonly ReactiveProperty<StagePhase> _phase;
 
         public ReadOnlyReactiveProperty<StageMode> Mode => _mode;
         public ReadOnlyReactiveProperty<StagePhase> Phase => _phase;
+
+        public StageContext()
+        {
+            _mode = new ReactiveProperty<StageMode>(StageMode.Idle).AddTo(ref DisposableBag);
+            _phase = new ReactiveProperty<StagePhase>(StagePhase.Idle).AddTo(ref DisposableBag);
+        }
 
         internal void SetMode(StageMode id)
         {
@@ -18,13 +24,6 @@ namespace Domivium.Client.Core.Context
         internal void SetPhase(StagePhase phase)
         {
             _phase.Value = phase;
-        }
-
-        protected override void OnDispose()
-        {
-            _mode?.Dispose();
-            _phase?.Dispose();
-            base.OnDispose();
         }
     }
 }

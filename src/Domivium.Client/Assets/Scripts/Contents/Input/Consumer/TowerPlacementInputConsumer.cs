@@ -12,9 +12,9 @@ namespace Domivium.Client.Contents.Input.Consumer
         private readonly StageContext _stageContext;
         private readonly ITowerPlacementCommand _command;
 
-        private bool IsTowerPlacementMode => _stageContext.Mode.CurrentValue == StageModes.TowerPlacement;
-
         public InputPriority Priority => InputPriorities.TowerPlacement;
+        private bool IsTowerPlacementMode => _stageContext.Mode.CurrentValue == StageModes.TowerPlacement;
+        private bool IsTerminated => _stageContext.Phase.CurrentValue == StagePhases.Cleared || _stageContext.Phase.CurrentValue == StagePhases.Failed;
 
         public TowerPlacementInputConsumer(StageContext stageContext, ITowerPlacementCommand command)
         {
@@ -24,6 +24,8 @@ namespace Domivium.Client.Contents.Input.Consumer
 
         public bool TryHandle(InputMessage message)
         {
+            if (IsTerminated) return false;
+
             return message.Type switch
             {
                 InputMessageType.Submit => false,

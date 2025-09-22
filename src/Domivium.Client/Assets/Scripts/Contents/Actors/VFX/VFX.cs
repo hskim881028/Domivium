@@ -2,8 +2,5 @@
 
 namespace Domivium.Client.Contents.Actors
 {
-    public abstract class VFX : Actor, IVFX
-    {
-        public virtual void Tick(float deltaTime) { }
-    }
+    public abstract class VFX : Actor, IVFX { }
 }

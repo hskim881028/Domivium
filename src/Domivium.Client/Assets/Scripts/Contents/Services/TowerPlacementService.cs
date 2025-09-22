@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Battle;
@@ -14,29 +13,25 @@ using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Provider;
-using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Store;
 using MessagePipe;
 using ObservableCollections;
 using R3;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace Domivium.Client.Contents.Services
 {
     public sealed class TowerPlacementService : Disposable, ITowerPlacementReadModel, ITowerPlacementCommand
     {
         private readonly MasterDbService _masterDbService;
+        private readonly CoordinateService _coordinateService;
         private readonly StageMapProvider _stageMapProvider;
         private readonly IStageDirector _director;
         private readonly IActorSpawner _actorSpawner;
         private readonly IBattleAbilityFactory _abilityFactory;
         private readonly IStageMapStore _store;
-        private readonly ICameraReadModel _cameraRead;
         private readonly ObservableList<Vector3Int> _stagedTower = new();
         private readonly ObservableDictionary<Vector3Int, bool> _previewTower = new();
-
-        private Tilemap _grid;
 
         public IReadOnlyObservableList<Vector3Int> StagedTower => _stagedTower;
 
@@ -44,24 +39,22 @@ namespace Domivium.Client.Contents.Services
 
         public TowerPlacementService(
             MasterDbService masterDbService,
+            CoordinateService coordinateService,
             StageMapProvider stageMapProvider,
             IStageDirector director,
             IActorSpawner actorSpawner,
             IBattleAbilityFactory abilityFactory,
             IStageMapStore store,
-            ICameraReadModel cameraRead,
-            ISubscriber<SceneMessage> sceneSubscriber,
-            ISubscriber<SpawnActorMessage> spawnerSubscriber)
+            ISubscriber<SceneMessage> sceneSubscriber)
         {
             _masterDbService = masterDbService;
+            _coordinateService = coordinateService;
             _stageMapProvider = stageMapProvider;
             _director = director;
             _actorSpawner = actorSpawner;
             _abilityFactory = abilityFactory;
             _store = store;
-            _cameraRead = cameraRead;
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
-            spawnerSubscriber.Subscribe(OnSpawnerMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTask InitializeAsync(int stageId)
@@ -76,8 +69,6 @@ namespace Domivium.Client.Contents.Services
             _store.Initialize(tilemap.cellBounds);
             await _actorSpawner.SpawnAsync(ActorIds.Map, new ActorParams(cells));
         }
-
-        public void SetGrid(Tilemap tilemap) => _grid = tilemap;
 
         public void Show(int index)
         {
@@ -101,7 +92,7 @@ namespace Domivium.Client.Contents.Services
         public bool Update(Vector2 position)
         {
             _previewTower.Clear();
-            if (CoordinateUtils.TryScreenToCell(_cameraRead.MainCamera, _grid, position, out var cell))
+            if (_coordinateService.TryScreenToCell(position, out var cell))
             {
                 _store.GetTower(cell, _previewTower);
             }
@@ -127,7 +118,7 @@ namespace Domivium.Client.Contents.Services
                 var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
                 var abilities = new List<BattleAbilitySpec> { ability };
                 var unitContext = new UnitContext(row);
-                _actorSpawner.SpawnAsync(ActorIds.Tower, new TowerParams(_stagedTower.First(), unitContext, abilities)).Forget();
+                _actorSpawner.SpawnAsync(ActorIds.Tower, new UnitParams(_stagedTower.First(), unitContext, abilities)).Forget();
             }
 
             Hide();
@@ -151,14 +142,6 @@ namespace Domivium.Client.Contents.Services
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private void OnSpawnerMessage(SpawnActorMessage message)
-        {
-            if (message.Presenter is StageMapPresenter stageMapPresenter)
-            {
-                _grid = stageMapPresenter.Grid;
             }
         }
     }

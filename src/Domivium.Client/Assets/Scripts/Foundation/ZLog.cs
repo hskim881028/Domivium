@@ -1,0 +1,140 @@
+﻿// ReSharper disable CheckNamespace
+
+using System.Runtime.CompilerServices;
+using Cysharp.Text;
+using MagicOnion.Client;
+using UnityEngine;
+
+public static class ZLog
+{
+    public static void Request(RequestContext ctx)
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append("<color=#4FC3F7>[Req]</color> ");
+        sb.Append(ctx.MethodPath);
+        sb.Append("\n");
+        sb.Append(JsonHelper.ExtractKey(ctx, "Request"));
+        Debug.Log(sb.ToString());
+#endif
+    }
+
+    public static void Response(string caller, double elapsed, ResponseContext ctx)
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append("<color=#81C784>[Res]</color> ");
+        sb.Append(caller);
+        sb.Append(" (Elapsed:");
+        sb.Append(GetElapsedColor(elapsed));
+        sb.Append(elapsed.ToString("0.0"));
+        sb.Append("</color>ms)\n");
+        sb.Append(JsonHelper.ExtractNestedKey(ctx, "ResponseAsync", "Result"));
+        Debug.Log(sb.ToString());
+#endif
+    }
+
+    public static void StatusCodeException(string message)
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append("<color=#FF5252>[Err]</color> ");
+        sb.Append(message);
+        Debug.Log(sb.ToString());
+#endif
+    }
+
+    private static string GetElapsedColor(double elapsed) =>
+        elapsed <= 300 ? "<color=#81C784>" :
+        elapsed <= 800 ? "<color=#FFD54F>" : "<color=#E57373>";
+
+    public static void Log(this object obj, string message = "", [CallerMemberName] string caller = "")
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append($"<color=#BA68C8>[Frame: {Time.frameCount}] [{obj.GetType().Name}.");
+        sb.Append($"<color=#D7B2E2>{caller}</color>]</color> {message}");
+        Debug.Log(sb.ToString());
+#endif
+    }
+
+    public static void Log(this object obj, Vector3 value, [CallerMemberName] string caller = "")
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append($"<color=#BA68C8>[Frame: {Time.frameCount}] [{obj.GetType().Name}.");
+        sb.Append($"<color=#D7B2E2>{caller}</color>]</color> {value}");
+        Debug.Log(sb.ToString());
+#endif
+    }
+
+    public static void Log(this object obj, Vector2 value, [CallerMemberName] string caller = "")
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append($"<color=#BA68C8>[Frame: {Time.frameCount}] [{obj.GetType().Name}.");
+        sb.Append($"<color=#D7B2E2>{caller}</color>]</color> {value}");
+        Debug.Log(sb.ToString());
+#endif
+    }
+
+    public static void Log(this object obj, ulong value, [CallerMemberName] string caller = "")
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append($"<color=#BA68C8>[Frame: {Time.frameCount}] [{obj.GetType().Name}.");
+        sb.Append($"<color=#D7B2E2>{caller}</color>]</color> {value}");
+        Debug.Log(sb.ToString());
+#endif
+    }
+
+    public static void Log(this object obj, float value, [CallerMemberName] string caller = "")
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append($"<color=#BA68C8>[Frame: {Time.frameCount}] [{obj.GetType().Name}.");
+        sb.Append($"<color=#D7B2E2>{caller}</color>]</color> {value}");
+        Debug.Log(sb.ToString());
+#endif
+    }
+
+    public static void Log(this object obj, int value, [CallerMemberName] string caller = "")
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append($"<color=#BA68C8>[Frame: {Time.frameCount}] [{obj.GetType().Name}.");
+        sb.Append($"<color=#D7B2E2>{caller}</color>]</color> {value}");
+        Debug.Log(sb.ToString());
+#endif
+    }
+
+    public static void Log(this object obj, bool value, [CallerMemberName] string caller = "")
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append($"<color=#BA68C8>[Frame: {Time.frameCount}] [{obj.GetType().Name}.");
+        sb.Append($"<color=#D7B2E2>{caller}</color>]</color> {value}");
+        Debug.Log(sb.ToString());
+#endif
+    }
+}

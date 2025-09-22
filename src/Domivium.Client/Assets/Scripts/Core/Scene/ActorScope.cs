@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
@@ -10,12 +11,14 @@ namespace Domivium.Client.Core.Scene
     {
         private bool _isDespawn;
 
+        public Guid Id { get; private set; }
         public IActorPresenter Presenter { get; private set; }
 
-        public void Initialize(IActorPresenter presenter)
+        public void Initialize(Guid id, IActorPresenter presenter)
         {
+            Id = id;
             Presenter = presenter;
-            Presenter.Initialize(transform);
+            Presenter.Initialize(id, transform);
         }
 
         public async UniTask SpawnAsync(ActorParam param, CancellationToken token)

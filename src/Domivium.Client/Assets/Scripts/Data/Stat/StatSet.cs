@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Domivium.Client.Data.Stat
 {
@@ -14,7 +15,35 @@ namespace Domivium.Client.Data.Stat
             _onChanged[id]?.Invoke();
         }
 
-        public int Value(StatId id) => Ref(id).Value();
+        public int Value(StatId id)
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            ref var s = ref Ref(id);
+            if (s.Domain != StatDomain.Value)
+            {
+                Debug.LogException(new InvalidOperationException($"Domain mismatch: {id} (expected {StatDomain.Value}, actual={s.Domain})"));
+            }
+
+            return s.Value();
+#else
+            return Ref(id).Value();
+#endif
+        }
+
+        public float RateValue(StatId id)
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            ref var s = ref Ref(id);
+            if (s.Domain != StatDomain.Rate)
+            {
+                Debug.LogException(new InvalidOperationException($"Domain mismatch: {id} (expected {StatDomain.Rate}, actual={s.Domain})"));
+            }
+
+            return s.Value() * Constant.Percent;
+#else
+            return Ref(id).Value() * Constant.Percent;
+#endif
+        }
 
         public void Apply(StatId id, int value, StatChannel channel)
         {

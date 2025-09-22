@@ -21,9 +21,12 @@ namespace Domivium.Client.Contents.Input.Consumer
         public InputPriority Priority => InputPriorities.Battle;
 
         private bool IsBattleMode => _stageContext.Mode.CurrentValue == StageModes.Battle;
+        private bool IsTerminated => _stageContext.Phase.CurrentValue == StagePhases.Cleared || _stageContext.Phase.CurrentValue == StagePhases.Failed;
 
         public bool TryHandle(InputMessage message)
         {
+            if (IsTerminated) return false;
+
             switch (message.Type)
             {
                 case InputMessageType.Submit:

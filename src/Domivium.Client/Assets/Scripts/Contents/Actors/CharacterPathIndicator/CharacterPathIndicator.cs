@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
+using Domivium.Client.Core.Battle;
 using UnityEngine;
 
 namespace Domivium.Client.Contents.Actors
@@ -10,7 +11,7 @@ namespace Domivium.Client.Contents.Actors
     {
         [SerializeField] private LineRenderer _lineRenderer;
 
-        private Transform _character;
+        private IBattleSystem _character;
         private Vector3 _targetPosition;
         private bool _isPicked;
 
@@ -20,7 +21,7 @@ namespace Domivium.Client.Contents.Actors
             return base.ActivateAsync(token, param);
         }
 
-        public void SetCharacter(Transform character)
+        public void SetCharacter(IBattleSystem character)
         {
             _character = character;
             _isPicked = _character != null;
@@ -40,7 +41,7 @@ namespace Domivium.Client.Contents.Actors
         {
             if (!_isPicked) return;
 
-            var position = _character.position;
+            var position = _character.UnitPosition;
             position.y = 0.1f;
             _lineRenderer.SetPosition(0, position);
             _lineRenderer.SetPosition(1, _targetPosition);

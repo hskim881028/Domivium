@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.ReadModels;
-using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Context;
-using Domivium.Client.Core.Message;
-using MessagePipe;
+using Domivium.Client.Core.Factory;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -21,12 +19,11 @@ namespace Domivium.Client.Contents.Actors
         public Tilemap Grid => Actor.Background;
 
         public StageMapPresenter(
-            Guid id,
             StageMap actor,
-            IPublisher<ActorTagMessage> tagPublisher,
+            ISystemFactory systemFactory,
             StageContext stageContext,
             ITowerPlacementReadModel read)
-            : base(id, actor, tagPublisher)
+            : base(actor, systemFactory)
         {
             stageContext.Mode.Subscribe(OnChangeMode).AddTo(ref DisposableBag);
 

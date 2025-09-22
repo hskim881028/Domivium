@@ -22,5 +22,7 @@ namespace Domivium.Client.Core.Director
         public abstract bool TrySetMode(StageMode mode);
 
         public abstract bool TrySetPhase(StagePhase phase);
+
+        public abstract void Tick(float deltaTime);
     }
 }
