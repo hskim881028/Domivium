@@ -1,11 +1,13 @@
 ﻿using System;
+using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Battle.Ability;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Message;
 using MessagePipe;
 
-namespace Domivium.Client.Contents.Battle
+namespace Domivium.Client.Contents.Factory
 {
     public sealed class BattleAbilityFactory : IBattleAbilityFactory
     {

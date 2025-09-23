@@ -66,7 +66,7 @@ namespace Domivium.Client.Contents.DI.Scene
             Actor(builder, Lifetime.Singleton);
             Stage(builder, Lifetime.Singleton);
             Battle(builder, Lifetime.Singleton);
-            State(builder, Lifetime.Singleton);
+            Factory(builder, Lifetime.Singleton);
 
             builder.Register<ApplicationEntry>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
         }
@@ -186,13 +186,14 @@ namespace Domivium.Client.Contents.DI.Scene
         private void Battle(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<IBattleEffectPool, BattleEffectPool>(lifetime);
-            builder.Register<IBattleAbilityFactory, BattleAbilityFactory>(lifetime);
             builder.Register<IBattleCuePlayer, BattleCuePlayer>(lifetime);
         }
 
-        private void State(IContainerBuilder builder, Lifetime lifetime)
+        private void Factory(IContainerBuilder builder, Lifetime lifetime)
         {
+            builder.Register<IBattleAbilityFactory, BattleAbilityFactory>(lifetime);
             builder.Register<ISystemFactory, SystemFactory>(lifetime);
+            builder.Register<IUnitFactory, UnitFactory>(lifetime);
         }
     }
 }
