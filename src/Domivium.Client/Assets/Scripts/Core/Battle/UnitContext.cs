@@ -10,10 +10,11 @@ namespace Domivium.Client.Core.Battle
         public int Health { get; }
         public int Attack { get; }
         public int Defense { get; }
-        public int HitRange { get; }
-        public int AttackRange { get; }
+        public int MoveSpeed { get; } // percent
+        public int AttackSpeed { get; } // percent
+        public int HitRange { get; } // percent
+        public int AttackRange { get; } // percent
         public int DetectionRange { get; } // percent
-        public int Speed { get; } // percent
         public int CriticalRate { get; } // percent
         public int CriticalDamage { get; } // percent
 
@@ -25,10 +26,11 @@ namespace Domivium.Client.Core.Battle
             Health = row.Health;
             Attack = row.Attack;
             Defense = row.Defense;
+            MoveSpeed = row.MoveSpeed;
+            AttackSpeed = row.AttackSpeed;
             HitRange = row.HitRange;
             AttackRange = row.AttackRange;
             DetectionRange = row.DetectionRange;
-            Speed = row.Speed;
             CriticalRate = row.CriticalRate;
             CriticalDamage = row.CriticalDamage;
         }
@@ -41,10 +43,11 @@ namespace Domivium.Client.Core.Battle
             Health = row.Health;
             Attack = row.Attack;
             Defense = row.Defense;
+            MoveSpeed = row.MoveSpeed;
+            AttackSpeed = row.AttackSpeed;
             HitRange = row.HitRange;
             AttackRange = row.AttackRange;
             DetectionRange = row.DetectionRange;
-            Speed = row.Speed;
             CriticalRate = row.CriticalRate;
             CriticalDamage = row.CriticalDamage;
         }
@@ -57,10 +60,11 @@ namespace Domivium.Client.Core.Battle
             Health = row.Health;
             Attack = row.Attack;
             Defense = row.Defense;
+            MoveSpeed = row.MoveSpeed;
+            AttackSpeed = row.AttackSpeed;
             AttackRange = row.AttackRange;
             HitRange = row.HitRange;
             DetectionRange = row.DetectionRange;
-            Speed = row.Speed;
             CriticalRate = row.CriticalRate;
             CriticalDamage = row.CriticalDamage;
         }
@@ -73,10 +77,11 @@ namespace Domivium.Client.Core.Battle
             Health = row.Health;
             Attack = row.Attack;
             Defense = row.Defense;
+            MoveSpeed = row.MoveSpeed;
+            AttackSpeed = row.AttackSpeed;
             HitRange = row.HitRange;
             AttackRange = row.AttackRange;
             DetectionRange = row.DetectionRange;
-            Speed = row.Speed;
             CriticalRate = row.CriticalRate;
             CriticalDamage = row.CriticalDamage;
         }

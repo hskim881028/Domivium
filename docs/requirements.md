@@ -16,6 +16,8 @@ Fill in the sections below with as much detail as possible. Use bullet points fo
 - character, monster는 unit을 상속.
 - character, monster는 x,y축 사용한 Plane mesh로 구성. 
 - 게임 전투는 Unreal Engine에 있는 Gameplay Ability System와 동일하게 구성.
+- BattleSystem이 GameplaySystemComponent와 비슷하다고 보면되.
+- BattleAbility, BattleEffect, BattleCuePlayer, StateSystem도 GAS 따라한거야
 
 ## 2. Goals (What success looks like)
 - G1: 객체 지향 설계의 5원칙 지켜줘. (Single Responsibility Principle, Open Closed Priciple, Listov Substitution Priciple, Interface Segregation Principle, Dependency Inversion Principle)

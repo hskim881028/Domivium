@@ -4,6 +4,6 @@ namespace Domivium.Client.Core.Factory
 {
     public interface IBattleAbilityFactory
     {
-        public BattleAbilitySpec Create(BattleAbilityId id);
+        public BattleAbility Create(BattleAbilityId id);
     }
 }

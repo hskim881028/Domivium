@@ -16,7 +16,7 @@ namespace Domivium.Client.Core.Battle
         public bool Contains(BattleTag tag);
         public void Reset();
         public void SetType(UnitType type);
-        public void GrantAbility(BattleAbilitySpec ability);
+        public void GrantAbility(BattleAbility ability);
         public bool TryActivateAbility(BattleAbilityId id, ref BattleAbilityContext context);
         public void ActivateEffect(BattleEffectSpec spec);
     }

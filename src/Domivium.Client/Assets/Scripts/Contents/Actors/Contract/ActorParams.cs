@@ -10,7 +10,7 @@ namespace Domivium.Client.Contents.Actors.Contract
     public record UnitParams(
         Vector3Int SpawnPoint,
         UnitContext UnitContext,
-        IReadOnlyList<BattleAbilitySpec> Abilities) : ActorParam;
+        IReadOnlyList<BattleAbility> Abilities) : ActorParam;
 
     public record DamageTextParams(Vector3 Position, int Damage, float DespawnTime) : ActorParam;
 }

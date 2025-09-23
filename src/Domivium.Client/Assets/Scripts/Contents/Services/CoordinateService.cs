@@ -23,10 +23,7 @@ namespace Domivium.Client.Contents.Services
             spawnerSubscriber.Subscribe(OnSpawnerMessage).AddTo(ref DisposableBag);
         }
 
-        public Vector3Int GetPosition(Vector3 worldPosition)
-        {
-            return _grid.WorldToCell(worldPosition);
-        }
+        public Vector3Int GetPosition(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
 
         public bool TryScreenToCell(Vector2 screenPosition, out Vector3Int cell)
         {

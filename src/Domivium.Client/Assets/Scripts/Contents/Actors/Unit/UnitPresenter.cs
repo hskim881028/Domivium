@@ -43,23 +43,26 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.SetType(row.Job.ToUnitType());
             TargetActionId = row.Target.ToActorId();
 
-            foreach (var ability in p.Abilities)
-            {
-                BattleSystem.GrantAbility(ability);
-            }
-
             BattleSystem.Stat.Register(StatId.Health, row.Health, OnHealthStatChanged);
             BattleSystem.Stat.Register(StatId.Attack, row.Attack, OnAttackStatChanged);
             BattleSystem.Stat.Register(StatId.Defense, row.Defense, OnDefenseStatChanged);
+
+            BattleSystem.Stat.Register(StatId.MoveSpeed, row.MoveSpeed, OnMoveSpeedStatChanged);
+            BattleSystem.Stat.Register(StatId.AttackSpeed, row.AttackSpeed, OnAttackSpeedStatChanged);
+
             BattleSystem.Stat.Register(StatId.HitRange, row.HitRange, OnHitRangeStatChanged);
             BattleSystem.Stat.Register(StatId.AttackRange, row.AttackRange, OnAttackRangeStatChanged);
             BattleSystem.Stat.Register(StatId.DetectionRange, row.DetectionRange, OnDetectionRangeStatChanged);
 
-            BattleSystem.Stat.Register(StatId.Speed, row.Speed, OnSpeedStatChanged);
             BattleSystem.Stat.Register(StatId.CriticalRate, row.CriticalRate, OnCriticalRateStatChanged);
             BattleSystem.Stat.Register(StatId.CriticalDamage, row.CriticalDamage, OnCriticalDamageStatChanged);
 
             BattleSystem.Gauge.Register(StatId.Health, row.Health, OnHealthGaugeChanged);
+
+            foreach (var ability in p.Abilities)
+            {
+                BattleSystem.GrantAbility(ability);
+            }
 
             StateSystem.TryTransit(StateTags.Idle);
             return base.ActivateAsync(token, param);
@@ -157,11 +160,13 @@ namespace Domivium.Client.Contents.Actors
 
         private void OnDefenseStatChanged() { }
 
-        private void OnSpeedStatChanged()
+        private void OnMoveSpeedStatChanged()
         {
-            var speed = BattleSystem.Stat.RateValue(StatId.Speed);
+            var speed = BattleSystem.Stat.RateValue(StatId.MoveSpeed);
             Actor.SetSpeed(speed);
         }
+
+        private void OnAttackSpeedStatChanged() { }
 
         private void OnCriticalRateStatChanged() { }
 

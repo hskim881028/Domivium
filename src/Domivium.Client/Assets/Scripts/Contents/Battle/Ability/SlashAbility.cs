@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Domivium.Client.Contents.State;
-using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.State;
 
@@ -12,10 +11,11 @@ namespace Domivium.Client.Contents.Battle.Ability
         protected override IReadOnlyCollection<BattleTag> BlockedBattleTags => BattleTags.Empty;
         protected override IReadOnlyCollection<StateTag> BlockedStateTags => StateTags.DefaultBlockedTag;
         public override BattleAbilityId Id => BattleAbilityIds.Slash;
-        public override float Cooldown => 0.2f;
         public override BattleCueId CueId => BattleCueIds.Slash;
+        public override float Cooldown => 1;
+        public override bool ApplyAttackSpeed => true;
 
-        public SlashAbility(IBattleEffectPool effectPool, IActorFinder actorFinder) : base(effectPool, actorFinder) { }
+        public SlashAbility(IBattleEffectPool effectPool) : base(effectPool) { }
 
         protected override bool OnActivate(ref BattleAbilityContext context)
         {

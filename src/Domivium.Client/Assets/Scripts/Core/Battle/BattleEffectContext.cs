@@ -7,14 +7,11 @@
         public BattleAbility Ability { get; init; }
         public int Damage { get; set; }
 
-        public static BattleEffectContext Create(BattleAbilityContext context, BattleAbility ability)
+        public static BattleEffectContext Create(BattleAbilityContext context, BattleAbility ability) => new()
         {
-            return new BattleEffectContext
-            {
-                Source = context.Source,
-                Owner = context.Target,
-                Ability = ability,
-            };
-        }
+            Source = context.Source,
+            Owner = context.Target,
+            Ability = ability
+        };
     }
 }

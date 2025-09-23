@@ -29,7 +29,7 @@ namespace Domivium.Client.Contents.Factory
         {
             var row = _masterDbService.DB.CharacterRowTable.FindById(id);
             var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbilitySpec> { ability };
+            var abilities = new List<BattleAbility> { ability };
             var context = new UnitContext(row);
             var spawnPoint = _coordinateService.GetPosition(spawnPosition);
             return new UnitParams(spawnPoint, context, abilities);
@@ -39,7 +39,7 @@ namespace Domivium.Client.Contents.Factory
         {
             var row = _masterDbService.DB.MonsterRowTable.FindById(id);
             var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbilitySpec> { ability };
+            var abilities = new List<BattleAbility> { ability };
             var context = new UnitContext(row);
             var spawnPoint = _coordinateService.GetPosition(spawnPosition);
             return new UnitParams(spawnPoint, context, abilities);
@@ -49,7 +49,7 @@ namespace Domivium.Client.Contents.Factory
         {
             var row = _masterDbService.DB.NexusRowTable.FindById(id);
             var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbilitySpec> { ability };
+            var abilities = new List<BattleAbility> { ability };
             var context = new UnitContext(row);
             return new UnitParams(spawnPoint, context, abilities);
         }
@@ -58,7 +58,7 @@ namespace Domivium.Client.Contents.Factory
         {
             var row = _masterDbService.DB.TowerRowTable.FindById(id);
             var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbilitySpec> { ability };
+            var abilities = new List<BattleAbility> { ability };
             var context = new UnitContext(row);
             return new UnitParams(spawnPoint, context, abilities);
         }

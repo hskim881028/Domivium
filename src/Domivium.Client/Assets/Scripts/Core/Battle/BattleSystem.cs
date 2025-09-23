@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using Domivium.Client.Core.Actors.Unit;
+using Domivium.Client.Core.Message;
 using Domivium.Client.Core.State;
 using Domivium.Client.Data.Stat;
+using MessagePipe;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -16,6 +18,7 @@ namespace Domivium.Client.Core.Battle
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
         private readonly ReadOnlyReactiveProperty<StateTag> _state;
+        private readonly IPublisher<BattleCueMessage> _cuePublisher;
 
         public UnitType Type { get; private set; }
         public StatSet Stat { get; }
@@ -24,12 +27,16 @@ namespace Domivium.Client.Core.Battle
         public Vector3 UnitPosition => Unit.position;
         public StateTag State => _state.CurrentValue;
 
-        public BattleSystem(Transform unit, ReadOnlyReactiveProperty<StateTag> state)
+        public BattleSystem(
+            Transform unit,
+            ReadOnlyReactiveProperty<StateTag> state,
+            IPublisher<BattleCueMessage> cuePublisher)
         {
             Unit = unit;
             Stat = new StatSet();
             Gauge = new GaugeSet(Stat);
             _state = state;
+            _cuePublisher = cuePublisher;
         }
 
         public bool Contains(BattleTag tag) => _tags.Contains(tag);
@@ -55,12 +62,15 @@ namespace Domivium.Client.Core.Battle
             Type = type;
         }
 
-        public void GrantAbility(BattleAbilitySpec ability)
+        public void GrantAbility(BattleAbility ability)
         {
-            _abilitySpecs.Add(ability.Id, ability);
+            _abilitySpecs.Add(ability.Id, new BattleAbilitySpec(ability, Stat, _cuePublisher));
         }
 
-        public bool TryActivateAbility(BattleAbilityId id, ref BattleAbilityContext context) => _abilitySpecs.TryGetValue(id, out var spec) && spec.TryActivate(ref context);
+        public bool TryActivateAbility(BattleAbilityId id, ref BattleAbilityContext context)
+        {
+            return _abilitySpecs.TryGetValue(id, out var spec) && spec.TryActivate(ref context);
+        }
 
         public void ActivateEffect(BattleEffectSpec spec)
         {

@@ -5,13 +5,10 @@
         public IBattleSystem Source { get; private init; }
         public IBattleSystem Target { get; private init; }
 
-        public static BattleAbilityContext Create(IBattleSystem source, IBattleSystem target)
+        public static BattleAbilityContext Create(IBattleSystem source, IBattleSystem target) => new()
         {
-            return new BattleAbilityContext
-            {
-                Source = source,
-                Target = target
-            };
-        }
+            Source = source,
+            Target = target
+        };
     }
 }
