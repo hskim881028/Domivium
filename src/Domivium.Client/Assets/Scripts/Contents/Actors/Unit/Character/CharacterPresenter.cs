@@ -9,6 +9,8 @@ namespace Domivium.Client.Contents.Actors
 {
     public class CharacterPresenter : UnitPresenter<Character>
     {
+        private readonly IBattleReadModel _read;
+
         public CharacterPresenter(
             Character actor,
             ISystemFactory systemFactory,
@@ -16,6 +18,7 @@ namespace Domivium.Client.Contents.Actors
             IBattleReadModel read)
             : base(actor, systemFactory, actorFinder)
         {
+            _read = read;
             read.TargetPosition.Subscribe(ForceMove).AddTo(ref DisposableBag);
         }
 
@@ -42,6 +45,8 @@ namespace Domivium.Client.Contents.Actors
 
         private void ForceMove(Vector3 position)
         {
+            if (_read.PickedCharacter.CurrentValue.Id != Id) return;
+
             StateSystem.TryTransit(StateTags.Move);
             Actor.SetDestination(position);
         }

@@ -25,7 +25,7 @@ namespace Domivium.Client.Contents.Battle
         {
             var distance = Vector3.Distance(source.UnitPosition, target.UnitPosition);
             var range = source.Stat.RateValue(StatId.AttackRange) + target.Stat.RateValue(StatId.HitRange);
-            if (source.Type == UnitTypes.Ranged || target.Type == UnitTypes.Support)
+            if (source.Type == UnitTypes.Ranged || source.Type == UnitTypes.Support)
             {
                 return distance < range;
             }

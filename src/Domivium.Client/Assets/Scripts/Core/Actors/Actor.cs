@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors.Contract;
 using UnityEngine;
@@ -8,9 +7,9 @@ namespace Domivium.Client.Core.Actors
 {
     public class Actor : MonoBehaviour, IActorActivatable, ITicker
     {
-        public Guid Id { get; private set; }
+        public ushort Id { get; private set; }
 
-        public virtual void Initialize(Guid id, Transform parent)
+        public virtual void Initialize(ushort id, Transform parent)
         {
             Id = id;
             transform.SetParent(parent);

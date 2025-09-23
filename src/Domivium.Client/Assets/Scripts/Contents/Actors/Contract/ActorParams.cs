@@ -13,4 +13,5 @@ namespace Domivium.Client.Contents.Actors.Contract
         IReadOnlyList<BattleAbility> Abilities) : ActorParam;
 
     public record DamageTextParams(Vector3 Position, int Damage, float DespawnTime) : ActorParam;
+    public record HealTextParams(Vector3 Position, int Damage, float DespawnTime) : ActorParam;
 }

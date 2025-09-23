@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Actors.Contract;
+using Domivium.Client.Core.Actors.Unit;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using UnityEngine;
@@ -28,8 +32,7 @@ namespace Domivium.Client.Contents.Factory
         public ActorParam CreateCharacter(int id, Vector3 spawnPosition)
         {
             var row = _masterDbService.DB.CharacterRowTable.FindById(id);
-            var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbility> { ability };
+            var abilities = GetDefaultAbility(row.Job.ToUnitType());
             var context = new UnitContext(row);
             var spawnPoint = _coordinateService.GetPosition(spawnPosition);
             return new UnitParams(spawnPoint, context, abilities);
@@ -38,8 +41,7 @@ namespace Domivium.Client.Contents.Factory
         public ActorParam CreateMonster(int id, Vector3 spawnPosition)
         {
             var row = _masterDbService.DB.MonsterRowTable.FindById(id);
-            var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbility> { ability };
+            var abilities = GetDefaultAbility(row.Job.ToUnitType());
             var context = new UnitContext(row);
             var spawnPoint = _coordinateService.GetPosition(spawnPosition);
             return new UnitParams(spawnPoint, context, abilities);
@@ -48,19 +50,42 @@ namespace Domivium.Client.Contents.Factory
         public ActorParam CreateNexus(int id, Vector3Int spawnPoint)
         {
             var row = _masterDbService.DB.NexusRowTable.FindById(id);
-            var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbility> { ability };
             var context = new UnitContext(row);
-            return new UnitParams(spawnPoint, context, abilities);
+            return new UnitParams(spawnPoint, context, new List<BattleAbility>());
         }
 
         public ActorParam CreateTower(int id, Vector3Int spawnPoint)
         {
             var row = _masterDbService.DB.TowerRowTable.FindById(id);
-            var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbility> { ability };
+            var abilities = GetDefaultAbility(row.Job.ToUnitType());
             var context = new UnitContext(row);
             return new UnitParams(spawnPoint, context, abilities);
+        }
+        
+        private List<BattleAbility> GetDefaultAbility(UnitType unitType) // temp
+        {
+            var abilities = new List<BattleAbility>();
+            if (unitType == UnitTypes.Melee)
+            {
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Attack));
+            }
+
+            if (unitType == UnitTypes.Ranged)
+            {
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Attack));
+            }
+
+            if (unitType == UnitTypes.Tank)
+            {
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Attack));
+            }
+
+            if (unitType == UnitTypes.Support)
+            {
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Heal));
+            }
+
+            return abilities;
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using Domivium.Client.Contents.Battle;
 using Domivium.Client.Core.Actors.Unit;
+using Domivium.Client.Core.Battle;
 
 namespace Domivium.Client.Contents.Actors
 {
@@ -18,6 +20,16 @@ namespace Domivium.Client.Contents.Actors
                 "Ranged" => Ranged,
                 "Tank" => Tank,
                 "Support" => Support,
+                _ => throw new Exception($"Unknown Unit type: {type}")
+            };
+        }
+
+        public static BattleAbilityId ToBattleAbilityId(this string type)
+        {
+            return type switch
+            {
+                "Melee" or "Ranged" or "Tank" => BattleAbilityIds.Attack,
+                "Support" => BattleAbilityIds.Heal,
                 _ => throw new Exception($"Unknown Unit type: {type}")
             };
         }

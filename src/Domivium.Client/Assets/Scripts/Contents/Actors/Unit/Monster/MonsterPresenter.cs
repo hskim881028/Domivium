@@ -1,6 +1,7 @@
 ﻿using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 
 namespace Domivium.Client.Contents.Actors
@@ -34,6 +35,15 @@ namespace Domivium.Client.Contents.Actors
 
             StateSystem.TryTransit(StateTags.Chase);
             base.OnIdleTick();
+        }
+
+        protected override void OnDamagedEffect(BattleEffectContext context)
+        {
+            if (Target.Id != context.Source.Id)
+            {
+                Target =  context.Source;
+            }
+            base.OnDamagedEffect(context);
         }
     }
 }

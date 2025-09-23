@@ -4,6 +4,7 @@ namespace Domivium.Client.Contents.Battle
 {
     public static class BattleAbilityIds
     {
-        public static BattleAbilityId Slash = new(0);
+        public static BattleAbilityId Attack = new(0);
+        public static BattleAbilityId Heal = new(1);
     }
 }

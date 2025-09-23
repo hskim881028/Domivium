@@ -4,7 +4,6 @@ using Domivium.Client.Core.Message;
 using Domivium.Client.Core.State;
 using Domivium.Client.Data.Stat;
 using MessagePipe;
-using ObservableCollections;
 using R3;
 using UnityEngine;
 
@@ -12,7 +11,6 @@ namespace Domivium.Client.Core.Battle
 {
     public sealed class BattleSystem : IBattleSystem
     {
-        private readonly ObservableHashSet<BattleTag> _tags = new();
         private readonly Dictionary<BattleAbilityId, BattleAbilitySpec> _abilitySpecs = new();
         private readonly List<BattleEffectSpec> _effectSpecs = new();
         private readonly Queue<BattleStatModifier> _statModifiers = new();
@@ -20,12 +18,19 @@ namespace Domivium.Client.Core.Battle
         private readonly ReadOnlyReactiveProperty<StateTag> _state;
         private readonly IPublisher<BattleCueMessage> _cuePublisher;
 
+        private readonly HashSet<BattleTag> _tags = new();
+        private readonly ReactiveProperty<BattleEffectContext> _appliedEffect = new();
+
+        private bool _isDisposed;
+
+        public ushort Id { get; private set; }
         public UnitType Type { get; private set; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
         public Transform Unit { get; }
         public Vector3 UnitPosition => Unit.position;
         public StateTag State => _state.CurrentValue;
+        public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect => _appliedEffect;
 
         public BattleSystem(
             Transform unit,
@@ -40,6 +45,13 @@ namespace Domivium.Client.Core.Battle
         }
 
         public bool Contains(BattleTag tag) => _tags.Contains(tag);
+
+        public void Initialize(ushort id, UnitType type)
+        {
+            Id = id;
+            Type = type;
+            Reset();
+        }
 
         public void Reset()
         {
@@ -57,19 +69,14 @@ namespace Domivium.Client.Core.Battle
             Gauge.Clear();
         }
 
-        public void SetType(UnitType type)
-        {
-            Type = type;
-        }
-
         public void GrantAbility(BattleAbility ability)
         {
             _abilitySpecs.Add(ability.Id, new BattleAbilitySpec(ability, Stat, _cuePublisher));
         }
 
-        public bool TryActivateAbility(BattleAbilityId id, ref BattleAbilityContext context)
+        public bool TryActivateAbility(ref BattleAbilityContext context)
         {
-            return _abilitySpecs.TryGetValue(id, out var spec) && spec.TryActivate(ref context);
+            return _abilitySpecs.TryGetValue(context.AbilityId, out var spec) && spec.TryActivate(ref context);
         }
 
         public void ActivateEffect(BattleEffectSpec spec)
@@ -79,6 +86,8 @@ namespace Domivium.Client.Core.Battle
             EnqueueModifiers(spec.StatModifiers, spec.GaugeModifiers);
             AddTags(spec.GrantedTags);
             _effectSpecs.Add(spec);
+            _appliedEffect.Value = spec.Context;
+            _appliedEffect.ForceNotify();
         }
 
         public void Tick(float deltaTime)
@@ -86,6 +95,14 @@ namespace Domivium.Client.Core.Battle
             UpdateAbilities(deltaTime);
             UpdateEffects(deltaTime);
             UpdateAttributeSet();
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed) return;
+
+            _isDisposed = true;
+            _appliedEffect?.Dispose();
         }
 
         private void UpdateAttributeSet()

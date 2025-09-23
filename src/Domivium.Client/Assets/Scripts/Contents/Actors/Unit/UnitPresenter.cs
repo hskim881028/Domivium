@@ -9,6 +9,7 @@ using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Data.Stat;
+using R3;
 using UnityEngine;
 
 namespace Domivium.Client.Contents.Actors
@@ -21,6 +22,7 @@ namespace Domivium.Client.Contents.Actors
         protected IBattleSystem Target;
         protected Vector3 ChasePosition;
         protected ActorId TargetActionId;
+        protected BattleAbilityId BattleAbilityId;
 
         public IBattleSystem BattleSystem { get; }
 
@@ -31,6 +33,7 @@ namespace Domivium.Client.Contents.Actors
             : base(actor, systemFactory)
         {
             BattleSystem = systemFactory.CreateBattle(actor.transform, StateSystem.Tag);
+            BattleSystem.AppliedEffect.Subscribe(OnAppliedEffectChanged).AddTo(ref DisposableBag);
             ActorFinder = actorFinder;
         }
 
@@ -39,9 +42,10 @@ namespace Domivium.Client.Contents.Actors
             var p = param.As<UnitParams>();
             var row = p.UnitContext;
 
-            BattleSystem.Reset();
-            BattleSystem.SetType(row.Job.ToUnitType());
             TargetActionId = row.Target.ToActorId();
+            BattleAbilityId = row.Job.ToBattleAbilityId();
+
+            BattleSystem.Initialize(Id, row.Job.ToUnitType());
 
             BattleSystem.Stat.Register(StatId.Health, row.Health, OnHealthStatChanged);
             BattleSystem.Stat.Register(StatId.Attack, row.Attack, OnAttackStatChanged);
@@ -121,12 +125,12 @@ namespace Domivium.Client.Contents.Actors
 
             if (BattleCalculator.CanBattle(BattleSystem, Target))
             {
-                var context = BattleAbilityContext.Create(BattleSystem, Target);
-                BattleSystem.TryActivateAbility(BattleAbilityIds.Slash, ref context);
+                var context = BattleAbilityContext.Create(BattleAbilityId, BattleSystem, Target);
+                BattleSystem.TryActivateAbility(ref context);
             }
             else
             {
-                StateSystem.TryTransit(StateTags.Idle);
+                StateSystem.TryTransit(StateTags.Chase);
             }
 
             base.OnBattleTick();
@@ -136,6 +140,12 @@ namespace Domivium.Client.Contents.Actors
         {
             Actor.SetDestination(ChasePosition);
             base.OnChase();
+        }
+
+        protected override void OnBattle()
+        {
+            Actor.Battle();
+            base.OnBattle();
         }
 
         protected override void OnDie()
@@ -149,6 +159,16 @@ namespace Domivium.Client.Contents.Actors
         {
             Actor.Die();
             base.OnTerminated();
+        }
+
+        protected virtual void OnDamagedEffect(BattleEffectContext context) { }
+
+        private void OnAppliedEffectChanged(BattleEffectContext context)
+        {
+            if (context.EffectId == BattleEffectIds.Damage)
+            {
+                OnDamagedEffect(context);
+            }
         }
 
         private void OnHealthStatChanged()

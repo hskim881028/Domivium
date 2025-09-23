@@ -1,24 +1,19 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
-using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Factory;
-using UnityEngine;
 
 namespace Domivium.Client.Contents.Actors
 {
-    public class NexusPresenter : UnitPresenter<Nexus>
+    public class HealTextPresenter : VFXPresenter<HealText>
     {
-        public Vector3Int Cell { get; private set; }
-
-        public NexusPresenter(Nexus actor, ISystemFactory systemFactory, IActorFinder actorFinder)
-            : base(actor, systemFactory, actorFinder) { }
+        public HealTextPresenter(HealText actor, ISystemFactory systemFactory) : base(actor, systemFactory) { }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
-            var p = param.As<UnitParams>();
-            Cell = p.SpawnPoint;
+            var p = param.As<HealTextParams>();
+            StateSystem.DespawnAsync(p.DespawnTime).Forget();
             return base.ActivateAsync(token, param);
         }
     }

@@ -21,12 +21,13 @@ namespace Domivium.Client.Core.Actors
         private readonly Dictionary<ActorId, (Type presenter, Type view)> _container;
         private readonly Dictionary<Type, Actor> _prefabs = new();
         private readonly IPublisher<SpawnActorMessage> _publisher;
-        private readonly Dictionary<ActorId, Queue<(Guid id, ActorScope scope)>> _pool = new();
-        private readonly Dictionary<Guid, (ActorId actorId, ActorScope scope)> _activeActors = new();
+        private readonly Dictionary<ActorId, Queue<(ushort id, ActorScope scope)>> _pool = new();
+        private readonly Dictionary<ushort, (ActorId actorId, ActorScope scope)> _activeActors = new();
 
         private ActorRootScope _root;
         private SceneMessageType _sceneMessageType;
         private CancellationTokenSource _cts = new();
+        private ushort _id;
 
         public ActorSpawner(
             Dictionary<ActorId, (Type presenter, Type view)> container,
@@ -72,9 +73,9 @@ namespace Domivium.Client.Core.Actors
                 },
                 $"{presenterType.Name.AsActor()}(Scope)");
 
-            var id = Guid.NewGuid();
+            _id++;
             var presenter = (IActorPresenter)actorScope.Container.Resolve(presenterType);
-            actorScope.Initialize(id, presenter);
+            actorScope.Initialize(_id, presenter);
             return actorScope;
         }
 
@@ -87,7 +88,7 @@ namespace Domivium.Client.Core.Actors
         private async UniTask SpawnInternalAsync(
             ActorScope scope,
             IActorPresenter presenter,
-            Guid id,
+            ushort id,
             ActorId actorId,
             ActorParam param)
         {
@@ -96,7 +97,7 @@ namespace Domivium.Client.Core.Actors
             _publisher.Publish(SpawnActorMessage.Create(id, actorId, presenter, Return));
         }
 
-        private void Return(Guid id)
+        private void Return(ushort id)
         {
             if (_sceneMessageType == SceneMessageType.Unload) return;
 
@@ -107,7 +108,7 @@ namespace Domivium.Client.Core.Actors
 
             if (!_pool.ContainsKey(value.actorId))
             {
-                _pool.Add(value.actorId, new Queue<(Guid, ActorScope)>());
+                _pool.Add(value.actorId, new Queue<(ushort, ActorScope)>());
             }
 
             if (_pool[value.actorId].Count < MaxPoolPerActor)
@@ -138,11 +139,11 @@ namespace Domivium.Client.Core.Actors
             }
         }
 
-        private bool TryGet(ActorId actorId, out (Guid id, ActorScope scope) actor)
+        private bool TryGet(ActorId actorId, out (ushort id, ActorScope scope) actor)
         {
             if (!_pool.TryGetValue(actorId, out var queue))
             {
-                _pool.Add(actorId, new Queue<(Guid, ActorScope)>());
+                _pool.Add(actorId, new Queue<(ushort, ActorScope)>());
                 queue = _pool[actorId];
             }
 
@@ -161,6 +162,7 @@ namespace Domivium.Client.Core.Actors
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
+            _id = 0;
             _activeActors.Clear();
             _pool.Clear();
         }

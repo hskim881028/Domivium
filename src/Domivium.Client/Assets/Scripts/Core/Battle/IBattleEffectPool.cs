@@ -2,6 +2,6 @@
 {
     public interface IBattleEffectPool
     {
-        public BattleEffectSpec Get(BattleEffectId id, BattleAbilityContext abilityContext, BattleAbility ability);
+        public BattleEffectSpec Get(BattleEffectId id, BattleAbilityContext abilityContext);
     }
 }

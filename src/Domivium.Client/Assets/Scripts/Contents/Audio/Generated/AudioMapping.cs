@@ -13,7 +13,7 @@ namespace Domivium.Client.Contents.Audio.Generated
 			{ BGMAudioId.Stage, "stage" },
 			// SFX
 			{ SFXAudioId.Damaged, "damaged" },
-			{ SFXAudioId.Slash, "slash" },
+			{ SFXAudioId.Attack, "attack" },
 			// UI
 			{ UIAudioId.Click, "click" },
 		};

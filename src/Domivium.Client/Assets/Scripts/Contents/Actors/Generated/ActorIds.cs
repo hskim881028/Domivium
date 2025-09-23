@@ -12,6 +12,7 @@ namespace Domivium.Client.Contents.Actors.Generated
         public static ActorId Monster = 4;
         public static ActorId CharacterPathIndicator = 5;
         public static ActorId DamageText = 6;
+        public static ActorId HealText = 7;
 
         public static ActorId ToActorId(this string type)
         {

@@ -59,8 +59,11 @@ namespace Domivium.Client.Contents.Services
 
             var character = _unitFactory.CreateCharacter(1, new Vector3(2, 0, 2));
             await _actorSpawner.SpawnAsync(ActorIds.Character, character);
+            
+            var support = _unitFactory.CreateCharacter(3, new Vector3(-2, 0, 2));
+            await _actorSpawner.SpawnAsync(ActorIds.Character, support);
 
-            var monster = _unitFactory.CreateMonster(1, new Vector3(-2, 0, -2));
+            var monster = _unitFactory.CreateMonster(1, new Vector3(-3, 0, -3));
             await _actorSpawner.SpawnAsync(ActorIds.Monster, monster);
         }
 

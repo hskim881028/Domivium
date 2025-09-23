@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domivium.Client.Core.State;
-using NUnit.Framework.Constraints;
+using Domivium.Client.Core.Utility;
 
 namespace Domivium.Client.Core.Battle
 {
     public abstract class BattleAbility
     {
         protected readonly IBattleEffectPool EffectPool;
-        protected abstract IReadOnlyCollection<BattleTag> RequiredBattleTags { get; }
-        protected abstract IReadOnlyCollection<BattleTag> BlockedBattleTags { get; }
-        protected abstract IReadOnlyCollection<StateTag> BlockedStateTags { get; }
+        protected virtual IReadOnlyCollection<BattleTag> RequiredBattleTags => TagGenerator.EmptyBattleTag;
+        protected virtual IReadOnlyCollection<BattleTag> BlockedBattleTags => TagGenerator.EmptyBattleTag;
+        protected virtual IReadOnlyCollection<StateTag> BlockedStateTags => TagGenerator.DefaultBlockedStateTag;
         public abstract BattleAbilityId Id { get; }
         public abstract BattleCueId CueId { get; }
         public abstract float Cooldown { get; }

@@ -14,7 +14,8 @@ namespace Domivium.Client.Contents.Actors.Generated
             { ActorIds.Character, (typeof(CharacterPresenter), typeof(Character)) },
             { ActorIds.Monster, (typeof(MonsterPresenter), typeof(Monster)) },
             { ActorIds.CharacterPathIndicator, (typeof(CharacterPathIndicatorPresenter), typeof(CharacterPathIndicator)) },
-            { ActorIds.DamageText, (typeof(DamageTextPresenter), typeof(DamageText)) }
+            { ActorIds.DamageText, (typeof(DamageTextPresenter), typeof(DamageText)) },
+            { ActorIds.HealText, (typeof(HealTextPresenter), typeof(HealText)) }
         };
     }
 }

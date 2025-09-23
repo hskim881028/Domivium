@@ -5,5 +5,6 @@ namespace Domivium.Client.Contents.Battle
     public static class BattleEffectIds
     {
         public static BattleEffectId Damage = new(0);
+        public static BattleEffectId Heal = new(1);
     }
 }

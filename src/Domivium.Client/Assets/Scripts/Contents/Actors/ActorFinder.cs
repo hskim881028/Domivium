@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
@@ -23,7 +22,7 @@ namespace Domivium.Client.Contents.Actors
 
         public bool IsExistUnit(ActorId actorId) => _actorManager.IsExistUnit(actorId);
 
-        public bool FindTarget(ActorId actorId, Guid id, out IBattleSystem target)
+        public bool FindTarget(ActorId actorId, ushort id, out IBattleSystem target)
         {
             target = null;
             if (_actorManager.TryGetUnit(actorId, id, out var presenter))
@@ -49,6 +48,8 @@ namespace Domivium.Client.Contents.Actors
             var detectionRange = source.Stat.RateValue(StatId.DetectionRange);
             foreach (var newTarget in GetUnitsWithinRadius(units, sourcePosition, detectionRange))
             {
+                if (source.Id == newTarget.Id) continue;
+
                 var targetPosition = newTarget.UnitPosition;
                 var offsetX = CalculateAttackOffset(source, newTarget);
                 if (!TryCalculateChasePath(sourcePosition, targetPosition, offsetX, out var newChasePosition)) continue;
@@ -77,6 +78,8 @@ namespace Domivium.Client.Contents.Actors
             var attackRange = source.Stat.RateValue(StatId.AttackRange);
             foreach (var newTarget in GetUnitsWithinRadius(units, sourcePosition, attackRange))
             {
+                if (source.Id == newTarget.Id) continue;
+                
                 if (!BattleCalculator.CanBattle(source, newTarget)) continue;
 
                 var distance = Vector3.Distance(source.UnitPosition, newTarget.UnitPosition);
@@ -100,7 +103,7 @@ namespace Domivium.Client.Contents.Actors
             return true;
         }
 
-        private static IEnumerable<IBattleSystem> GetUnitsWithinRadius(IReadOnlyDictionary<Guid, IUnitPresenter> units, Vector3 sourcePosition, float range)
+        private static IEnumerable<IBattleSystem> GetUnitsWithinRadius(IReadOnlyDictionary<ushort, IUnitPresenter> units, Vector3 sourcePosition, float range)
         {
             var r2 = range * range;
             foreach (var unit in units.Values)
@@ -171,7 +174,9 @@ namespace Domivium.Client.Contents.Actors
         {
             var corners = path.GetCornersNonAlloc(cornerBuffer);
 
-            if (corners <= 1 || corners == cornerBuffer.Length) return float.PositiveInfinity;
+            if (corners <= 1) return 0;
+
+            if (corners == cornerBuffer.Length) return float.PositiveInfinity;
 
             var length = 0f;
             for (var i = 1; i < corners; i++)

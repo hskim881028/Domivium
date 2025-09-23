@@ -12,12 +12,12 @@ namespace Domivium.Client.Contents.Actors
 {
     public sealed class ActorManager : Disposable
     {
-        private readonly Dictionary<Guid, (ActorId actorId, Action<Guid> onDespawn)> _actor = new();
-        private readonly Dictionary<ActorId, Dictionary<Guid, IUnitPresenter>> _unit = new();
-        private readonly Dictionary<ActorId, Dictionary<Guid, IVFXPresenter>> _vfx = new();
-        private readonly Dictionary<Guid, Action<Guid>> _pendingDespawns = new();
-        private readonly Queue<Guid> _immediateDespawns = new();
-        private readonly Queue<Guid> _pendingRemoves = new();
+        private readonly Dictionary<ushort, (ActorId actorId, Action<ushort> onDespawn)> _actor = new();
+        private readonly Dictionary<ActorId, Dictionary<ushort, IUnitPresenter>> _unit = new();
+        private readonly Dictionary<ActorId, Dictionary<ushort, IVFXPresenter>> _vfx = new();
+        private readonly Dictionary<ushort, Action<ushort>> _pendingDespawns = new();
+        private readonly Queue<ushort> _immediateDespawns = new();
+        private readonly Queue<ushort> _pendingRemoves = new();
 
         public ActorManager(
             StageContext stageContext,
@@ -33,7 +33,7 @@ namespace Domivium.Client.Contents.Actors
 
         public bool IsExistUnit(ActorId actorId) => _unit[actorId].Count > 0;
 
-        public bool TryGetUnit(ActorId actorId, Guid id, out IUnitPresenter unitPresenter)
+        public bool TryGetUnit(ActorId actorId, ushort id, out IUnitPresenter unitPresenter)
         {
             if (_unit.TryGetValue(actorId, out var units))
             {
@@ -48,7 +48,7 @@ namespace Domivium.Client.Contents.Actors
             return false;
         }
 
-        public bool TryGetUnits(ActorId actorId, out IReadOnlyDictionary<Guid, IUnitPresenter> units)
+        public bool TryGetUnits(ActorId actorId, out IReadOnlyDictionary<ushort, IUnitPresenter> units)
         {
             if (_unit.TryGetValue(actorId, out var value))
             {
@@ -112,7 +112,7 @@ namespace Domivium.Client.Contents.Actors
             _pendingRemoves.Clear();
         }
 
-        private Action<Guid> Remove(Guid id)
+        private Action<ushort> Remove(ushort id)
         {
             if (!_actor.Remove(id, out var value))
             {
@@ -184,7 +184,7 @@ namespace Domivium.Client.Contents.Actors
                 case IUnitPresenter unitPresenter:
                     if (!_unit.TryGetValue(actorId, out var unit))
                     {
-                        unit = new Dictionary<Guid, IUnitPresenter>();
+                        unit = new Dictionary<ushort, IUnitPresenter>();
                         _unit.Add(actorId, unit);
                     }
 
@@ -196,7 +196,7 @@ namespace Domivium.Client.Contents.Actors
                 case IVFXPresenter vfxPresenter:
                     if (!_vfx.TryGetValue(actorId, out var vfx))
                     {
-                        vfx = new Dictionary<Guid, IVFXPresenter>();
+                        vfx = new Dictionary<ushort, IVFXPresenter>();
                         _vfx.Add(actorId, vfx);
                     }
 

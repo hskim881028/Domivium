@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Domivium.Client.Contents.Battle.Effect;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Message;
 using MessagePipe;
 using R3;
@@ -10,18 +10,23 @@ namespace Domivium.Client.Contents.Battle
 {
     public sealed class BattleEffectPool : Disposable, IBattleEffectPool
     {
+        private readonly IBattleEffectFactory _effectFactory;
         private readonly IPublisher<BattleCueMessage> _cuePublisher;
         private readonly Dictionary<BattleEffectId, Queue<BattleEffectSpec>> _specs = new();
 
-        public BattleEffectPool(ISubscriber<SceneMessage> sceneSubscriber, IPublisher<BattleCueMessage> cuePublisher)
+        public BattleEffectPool(
+            IBattleEffectFactory effectFactory,
+            IPublisher<BattleCueMessage> cuePublisher,
+            ISubscriber<SceneMessage> sceneSubscriber)
         {
-            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
+            _effectFactory = effectFactory;
             _cuePublisher = cuePublisher;
+            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
-        public BattleEffectSpec Get(BattleEffectId id, BattleAbilityContext abilityContext, BattleAbility ability)
+        public BattleEffectSpec Get(BattleEffectId id, BattleAbilityContext abilityContext)
         {
-            var context = BattleEffectContext.Create(abilityContext, ability);
+            var context = BattleEffectContext.Create(id, abilityContext);
             if (!_specs.ContainsKey(id))
             {
                 _specs[id] = new Queue<BattleEffectSpec>();
@@ -34,7 +39,7 @@ namespace Domivium.Client.Contents.Battle
                 return spec;
             }
 
-            var effect = CreateEffect(id, ref context);
+            var effect = _effectFactory.Create(id, ref context);
             return new BattleEffectSpec(effect, _cuePublisher, Return);
         }
 
@@ -46,16 +51,6 @@ namespace Domivium.Client.Contents.Battle
             }
 
             _specs[spec.Id].Enqueue(spec);
-        }
-
-        private static BattleEffect CreateEffect(BattleEffectId id, ref BattleEffectContext context)
-        {
-            if (id == BattleEffectIds.Damage)
-            {
-                return new DamageEffect(ref context);
-            }
-
-            throw new Exception($"Invalid battle effect: {id}");
         }
 
         private void OnSceneMessage(SceneMessage message)

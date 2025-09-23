@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
@@ -11,10 +10,10 @@ namespace Domivium.Client.Core.Scene
     {
         private bool _isDespawn;
 
-        public Guid Id { get; private set; }
+        public ushort Id { get; private set; }
         public IActorPresenter Presenter { get; private set; }
 
-        public void Initialize(Guid id, IActorPresenter presenter)
+        public void Initialize(ushort id, IActorPresenter presenter)
         {
             Id = id;
             Presenter = presenter;

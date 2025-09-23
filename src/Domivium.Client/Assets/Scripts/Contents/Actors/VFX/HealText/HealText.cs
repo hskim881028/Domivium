@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 
 namespace Domivium.Client.Contents.Actors
 {
-    public class DamageText : VFX
+    public class HealText : VFX
     {
         private static readonly Vector3 Punch1 = new(0f, 0.8f, 0f);
         private static readonly Vector3 Punch2 = new(0f, 0.4f, 0f);
@@ -62,7 +62,7 @@ namespace Domivium.Client.Contents.Actors
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
-            var p = param.As<DamageTextParams>();
+            var p = param.As<HealTextParams>();
             var position = p.Position;
             var circle = Random.insideUnitCircle;
             position.x += circle.x * 0.3f;

@@ -15,7 +15,7 @@ namespace Domivium.Client.Core.Battle
         public static BattleCueContext Create(BattleEffectContext context) => new()
         {
             Position = context.Owner.UnitPosition,
-            Value = context.Damage
+            Value = context.Value
         };
     }
 }

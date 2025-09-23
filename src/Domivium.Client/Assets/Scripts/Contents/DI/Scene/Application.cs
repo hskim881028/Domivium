@@ -191,6 +191,7 @@ namespace Domivium.Client.Contents.DI.Scene
 
         private void Factory(IContainerBuilder builder, Lifetime lifetime)
         {
+            builder.Register<IBattleEffectFactory, BattleEffectFactory>(lifetime);
             builder.Register<IBattleAbilityFactory, BattleAbilityFactory>(lifetime);
             builder.Register<ISystemFactory, SystemFactory>(lifetime);
             builder.Register<IUnitFactory, UnitFactory>(lifetime);

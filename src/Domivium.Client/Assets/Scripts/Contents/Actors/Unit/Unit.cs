@@ -23,7 +23,7 @@ namespace Domivium.Client.Contents.Actors
 
         private MaterialPropertyBlock[] _materialPropertyBlocks;
 
-        public override void Initialize(Guid id, Transform parent)
+        public override void Initialize(ushort id, Transform parent)
         {
             _materialPropertyBlocks = new MaterialPropertyBlock[_meshRenderer.Count];
             for (var i = 0; i < _meshRenderer.Count; i++)
@@ -70,6 +70,11 @@ namespace Domivium.Client.Contents.Actors
             }
         }
 
+        public void Battle()
+        {
+            _agent.isStopped = true;
+        }
+
         public void SetHealth(int current, int max) => _healthDisplay.Set(current, max);
 
         public void SetSpeed(float speed)
@@ -83,6 +88,7 @@ namespace Domivium.Client.Contents.Actors
         {
             if (_agent == null) return;
 
+            _agent.isStopped = false;
             _agent.SetDestination(position);
         }
 
