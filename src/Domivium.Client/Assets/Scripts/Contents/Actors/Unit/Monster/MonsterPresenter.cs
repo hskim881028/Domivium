@@ -37,13 +37,14 @@ namespace Domivium.Client.Contents.Actors
             base.OnIdleTick();
         }
 
+        protected override bool CheckForceSwapTarget()
+        {
+            return Target.ActorId == ActorIds.Nexus;
+        }
+
         protected override void OnDamagedEffect(BattleEffectContext context)
         {
-            if (Target.Id != context.Source.Id)
-            {
-                Target =  context.Source;
-            }
-            base.OnDamagedEffect(context);
+            CheckSwapTarget(context);
         }
     }
 }

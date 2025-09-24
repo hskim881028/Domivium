@@ -68,7 +68,11 @@ namespace Domivium.Client.Core.Battle
 
         public void Deactivate(bool hideCue = false)
         {
-            _cuePublisher.Publish(BattleCueMessage.Emit(_effect.DeactivateCueId, BattleCueContext.Create(_effect.Context)));
+            if (!hideCue)
+            {
+                _cuePublisher.Publish(BattleCueMessage.Emit(_effect.DeactivateCueId, BattleCueContext.Create(_effect.Context)));
+            }
+            
             _onDeactivate.Invoke(this);
         }
 

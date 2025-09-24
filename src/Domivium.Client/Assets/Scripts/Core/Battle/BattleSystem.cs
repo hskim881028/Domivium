@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Unit;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.State;
@@ -11,19 +12,19 @@ namespace Domivium.Client.Core.Battle
 {
     public sealed class BattleSystem : IBattleSystem
     {
+        private readonly IPublisher<BattleCueMessage> _cuePublisher;
         private readonly Dictionary<BattleAbilityId, BattleAbilitySpec> _abilitySpecs = new();
         private readonly List<BattleEffectSpec> _effectSpecs = new();
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
         private readonly ReadOnlyReactiveProperty<StateTag> _state;
-        private readonly IPublisher<BattleCueMessage> _cuePublisher;
-
         private readonly HashSet<BattleTag> _tags = new();
         private readonly ReactiveProperty<BattleEffectContext> _appliedEffect = new();
 
         private bool _isDisposed;
 
         public ushort Id { get; private set; }
+        public ActorId ActorId { get; private set; }
         public UnitType Type { get; private set; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
@@ -46,9 +47,10 @@ namespace Domivium.Client.Core.Battle
 
         public bool Contains(BattleTag tag) => _tags.Contains(tag);
 
-        public void Initialize(ushort id, UnitType type)
+        public void Initialize(ushort id, ActorId actorId, UnitType type)
         {
             Id = id;
+            ActorId = actorId;
             Type = type;
             Reset();
         }
@@ -61,7 +63,8 @@ namespace Domivium.Client.Core.Battle
             {
                 effect.Deactivate(true);
             }
-
+            
+            _tags.Clear();
             _effectSpecs.Clear();
             _statModifiers.Clear();
             _gaugeModifiers.Clear();
@@ -129,9 +132,11 @@ namespace Domivium.Client.Core.Battle
                 var effect = _effectSpecs[i];
                 if (effect.Tick(deltaTime))
                 {
-                    if (!effect.TryActivateForPeriodic(deltaTime)) continue;
-
-                    EnqueueModifiers(effect.StatPeriodicModifiers, effect.GaugePeriodicModifiers);
+                    if (effect.TryActivateForPeriodic(deltaTime))
+                    {
+                        EnqueueModifiers(effect.StatPeriodicModifiers, effect.GaugePeriodicModifiers);
+                    }
+                    
                     _effectSpecs[write++] = effect;
                 }
                 else

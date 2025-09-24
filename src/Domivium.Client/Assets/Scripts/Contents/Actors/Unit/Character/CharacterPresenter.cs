@@ -1,6 +1,7 @@
 ﻿using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using R3;
 using UnityEngine;
@@ -41,6 +42,11 @@ namespace Domivium.Client.Contents.Actors
             StateSystem.TryTransit(StateTags.Idle);
 
             base.OnMoveTick();
+        }
+
+        protected override void OnDamagedEffect(BattleEffectContext context)
+        {
+            CheckSwapTarget(context);
         }
 
         private void ForceMove(Vector3 position)

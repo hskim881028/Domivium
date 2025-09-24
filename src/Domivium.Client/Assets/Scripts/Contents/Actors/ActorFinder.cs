@@ -33,6 +33,12 @@ namespace Domivium.Client.Contents.Actors
             return target != null;
         }
 
+        public bool TryGetChasePosition(IBattleSystem source, IBattleSystem target, out Vector3 chasePosition)
+        {
+            var offsetX = CalculateAttackOffset(source, target);
+            return TryCalculateChasePath(source.UnitPosition, target.UnitPosition, offsetX, out chasePosition);
+        }
+
         public bool FindChaseTarget(
             ActorId actorId,
             IBattleSystem source,
@@ -79,7 +85,7 @@ namespace Domivium.Client.Contents.Actors
             foreach (var newTarget in GetUnitsWithinRadius(units, sourcePosition, attackRange))
             {
                 if (source.Id == newTarget.Id) continue;
-                
+
                 if (!BattleCalculator.CanBattle(source, newTarget)) continue;
 
                 var distance = Vector3.Distance(source.UnitPosition, newTarget.UnitPosition);

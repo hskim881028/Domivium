@@ -17,12 +17,15 @@ namespace Domivium.Client.Contents.Actors
     public abstract class UnitPresenter<TUnit> : ActorPresenter<TUnit>, IUnitPresenter where TUnit : Unit
     {
         private const float UpdateDistance = 0.5f;
+        private const float Hysteresis = 0.25f;
+        private const float HysteresisSq = Hysteresis * Hysteresis;
 
         protected readonly IActorFinder ActorFinder;
         protected IBattleSystem Target;
         protected Vector3 ChasePosition;
         protected ActorId TargetActionId;
         protected BattleAbilityId BattleAbilityId;
+        protected bool LockOn;
 
         public IBattleSystem BattleSystem { get; }
 
@@ -42,10 +45,10 @@ namespace Domivium.Client.Contents.Actors
             var p = param.As<UnitParams>();
             var row = p.UnitContext;
 
-            TargetActionId = row.Target.ToActorId();
-            BattleAbilityId = row.Job.ToBattleAbilityId();
+            TargetActionId = row.TargetActionId;
+            BattleAbilityId = row.BattleAbilityId;
 
-            BattleSystem.Initialize(Id, row.Job.ToUnitType());
+            BattleSystem.Initialize(Id, row.ActorId, row.UnitType);
 
             BattleSystem.Stat.Register(StatId.Health, row.Health, OnHealthStatChanged);
             BattleSystem.Stat.Register(StatId.Attack, row.Attack, OnAttackStatChanged);
@@ -136,6 +139,12 @@ namespace Domivium.Client.Contents.Actors
             base.OnBattleTick();
         }
 
+        protected override void OnIdle()
+        {
+            LockOn = false;
+            base.OnIdle();
+        }
+
         protected override void OnChase()
         {
             Actor.SetDestination(ChasePosition);
@@ -144,12 +153,20 @@ namespace Domivium.Client.Contents.Actors
 
         protected override void OnBattle()
         {
+            LockOn = true;
             Actor.Battle();
             base.OnBattle();
         }
 
+        protected override void OnMove()
+        {
+            LockOn = false;
+            base.OnMove();
+        }
+
         protected override void OnDie()
         {
+            LockOn = false;
             this.Log();
             Actor.Die();
             base.OnDie();
@@ -157,11 +174,10 @@ namespace Domivium.Client.Contents.Actors
 
         protected override void OnTerminated()
         {
+            LockOn = false;
             Actor.Die();
             base.OnTerminated();
         }
-
-        protected virtual void OnDamagedEffect(BattleEffectContext context) { }
 
         private void OnAppliedEffectChanged(BattleEffectContext context)
         {
@@ -169,6 +185,36 @@ namespace Domivium.Client.Contents.Actors
             {
                 OnDamagedEffect(context);
             }
+        }
+
+        protected virtual void OnDamagedEffect(BattleEffectContext context) { }
+
+        protected virtual bool CheckForceSwapTarget() => false;
+
+        protected void CheckSwapTarget(BattleEffectContext context)
+        {
+            if (Target.Id == context.Source.Id) return;
+
+            if (!ActorFinder.TryGetChasePosition(BattleSystem, context.Source, out var chasePosition)) return;
+
+            if (CheckForceSwapTarget())
+            {
+                LockOnTarget(context.Source, chasePosition);
+                return;
+            }
+
+            if (StateSystem.Tag.CurrentValue == StateTags.Battle)
+            {
+                var newDistSq = (Actor.transform.position - chasePosition).sqrMagnitude;
+                var curDistSq = (Actor.transform.position - ChasePosition).sqrMagnitude;
+                if (newDistSq + HysteresisSq > curDistSq) return;
+            }
+            else
+            {
+                if (LockOn) return;
+            }
+
+            LockOnTarget(context.Source, chasePosition);
         }
 
         private void OnHealthStatChanged()
@@ -224,6 +270,13 @@ namespace Domivium.Client.Contents.Actors
             var cur = BattleSystem.Gauge.Current(StatId.Health);
             var max = BattleSystem.Stat.Value(StatId.Health);
             Actor.SetHealth(cur, max);
+        }
+
+        private void LockOnTarget(IBattleSystem battleSystem, Vector3 chasePosition)
+        {
+            Target = battleSystem;
+            LockOn = true;
+            ChasePosition = chasePosition;
         }
     }
 }
