@@ -1,5 +1,4 @@
-﻿using Domivium.Client.Core.Actors;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Domivium.Client.Core.Utility
 {

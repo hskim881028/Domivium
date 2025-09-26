@@ -12,15 +12,17 @@ namespace Domivium.Client.Contents.Factory
 {
     public sealed class SystemFactory : ISystemFactory
     {
-        private readonly IPublisher<ActorStateMessage> _publisher;
+        private readonly IPublisher<ActorStateMessage> _statePublisher;
+        private readonly IPublisher<BattleCueMessage> _cuePublisher;
 
-        public SystemFactory(IPublisher<ActorStateMessage> publisher)
+        public SystemFactory(IPublisher<ActorStateMessage> statePublisher, IPublisher<BattleCueMessage> cuePublisher)
         {
-            _publisher = publisher;
+            _statePublisher = statePublisher;
+            _cuePublisher = cuePublisher;
         }
 
-        public IStateSystem CreateState(IActorPresenter presenter) => new StateSystem(presenter, _publisher);
+        public IStateSystem CreateState(IActorPresenter presenter) => new StateSystem(presenter, _statePublisher);
 
-        public IBattleSystem CreateBattle(Transform unit, ReadOnlyReactiveProperty<StateTag> tag) => new BattleSystem(unit, tag);
+        public IBattleSystem CreateBattle(Transform unit, ReadOnlyReactiveProperty<StateTag> tag) => new BattleSystem(unit, tag, _cuePublisher);
     }
 }

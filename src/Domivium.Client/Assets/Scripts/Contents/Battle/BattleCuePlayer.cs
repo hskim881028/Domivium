@@ -25,9 +25,9 @@ namespace Domivium.Client.Contents.Battle
 
         private void OnCueMessage(BattleCueMessage message)
         {
-            if (message.CueId == BattleCueIds.Slash)
+            if (message.CueId == BattleCueIds.Attack)
             {
-                _audioController.PlaySFX(SFXAudioId.Slash);
+                _audioController.PlaySFX(SFXAudioId.Attack);
             }
             else if (message.CueId == BattleCueIds.Damaged)
             {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
@@ -16,7 +15,9 @@ namespace Domivium.Client.Contents.Actors
         protected TActor Actor { get; }
         protected IStateSystem StateSystem { get; }
 
-        public Guid Id { get; private set; }
+        public ushort Id { get; private set; }
+
+        public abstract ActorId ActorId { get; }
 
         protected ActorPresenter(TActor actor, ISystemFactory systemFactory)
         {
@@ -25,7 +26,7 @@ namespace Domivium.Client.Contents.Actors
             StateSystem.Tag.DistinctUntilChanged().Subscribe(OnStateChanged).AddTo(ref DisposableBag);
         }
 
-        public virtual void Initialize(Guid id, Transform parent)
+        public virtual void Initialize(ushort id, Transform parent)
         {
             Id = id;
             Actor.Initialize(id, parent);
@@ -54,23 +55,23 @@ namespace Domivium.Client.Contents.Actors
             StateSystem.Terminate();
         }
 
-        protected virtual void OnIdleTick() { }
-        protected virtual void OnChaseTick() { }
-        protected virtual void OnBattleTick() { }
-        protected virtual void OnMoveTick() { }
-
-        protected virtual void OnIdle() => this.Log();
-        protected virtual void OnChase() => this.Log();
-        protected virtual void OnBattle() => this.Log();
-        protected virtual void OnMove() => this.Log();
-        protected virtual void OnDie() { }
-        protected virtual void OnTerminated() => this.Log();
-
         protected override void OnDispose()
         {
             StateSystem.Dispose();
             base.OnDispose();
         }
+
+        protected virtual void OnIdleTick() { }
+        protected virtual void OnChaseTick() { }
+        protected virtual void OnBattleTick() { }
+        protected virtual void OnMoveTick() { }
+
+        protected virtual void OnIdle() => this.Log(Id);
+        protected virtual void OnChase() => this.Log(Id);
+        protected virtual void OnBattle() => this.Log(Id);
+        protected virtual void OnMove() => this.Log(Id);
+        protected virtual void OnDie() { }
+        protected virtual void OnTerminated() => this.Log(Id);
 
         private void StateTick()
         {

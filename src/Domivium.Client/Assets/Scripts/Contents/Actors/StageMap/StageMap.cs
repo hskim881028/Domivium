@@ -25,7 +25,7 @@ namespace Domivium.Client.Contents.Actors
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
-            foreach (var cell in param.As<ActorParams>().Cells)
+            foreach (var cell in param.As<StageMapParams>().CellBounds.allPositionsWithin)
             {
                 _background.SetTile(cell, _gridBase);
                 _grid.SetTile(cell, _gridBase);
@@ -34,7 +34,6 @@ namespace Domivium.Client.Contents.Actors
                 _preview.SetColor(cell, Color.clear);
             }
 
-            _navMeshSurface.BuildNavMesh();
             return base.ActivateAsync(token, param);
         }
 
@@ -43,6 +42,8 @@ namespace Domivium.Client.Contents.Actors
             _grid.gameObject.SetActive(value);
             _preview.gameObject.SetActive(value);
         }
+
+        public void BuildNavMesh() => _navMeshSurface.BuildNavMesh();
 
         public void DrawPreview(Vector3Int cell, bool canPlace)
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using Domivium.Client.Core.Utility;
 using Domivium.Client.Network;
 using Domivium.Client.Network.ClientFilters;
 using Domivium.Shared.Response;

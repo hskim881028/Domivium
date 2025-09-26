@@ -1,145 +1,261 @@
-﻿using System;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Actors;
-using Domivium.Client.Contents.Actors.Contract;
+﻿using System.Collections.Generic;
 using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Battle;
-using Domivium.Client.Contents.Commands;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
-using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
-using Domivium.Client.Core.Message;
-using MessagePipe;
-using R3;
+using Domivium.Client.Data.Stat;
+using Domivium.Client.Data.Store;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Domivium.Client.Contents.Services
 {
-    public sealed class BattleService : Disposable, IBattleReadModel, IBattleCommand
+    public sealed class BattleService : IBattleService
     {
-        private readonly MasterDbService _masterDbService;
+        private const int TryCount = 32;
+        private readonly IActorManager _actorManager;
         private readonly CoordinateService _coordinateService;
-        private readonly IActorSpawner _actorSpawner;
-        private readonly IActorFinder _actorFinder;
-        private readonly IBattleAbilityFactory _abilityFactory;
+        private readonly IStageMapStore _stageMapStore;
+        private readonly NavMeshPath _path = new();
+        private readonly Vector3[] _cornerBuffer = new Vector3[64];
 
-        private readonly ReactiveProperty<IBattleSystem> _pickedCharacter;
-        private readonly ReactiveProperty<Vector3> _previewPosition;
-        private readonly ReactiveProperty<Vector3> _targetPosition;
-
-        public ReadOnlyReactiveProperty<IBattleSystem> PickedCharacter => _pickedCharacter;
-        public ReadOnlyReactiveProperty<Vector3> PreviewPosition => _previewPosition;
-        public ReadOnlyReactiveProperty<Vector3> TargetPosition => _targetPosition;
+        private readonly List<IBattleSystem> _units = new(256);
 
         public BattleService(
-            MasterDbService masterDbService,
             CoordinateService coordinateService,
-            IActorSpawner actorSpawner,
-            IActorFinder actorFinder,
-            IBattleAbilityFactory abilityFactory,
-            ISubscriber<SceneMessage> subscriber)
+            IActorManager actorManager,
+            IStageMapStore stageMapStore)
         {
-            _pickedCharacter = new ReactiveProperty<IBattleSystem>().AddTo(ref DisposableBag);
-            _previewPosition = new ReactiveProperty<Vector3>().AddTo(ref DisposableBag);
-            _targetPosition = new ReactiveProperty<Vector3>().AddTo(ref DisposableBag);
-
-            _masterDbService = masterDbService;
+            _actorManager = actorManager;
             _coordinateService = coordinateService;
-            _actorSpawner = actorSpawner;
-            _actorFinder = actorFinder;
-            _abilityFactory = abilityFactory;
-
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
+            _stageMapStore = stageMapStore;
         }
 
-        public async UniTask InitializeAsync(int stageId)
+        public bool IsExistUnit(ActorId actorId) => _actorManager.Any(actorId);
+
+        public Vector3 GetPositionOffset(IBattleSystem source, IBattleSystem target)
         {
-            var nexusRow = _masterDbService.DB.NexusRowTable.FindById(1);
-            var ability = _abilityFactory.Create(BattleAbilityIds.Slash);
-            var abilities = new List<BattleAbilitySpec> { ability };
-            var nexusContext = new UnitContext(nexusRow);
-            await _actorSpawner.SpawnAsync(ActorIds.Nexus, new UnitParams(Vector3Int.zero, nexusContext, abilities));
+            var offset = Vector3.zero;
+            var total = _actorManager.GetUnits(stackalloc ActorId[] { ActorIds.Character, ActorIds.Monster }, _units);
+            if (total == 0) return offset;
 
-            var characterRow = _masterDbService.DB.CharacterRowTable.FindById(1);
-            var characterAbilities = new List<BattleAbilitySpec> { _abilityFactory.Create(BattleAbilityIds.Slash) };
-            var characterContext = new UnitContext(characterRow);
-            var characterPosition = _coordinateService.GetPosition(new Vector3(2, 0, 2));
-            await _actorSpawner.SpawnAsync(ActorIds.Character, new UnitParams(characterPosition, characterContext, characterAbilities));
-            await _actorSpawner.SpawnAsync(ActorIds.CharacterPathIndicator, ActorParam.Empty);
-
-            var monsterRow = _masterDbService.DB.MonsterRowTable.FindById(1);
-            var monsterAbilities = new List<BattleAbilitySpec> { _abilityFactory.Create(BattleAbilityIds.Slash) };
-            var monsterContext = new UnitContext(monsterRow);
-            var monsterPosition = _coordinateService.GetPosition(new Vector3(-2, 0, -2));
-            await _actorSpawner.SpawnAsync(ActorIds.Monster, new UnitParams(monsterPosition, monsterContext, monsterAbilities));
-        }
-
-        public bool PickCharacter(Vector2 position)
-        {
-            if (_pickedCharacter.Value != null) return false;
-
-            if (!_coordinateService.TryScreenToCollider(position, out var collider)) return false;
-
-            var character = collider.GetComponent<Character>();
-            if (character == null) return false;
-
-            if (!_actorFinder.FindTarget(ActorIds.Character, character.Id, out var target)) return false;
-
-            if (target.State == StateTags.Die || target.State == StateTags.Despawn) return false;
-
-            _pickedCharacter.Value = target;
-            _previewPosition.Value = target.UnitPosition;
-            return true;
-        }
-
-        public bool UpdateMoveTarget(Vector2 position)
-        {
-            if (_pickedCharacter.Value == null ||
-                _pickedCharacter.Value.State == StateTags.Die ||
-                _pickedCharacter.Value.State == StateTags.Despawn)
+            for (var i = 0; i < TryCount; i++)
             {
-                _previewPosition.Value = Vector3.zero;
-                _pickedCharacter.Value = null;
-                return false;
+                var position = source.UnitPosition + offset;
+                if (!IsPositionOccupied(source.Id, position, _units)) return offset;
+
+                if (!TryFindBattleOffset(source, target, out offset)) break;
             }
 
-            if (!_coordinateService.TryScreenToWorld(position, out var worldPosition)) return true;
+            return offset;
+        }
 
-            _previewPosition.Value = worldPosition;
+        public bool FindTarget(ActorId actorId, ushort id, out IBattleSystem target) => _actorManager.TryGetUnit(actorId, id, out target);
+
+
+        public bool TryGetChasePosition(IBattleSystem source, IBattleSystem target, out Vector3 chasePosition)
+        {
+            var offsetX = BattleCalculator.GetAttackOffset(source, target);
+            return TryCalculateChasePath(source.UnitPosition, target.UnitPosition, offsetX, out chasePosition);
+        }
+
+        public bool FindChaseTarget(
+            ActorId actorId,
+            IBattleSystem source,
+            out IBattleSystem target,
+            out Vector3 chasePosition)
+        {
+            target = null;
+            chasePosition = Vector3.zero;
+            if (_actorManager.GetUnits(actorId, _units) == 0) return false;
+
+            var bestPathLen = float.PositiveInfinity;
+            var sourcePosition = source.UnitPosition;
+            var detectionRange = source.Stat.RateValue(StatId.DetectionRange);
+            foreach (var newTarget in GetUnitsWithinRadius(_units, sourcePosition, detectionRange))
+            {
+                if (source.Id == newTarget.Id) continue;
+
+                var targetPosition = newTarget.UnitPosition;
+                var offsetX = BattleCalculator.GetAttackOffset(source, newTarget);
+                if (!TryCalculateChasePath(sourcePosition, targetPosition, offsetX, out var newChasePosition)) continue;
+
+                var pathLen = MeasurePathLength(_path, _cornerBuffer, bestPathLen);
+                if (pathLen >= bestPathLen) continue;
+
+                bestPathLen = pathLen;
+                target = newTarget;
+                chasePosition = newChasePosition;
+            }
+
+            return target != null;
+        }
+
+        public bool FindNearestBattleTarget(
+            ActorId actorId,
+            IBattleSystem source,
+            out IBattleSystem target)
+        {
+            target = null;
+            if (_actorManager.GetUnits(actorId, _units) == 0) return false;
+
+            var bestDistance = float.PositiveInfinity;
+            var sourcePosition = source.UnitPosition;
+            var attackRange = source.Stat.RateValue(StatId.AttackRange);
+            foreach (var newTarget in GetUnitsWithinRadius(_units, sourcePosition, attackRange))
+            {
+                if (source.Id == newTarget.Id) continue;
+
+                if (!BattleCalculator.CanBattle(source, newTarget)) continue;
+
+                var distance = Vector3.Distance(source.UnitPosition, newTarget.UnitPosition);
+
+                if (distance > bestDistance) continue;
+
+                bestDistance = distance;
+                target = newTarget;
+            }
+
+            return target != null;
+        }
+
+        public bool RecalculateChasePosition(IBattleSystem source, IBattleSystem target, out Vector3 chasePosition)
+        {
+            chasePosition = Vector3.zero;
+            var offsetX = BattleCalculator.GetAttackOffset(source, target);
+            if (!TryCalculateChasePath(source.UnitPosition, target.UnitPosition, offsetX, out var newChasePosition)) return false;
+
+            chasePosition = newChasePosition;
             return true;
         }
 
-        public bool SelectCharacter(Vector2 position)
+        private static IEnumerable<IBattleSystem> GetUnitsWithinRadius(IReadOnlyList<IBattleSystem> units, Vector3 sourcePosition, float range)
         {
-            if (_pickedCharacter.Value != null &&
-                _pickedCharacter.Value.State != StateTags.Die &&
-                _pickedCharacter.Value.State != StateTags.Despawn)
+            var r2 = range * range;
+            foreach (var unit in units)
             {
-                var dist = Vector3.Distance(_pickedCharacter.Value.UnitPosition, _previewPosition.Value);
-                if (dist > 0.2f)
+                var unitPosition = unit.UnitPosition;
+                var d2 = (unitPosition - sourcePosition).sqrMagnitude;
+                if (d2 > r2) continue;
+
+                yield return unit;
+            }
+        }
+
+
+        private bool TryCalculateChasePath(Vector3 source, Vector3 target, float offsetX, out Vector3 chasePosition)
+        {
+            chasePosition = Vector3.zero;
+            if (offsetX > 0)
+            {
+                var right = target;
+                right.x += offsetX;
+                var rightDist = Vector3.Distance(right, source);
+
+                var left = target;
+                left.x -= offsetX;
+                var leftDist = Vector3.Distance(left, source);
+
+                if (leftDist > rightDist)
                 {
-                    _targetPosition.Value = _previewPosition.Value;
+                    if (!NavMesh.CalculatePath(source, right, NavMesh.AllAreas, _path))
+                    {
+                        if (!NavMesh.CalculatePath(source, left, NavMesh.AllAreas, _path)) return false;
+
+                        chasePosition = left;
+                    }
+
+                    chasePosition = right;
+                }
+                else
+                {
+                    if (!NavMesh.CalculatePath(source, left, NavMesh.AllAreas, _path))
+                    {
+                        if (!NavMesh.CalculatePath(source, right, NavMesh.AllAreas, _path)) return false;
+
+                        chasePosition = right;
+                    }
+
+                    chasePosition = left;
+                }
+            }
+            else
+            {
+                if (!NavMesh.CalculatePath(source, target, NavMesh.AllAreas, _path)) return false;
+
+                chasePosition = target;
+            }
+
+            return _path.status == NavMeshPathStatus.PathComplete;
+        }
+
+        private static float MeasurePathLength(NavMeshPath path, Vector3[] cornerBuffer, float cutoffLength)
+        {
+            var corners = path.GetCornersNonAlloc(cornerBuffer);
+
+            if (corners <= 1) return 0;
+
+            if (corners == cornerBuffer.Length) return float.PositiveInfinity;
+
+            var length = 0f;
+            for (var i = 1; i < corners; i++)
+            {
+                length += Vector3.Distance(cornerBuffer[i - 1], cornerBuffer[i]);
+                if (length >= cutoffLength) break;
+            }
+
+            return length;
+        }
+
+        private static bool IsPositionOccupied(ushort id, Vector3 position, IReadOnlyList<IBattleSystem> units)
+        {
+            foreach (var unit in units)
+            {
+                if (unit.Id == id) continue;
+
+                if (unit.State != StateTags.Battle) continue;
+
+                if (Vector3.Distance(unit.UnitPosition, position) < 0.1f)
+                {
+                    return true;
                 }
             }
 
-            _previewPosition.Value = Vector3.zero;
-            _pickedCharacter.Value = null;
-            return true;
+            return false;
         }
 
-        private void OnSceneMessage(SceneMessage message)
+        private bool TryFindBattleOffset(IBattleSystem source, IBattleSystem target, out Vector3 offset)
         {
-            switch (message.Type)
+            offset = Vector3.zero;
+            var targetPosition = target.UnitPosition;
+            for (var i = 0; i < TryCount; i++)
             {
-                case SceneMessageType.Unload:
-                case SceneMessageType.Load:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                var sourcePosition = source.UnitPosition;
+                var sourceUnitType = source.Type;
+                var candidate = sourcePosition + BattleCalculator.GetPositionOffset();
+                if (BattleCalculator.IsMelee(sourceUnitType))
+                {
+                    var zDelta = targetPosition.z - candidate.z;
+                    if (Mathf.Abs(zDelta) > BattleCalculator.MinZDistance)
+                    {
+                        candidate.z = targetPosition.z + Mathf.Sign(-zDelta) * (BattleCalculator.MinZDistance - 0.01f);
+                    }
+                }
+
+                var sourceAttackRange = source.Stat.RateValue(StatId.AttackRange);
+                var targetHitRange = target.Stat.RateValue(StatId.HitRange);
+                if (!BattleCalculator.CanBattle(sourceUnitType, candidate, targetPosition, sourceAttackRange, targetHitRange)) continue;
+
+                var cell = _coordinateService.GetCellPoint(candidate);
+                if (!_stageMapStore.CanMove(cell)) continue;
+
+                offset = candidate - sourcePosition;
+                return true;
             }
+
+            return false;
         }
     }
 }

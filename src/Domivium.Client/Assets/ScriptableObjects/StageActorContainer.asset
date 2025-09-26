@@ -14,9 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.DI.Container.StageActorContainer
   _actor:
   - {fileID: 7482531951027177798, guid: 8607e987f4ac1704185435760a8987f1, type: 3}
+  - {fileID: 3179611749090336229, guid: a4f3305acb9ae704db62bfa85205d8a6, type: 3}
+  - {fileID: 6527686036460799326, guid: e7b75427a4db0aa44a21a76b218ee644, type: 3}
   - {fileID: 1098331822369118249, guid: e67753e4d91c4b24fb4d5b006f87b957, type: 3}
   - {fileID: 7214975708751510984, guid: 74886aef01e2b8f46967fd660929d277, type: 3}
   - {fileID: 4055049818437373291, guid: 53cbf17a47de8dd41b257a9142e8b388, type: 3}
   - {fileID: 6405865843538827807, guid: cde1f6aeefdf72c43b69baa82a1ec462, type: 3}
   - {fileID: 9129764056855290054, guid: eaf4d4e15ecc790418edfad1fba53bb4, type: 3}
   - {fileID: 54636237574995573, guid: e254bbc571489ae41a2dd00553a7ee70, type: 3}
+  - {fileID: 691908857281986180, guid: 4148cb5bf55a27d4787210b49b82106d, type: 3}

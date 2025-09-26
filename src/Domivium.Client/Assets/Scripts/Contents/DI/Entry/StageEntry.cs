@@ -1,8 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.Commands;
 using Domivium.Client.Contents.Context;
+using Domivium.Client.Contents.Controller;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Director;
@@ -18,22 +19,25 @@ namespace Domivium.Client.Contents.DI.Entry
     {
         private readonly StageMapProvider _stageMapProvider;
         private readonly IStageDirector _stageDirector;
+        private readonly IWaveController _waveController;
         private readonly ITowerPlacementCommand _towerPlacementCommand;
-        private readonly IBattleCommand _battleCommand;
-        private readonly ActorManager _actorManager;
+        private readonly IBattleUserCommand _battleUserCommand;
+        private readonly IActorManager _actorManager;
 
         public StageEntry(
             IInputComposition inputComposition,
             IBattleCuePlayer cuePlayer,
             IStageDirector stageDirector,
+            IWaveController waveController,
             IAudioController audioController,
             ITowerPlacementCommand towerPlacementCommand,
-            IBattleCommand battleCommand,
-            ActorManager actorManager)
+            IBattleUserCommand battleUserCommand,
+            IActorManager actorManager)
         {
             _stageDirector = stageDirector;
+            _waveController = waveController;
             _towerPlacementCommand = towerPlacementCommand;
-            _battleCommand = battleCommand;
+            _battleUserCommand = battleUserCommand;
             _actorManager = actorManager;
             audioController.PlayBGM(BGMAudioId.Stage);
         }
@@ -49,8 +53,9 @@ namespace Domivium.Client.Contents.DI.Entry
         private async UniTaskVoid RunAsync(StageConfig cfg)
         {
             _stageDirector.TrySetPhase(StagePhases.PreparingWave);
+            _waveController.Initialize(cfg.StageId);
             await _towerPlacementCommand.InitializeAsync(cfg.StageId); //data 만들기
-            await _battleCommand.InitializeAsync(cfg.StageId);
+            await _battleUserCommand.InitializeAsync(cfg.StageId);
 
             _stageDirector.TrySetMode(StageModes.Battle);
             _stageDirector.TrySetPhase(StagePhases.RunningWave);
@@ -60,7 +65,7 @@ namespace Domivium.Client.Contents.DI.Entry
         {
             var dt = Time.deltaTime;
             _actorManager.Tick(dt);
-            _stageDirector.Tick(dt);
+            _waveController.Tick(dt);
         }
     }
 }

@@ -10,9 +10,7 @@ namespace Domivium.Client.Contents.DI.Container
         [SerializeField] private TextAsset _masterDB;
 
         public bool LocalMode => _localMode;
-
         public string ServerUrl => _serverUrl;
-
         public TextAsset MasterDB => _masterDB;
     }
 }

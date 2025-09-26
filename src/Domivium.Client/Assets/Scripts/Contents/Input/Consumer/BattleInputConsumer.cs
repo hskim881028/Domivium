@@ -10,12 +10,12 @@ namespace Domivium.Client.Contents.Input.Consumer
     public sealed class BattleInputConsumer : IInputConsumer
     {
         private readonly StageContext _stageContext;
-        private readonly IBattleCommand _command;
+        private readonly IBattleUserCommand _userCommand;
 
-        public BattleInputConsumer(StageContext stageContext, IBattleCommand command)
+        public BattleInputConsumer(StageContext stageContext, IBattleUserCommand userCommand)
         {
             _stageContext = stageContext;
-            _command = command;
+            _userCommand = userCommand;
         }
 
         public InputPriority Priority => InputPriorities.Battle;
@@ -32,11 +32,11 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.Submit:
                 case InputMessageType.Cancel:
                 case InputMessageType.Point:
-                    return IsBattleMode && _command.UpdateMoveTarget(message.Value);
+                    return IsBattleMode && _userCommand.UpdateMoveTarget(message.Value);
                 case InputMessageType.ClickEnter:
-                    return IsBattleMode && _command.PickCharacter(message.Value);
+                    return IsBattleMode && _userCommand.PickCharacter(message.Value);
                 case InputMessageType.ClickExit:
-                    return IsBattleMode && _command.SelectCharacter(message.Value);
+                    return IsBattleMode && _userCommand.SelectCharacter(message.Value);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

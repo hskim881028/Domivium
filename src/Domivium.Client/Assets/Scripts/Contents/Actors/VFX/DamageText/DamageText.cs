@@ -32,7 +32,7 @@ namespace Domivium.Client.Contents.Actors
         private Vector3 _currentPosition;
 
 
-        public override void Initialize(Guid id, Transform parent)
+        public override void Initialize(ushort id, Transform parent)
         {
             SetText(int.MinValue);
             _text.ForceMeshUpdate();

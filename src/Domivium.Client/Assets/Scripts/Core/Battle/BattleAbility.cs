@@ -1,25 +1,24 @@
 using System.Collections.Generic;
 using System.Linq;
-using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.State;
+using Domivium.Client.Core.Utility;
 
 namespace Domivium.Client.Core.Battle
 {
     public abstract class BattleAbility
     {
         protected readonly IBattleEffectPool EffectPool;
-        protected readonly IActorFinder ActorFinder;
-        protected abstract IReadOnlyCollection<BattleTag> RequiredBattleTags { get; }
-        protected abstract IReadOnlyCollection<BattleTag> BlockedBattleTags { get; }
-        protected abstract IReadOnlyCollection<StateTag> BlockedStateTags { get; }
+        protected virtual IReadOnlyCollection<BattleTag> RequiredBattleTags => TagGenerator.EmptyBattleTag;
+        protected virtual IReadOnlyCollection<BattleTag> BlockedBattleTags => TagGenerator.EmptyBattleTag;
+        protected virtual IReadOnlyCollection<StateTag> BlockedStateTags => TagGenerator.DefaultBlockedStateTag;
         public abstract BattleAbilityId Id { get; }
-        public abstract float Cooldown { get; }
         public abstract BattleCueId CueId { get; }
+        public abstract float Cooldown { get; }
+        public virtual bool ApplyAttackSpeed => false;
 
-        protected BattleAbility(IBattleEffectPool effectPool, IActorFinder actorFinder)
+        protected BattleAbility(IBattleEffectPool effectPool)
         {
             EffectPool = effectPool;
-            ActorFinder = actorFinder;
         }
 
         public bool TryActivate(ref BattleAbilityContext abilityContext) => PassesTagRequirements(abilityContext.Source) && OnActivate(ref abilityContext);

@@ -11,10 +11,12 @@ namespace Domivium.Client.Editor
     {
         // Namespace suffixes
         private const string Csv = "Csv";
+        private const string Json = "Json";
         private const string Row = "Row";
 
         // File extensions
         public const string CSVExtension = ".csv";
+        public const string JsonExtension = ".json";
         public const string CSharpExtension = ".cs";
         public const string PrefabExtension = ".prefab";
 
@@ -64,6 +66,7 @@ namespace Domivium.Client.Editor
 
         public static string MasterDBPath => Path.Combine(RootPath, DataFolderName, "MasterDB.bytes");
         public static string CsvRootPath => Path.Combine(RootPath, DataFolderName, Csv);
+        public static string JsonRootPath => Path.Combine(RootPath, DataFolderName, Json);
         public static string RowDataRootPath => Path.Combine(RootPath, ScriptsFolderName, DataFolderName, Row);
         public static string RowDataNamespace => "Domivium.Client.Data.Row";
 

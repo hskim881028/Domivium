@@ -7,21 +7,15 @@ namespace Domivium.Client.Core.Battle
         public Vector3 Position { get; private init; }
         public int Value { get; private init; }
 
-        public static BattleCueContext Create(BattleAbilityContext context)
+        public static BattleCueContext Create(BattleAbilityContext context) => new()
         {
-            return new BattleCueContext
-            {
-                Position = context.Source.UnitPosition,
-            };
-        }
+            Position = context.Source.UnitPosition
+        };
 
-        public static BattleCueContext Create(BattleEffectContext context)
+        public static BattleCueContext Create(BattleEffectContext context) => new()
         {
-            return new BattleCueContext
-            {
-                Position = context.Owner.UnitPosition,
-                Value = context.Damage,
-            };
-        }
+            Position = context.Owner.UnitPosition,
+            Value = context.Value
+        };
     }
 }

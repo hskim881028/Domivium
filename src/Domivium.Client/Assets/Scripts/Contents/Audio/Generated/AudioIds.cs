@@ -12,7 +12,7 @@ namespace Domivium.Client.Contents.Audio.Generated
 	public static class SFXAudioId
 	{
 		public static AudioId Damaged = new(555926092);
-		public static AudioId Slash = new(825186954);
+		public static AudioId Attack = new(825186954);
 	}
 
 	public static class UIAudioId

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Message;
 using MessagePipe;
@@ -10,149 +11,144 @@ using R3;
 
 namespace Domivium.Client.Contents.Actors
 {
-    public sealed class ActorManager : Disposable
+    public sealed class ActorManager : Disposable, IActorManager
     {
-        private readonly Dictionary<Guid, (ActorId actorId, Action<Guid> onDespawn)> _actor = new();
-        private readonly Dictionary<ActorId, Dictionary<Guid, IUnitPresenter>> _unit = new();
-        private readonly Dictionary<ActorId, Dictionary<Guid, IVFXPresenter>> _vfx = new();
-        private readonly Dictionary<Guid, Action<Guid>> _pendingDespawns = new();
-        private readonly Queue<Guid> _immediateDespawns = new();
-        private readonly Queue<Guid> _pendingRemoves = new();
+        private readonly StageContext _stageContext;
+        private readonly Dictionary<ushort, (ActorId actorId, Action<ushort> onDespawn)> _index = new();
+        private readonly Dictionary<ActorId, ActorBucket> _buckets = new();
+        private readonly Dictionary<ushort, ActorId> _pendingRemove = new();
+        private readonly Dictionary<ushort, Action<ushort>> _awaitDespawn = new();
+        private readonly List<ActorBucket> _bucketSnapshot = new(32);
 
         public ActorManager(
             StageContext stageContext,
             ISubscriber<SceneMessage> sceneSubscriber,
             ISubscriber<SpawnActorMessage> spawnActorSubscriber,
-            ISubscriber<ActorStateMessage> actorTagSubscriber)
+            ISubscriber<ActorStateMessage> actorStateSubscriber)
         {
+            _stageContext = stageContext;
             stageContext.Phase.Subscribe(OnChangedPhase).AddTo(ref DisposableBag);
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
             spawnActorSubscriber.Subscribe(OnSpawnActorMessage).AddTo(ref DisposableBag);
-            actorTagSubscriber.Subscribe(OnActorTagMessage).AddTo(ref DisposableBag);
+            actorStateSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
         }
 
-        public bool IsExistUnit(ActorId actorId) => _unit[actorId].Count > 0;
-
-        public bool TryGetUnit(ActorId actorId, Guid id, out IUnitPresenter unitPresenter)
+        public bool Any(ActorId actorId)
         {
-            if (_unit.TryGetValue(actorId, out var units))
+            if (!_buckets.TryGetValue(actorId, out var bucket)) return false;
+
+            var removeCount = 0;
+            foreach (var kv in _pendingRemove)
             {
-                if (units.TryGetValue(id, out var unit))
+                if (kv.Value == actorId)
                 {
-                    unitPresenter = unit;
-                    return true;
+                    removeCount++;
                 }
             }
 
-            unitPresenter = null;
+            return bucket.Count > removeCount;
+        }
+
+        public bool TryGet(ActorId actorId, ushort id, out IActorPresenter presenter)
+        {
+            presenter = null;
+            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGet(id, out presenter);
+        }
+
+        public bool TryGetAll(ActorId actorId, out IReadOnlyDictionary<ushort, IActorPresenter> map)
+        {
+            if (_buckets.TryGetValue(actorId, out var b))
+            {
+                map = b.Map;
+                return true;
+            }
+            map = null;
             return false;
         }
 
-        public bool TryGetUnits(ActorId actorId, out IReadOnlyDictionary<Guid, IUnitPresenter> units)
+        public bool TryGetUnit(ActorId actorId, ushort id, out IBattleSystem unit)
         {
-            if (_unit.TryGetValue(actorId, out var value))
-            {
-                units = value;
-                return true;
-            }
+            unit = null;
+            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetUnit(id, out unit);
+        }
 
-            units = null;
-            return false;
+        public int GetUnits(ActorId actorId, List<IBattleSystem> buffer) => !_buckets.TryGetValue(actorId, out var bucket) ? 0 : bucket.CollectUnits(buffer);
+
+        public int GetUnits(ReadOnlySpan<ActorId> actorIds, List<IBattleSystem> buffer)
+        {
+            var total = 0;
+            foreach (var actorId in actorIds)
+            {
+                if (_buckets.TryGetValue(actorId, out var bucket))
+                {
+                    total += bucket.CollectUnits(buffer);
+                }
+            }
+            return total;
         }
 
         public void Tick(float deltaTime)
         {
-            while (_immediateDespawns.Count > 0)
+            if (_stageContext.Phase.CurrentValue != StagePhases.RunningWave) return;
+
+            if (_pendingRemove.Count > 0)
             {
-                var id = _immediateDespawns.Dequeue();
-                var callback = Remove(id);
-                callback.Invoke(id);
+                foreach (var id in _pendingRemove.Keys)
+                {
+                    if (!_index.Remove(id, out var meta)) continue;
+
+                    if (_buckets.TryGetValue(meta.actorId, out var bucket))
+                    {
+                        bucket.Remove(id);
+                    }
+
+                    if (meta.onDespawn != null)
+                    {
+                        _awaitDespawn[id] = meta.onDespawn;
+                    }
+                }
+                _pendingRemove.Clear();
             }
 
-            while (_pendingRemoves.Count > 0)
+            _bucketSnapshot.Clear();
+            foreach (var bucket in _buckets.Values)
             {
-                var id = _pendingRemoves.Dequeue();
-                var callback = Remove(id);
-                if (callback != null)
-                {
-                    _pendingDespawns[id] = callback;
-                }
+                _bucketSnapshot.Add(bucket);
             }
 
-            foreach (var dic in _unit.Values)
+            foreach (var bucket in _bucketSnapshot)
             {
-                foreach (var presenter in dic.Values)
-                {
-                    presenter.Tick(deltaTime);
-                }
-            }
-
-            foreach (var dic in _vfx.Values)
-            {
-                foreach (var presenter in dic.Values)
-                {
-                    presenter.Tick(deltaTime);
-                }
+                bucket.TickAll(deltaTime);
             }
         }
 
-        protected override void OnDispose()
+        private ActorBucket GetOrAddBucket(ActorId actorId)
         {
-            Clear();
-            base.OnDispose();
+            if (_buckets.TryGetValue(actorId, out var bucket)) return bucket;
+
+            bucket = new ActorBucket();
+            _buckets.Add(actorId, bucket);
+            return bucket;
         }
 
-        private void Clear()
+        private void TerminateAll()
         {
-            _actor.Clear();
-            _unit.Clear();
-            _vfx.Clear();
-            _pendingDespawns.Clear();
-            _immediateDespawns.Clear();
-            _pendingRemoves.Clear();
-        }
-
-        private Action<Guid> Remove(Guid id)
-        {
-            if (!_actor.Remove(id, out var value))
+            foreach (var bucket in _buckets.Values)
             {
-                throw new Exception($"not exists. actor: {id}");
+                bucket.Terminate();
             }
 
-            if (_unit.TryGetValue(value.actorId, out var unit))
-            {
-                unit.Remove(id);
-            }
-
-            if (_vfx.TryGetValue(value.actorId, out var vfx))
-            {
-                vfx.Remove(id);
-            }
-
-            return value.onDespawn;
+            _buckets.Clear();
+            _index.Clear();
+            _pendingRemove.Clear();
+            _awaitDespawn.Clear();
         }
 
         private void OnChangedPhase(StagePhase phase)
         {
             if (phase == StagePhases.Failed || phase == StagePhases.Cleared)
             {
-                foreach (var (_, presenters) in _unit)
-                {
-                    foreach (var (_, presenter) in presenters)
-                    {
-                        presenter.Terminate();
-                    }
-                    presenters.Clear();
-                }
-
-                foreach (var (_, presenters) in _vfx)
-                {
-                    foreach (var (_, presenter) in presenters)
-                    {
-                        presenter.Terminate();
-                    }
-                    presenters.Clear();
-                }
+                TerminateAll();
             }
         }
 
@@ -161,7 +157,8 @@ namespace Domivium.Client.Contents.Actors
             switch (message.Type)
             {
                 case SceneMessageType.Unload:
-                    Clear();
+                    TerminateAll();
+                    _bucketSnapshot.Clear();
                     break;
                 case SceneMessageType.Load:
                     break;
@@ -172,59 +169,27 @@ namespace Domivium.Client.Contents.Actors
 
         private void OnSpawnActorMessage(SpawnActorMessage message)
         {
-            var id = message.Id;
-            var actorId = message.ActorId;
-            if (!_actor.TryAdd(id, (actorId, message.OnDespawn)))
+            if (!_index.TryAdd(message.Id, (message.ActorId, message.OnDespawn)))
             {
-                throw new Exception($"Already exists. actor: {id}");
+                throw new InvalidOperationException($"Actor already exists: {message.Id}");
             }
 
-            switch (message.Presenter)
-            {
-                case IUnitPresenter unitPresenter:
-                    if (!_unit.TryGetValue(actorId, out var unit))
-                    {
-                        unit = new Dictionary<Guid, IUnitPresenter>();
-                        _unit.Add(actorId, unit);
-                    }
-
-                    if (!unit.TryAdd(id, unitPresenter))
-                    {
-                        throw new Exception($"Already exists. unit: {id}");
-                    }
-                    break;
-                case IVFXPresenter vfxPresenter:
-                    if (!_vfx.TryGetValue(actorId, out var vfx))
-                    {
-                        vfx = new Dictionary<Guid, IVFXPresenter>();
-                        _vfx.Add(actorId, vfx);
-                    }
-
-                    if (!vfx.TryAdd(id, vfxPresenter))
-                    {
-                        throw new Exception($"Already exists. vfx: {id}");
-                    }
-                    break;
-            }
+            GetOrAddBucket(message.ActorId).Add(message.Id, message.Presenter);
         }
 
-        private void OnActorTagMessage(ActorStateMessage message)
+        private void OnActorStateMessage(ActorStateMessage message)
         {
             if (message.Tag == StateTags.Die)
             {
-                _pendingRemoves.Enqueue(message.Id);
+                _pendingRemove.TryAdd(message.Id, message.ActorId);
                 return;
             }
 
             if (message.Tag == StateTags.Despawn)
             {
-                if (_pendingDespawns.Remove(message.Id, out var onDespawn))
+                if (_awaitDespawn.Remove(message.Id, out var cb))
                 {
-                    onDespawn.Invoke(message.Id);
-                }
-                else
-                {
-                    _immediateDespawns.Enqueue(message.Id);
+                    cb?.Invoke(message.Id);
                 }
             }
         }

@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
+using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
@@ -11,10 +13,11 @@ namespace Domivium.Client.Contents.Actors
 {
     public class TowerPresenter : UnitPresenter<Tower>, ICellOccupant
     {
+        public override ActorId ActorId => ActorIds.Tower;
         public Vector3Int Cell { get; private set; }
 
-        public TowerPresenter(Tower actor, ISystemFactory systemFactory, IActorFinder actorFinder)
-            : base(actor, systemFactory, actorFinder) { }
+        public TowerPresenter(Tower actor, ISystemFactory systemFactory, IBattleService battleService)
+            : base(actor, systemFactory, battleService) { }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
@@ -25,7 +28,7 @@ namespace Domivium.Client.Contents.Actors
 
         protected override void OnIdleTick()
         {
-            if (!ActorFinder.FindNearestBattleTarget(TargetActionId, BattleSystem, out var target)) return;
+            if (!BattleService.FindNearestBattleTarget(TargetActionId, BattleSystem, out var target)) return;
 
             Target = target;
             StateSystem.TryTransit(StateTags.Battle);

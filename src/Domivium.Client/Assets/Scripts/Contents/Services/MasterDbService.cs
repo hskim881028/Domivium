@@ -6,9 +6,9 @@ namespace Domivium.Client.Contents.Services
     {
         public MemoryDatabase DB { get; }
 
-        public MasterDbService(TextAsset masterDb)
+        public MasterDbService(TextAsset data)
         {
-            DB = new MemoryDatabase(masterDb.bytes);
+            DB = new MemoryDatabase(data.bytes);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
@@ -23,7 +22,7 @@ namespace Domivium.Client.Contents.Actors
 
         private MaterialPropertyBlock[] _materialPropertyBlocks;
 
-        public override void Initialize(Guid id, Transform parent)
+        public override void Initialize(ushort id, Transform parent)
         {
             _materialPropertyBlocks = new MaterialPropertyBlock[_meshRenderer.Count];
             for (var i = 0; i < _meshRenderer.Count; i++)
@@ -39,7 +38,6 @@ namespace Domivium.Client.Contents.Actors
             {
                 _agent.updateUpAxis = false;
                 _agent.updateRotation = false;
-                _agent.updatePosition = true;
             }
 
             base.Initialize(id, parent);
@@ -48,9 +46,25 @@ namespace Domivium.Client.Contents.Actors
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             SetActiveIndicator(true);
+            if (_agent != null)
+            {
+                _agent.updatePosition = true;
+            }
+
+            for (var i = 0; i < _meshRenderer.Count; i++)
+            {
+                _materialPropertyBlocks[i].SetFloat(AlphaId, 1);
+                _meshRenderer[i].SetPropertyBlock(_materialPropertyBlocks[i]);
+            }
+
             var p = param.As<UnitParams>();
             transform.localPosition = new Vector3(p.SpawnPoint.x + 0.5f, 0, p.SpawnPoint.y);
             return base.ActivateAsync(token, param);
+        }
+
+        public override void Deactivate()
+        {
+            base.Deactivate();
         }
 
         public void Die()
@@ -59,7 +73,6 @@ namespace Domivium.Client.Contents.Actors
 
             if (_agent != null)
             {
-                _agent.speed = 0;
                 _agent.updatePosition = false;
             }
 
@@ -68,6 +81,22 @@ namespace Domivium.Client.Contents.Actors
                 _materialPropertyBlocks[i].SetFloat(AlphaId, 0.5f);
                 _meshRenderer[i].SetPropertyBlock(_materialPropertyBlocks[i]);
             }
+        }
+
+        private NavMeshPath _path;
+
+        protected override void OnAwake()
+        {
+            _path = new NavMeshPath();
+            base.OnAwake();
+        }
+
+        public void Battle(Vector3 offset)
+        {
+            _agent.isStopped = true;
+            _agent.ResetPath();
+            _agent.Move(offset);
+            _agent.velocity = Vector3.zero;
         }
 
         public void SetHealth(int current, int max) => _healthDisplay.Set(current, max);
@@ -83,6 +112,8 @@ namespace Domivium.Client.Contents.Actors
         {
             if (_agent == null) return;
 
+            _agent.isStopped = false;
+            _agent.ResetPath();
             _agent.SetDestination(position);
         }
 

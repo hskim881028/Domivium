@@ -5,13 +5,16 @@ namespace Domivium.Client.Contents.Actors.Generated
 {
     public static class ActorIds
     {
-        public static ActorId Map = 0;
-        public static ActorId Nexus = 1;
-        public static ActorId Tower = 2;
-        public static ActorId Character = 3;
-        public static ActorId Monster = 4;
-        public static ActorId CharacterPathIndicator = 5;
-        public static ActorId DamageText = 6;
+        public static ActorId Map = 1;
+        public static ActorId CharacterCamp = 2;
+        public static ActorId MonsterCamp = 3;
+        public static ActorId Nexus = 4;
+        public static ActorId Tower = 5;
+        public static ActorId Character = 6;
+        public static ActorId Monster = 7;
+        public static ActorId CharacterPathIndicator = 8;
+        public static ActorId DamageText = 9;
+        public static ActorId HealText = 10;
 
         public static ActorId ToActorId(this string type)
         {
@@ -22,6 +25,17 @@ namespace Domivium.Client.Contents.Actors.Generated
                 "Character" => Character,
                 "Monster" => Monster,
                 _ => throw new Exception($"Unknown Unit type: {type}")
+            };
+        }
+
+        public static ActorId FromCampTypeToActorId(this string type)
+        {
+            return type switch
+            {
+                "Nexus" => Nexus,
+                "CharacterCamp" => CharacterCamp,
+                "MonsterCamp" => MonsterCamp,
+                _ => throw new Exception($"Unknown Camp type: {type}")
             };
         }
     }

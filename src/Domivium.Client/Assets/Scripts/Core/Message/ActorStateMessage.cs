@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.State;
 
 namespace Domivium.Client.Core.Message
@@ -6,14 +6,16 @@ namespace Domivium.Client.Core.Message
     public readonly struct ActorStateMessage
     {
         public StateTag Tag { get; }
-        public Guid Id { get; }
+        public ushort Id { get; }
+        public ActorId ActorId { get; }
 
-        private ActorStateMessage(StateTag tag, Guid id)
+        private ActorStateMessage(StateTag tag, ushort id, ActorId actorId)
         {
             Tag = tag;
             Id = id;
+            ActorId = actorId;
         }
 
-        public static ActorStateMessage Create(StateTag tag, Guid id) => new(tag, id);
+        public static ActorStateMessage Create(StateTag tag, ushort id, ActorId actorId) => new(tag, id, actorId);
     }
 }

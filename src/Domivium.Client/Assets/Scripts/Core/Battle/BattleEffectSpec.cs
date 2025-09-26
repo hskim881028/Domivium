@@ -14,7 +14,7 @@ namespace Domivium.Client.Core.Battle
         private float _periodicInterval;
 
         public BattleEffectId Id => _effect.Id;
-
+        public BattleEffectContext Context => _effect.Context;
         public IReadOnlyCollection<BattleTag> GrantedTags => _effect.GrantedBattleTags;
         public IReadOnlyList<BattleStatModifier> StatModifiers => _effect.StatModifiers;
         public IReadOnlyList<BattleStatModifier> StatPeriodicModifiers => _effect.StatPeriodicModifiers;
@@ -68,7 +68,11 @@ namespace Domivium.Client.Core.Battle
 
         public void Deactivate(bool hideCue = false)
         {
-            _cuePublisher.Publish(BattleCueMessage.Emit(_effect.DeactivateCueId, BattleCueContext.Create(_effect.Context)));
+            if (!hideCue)
+            {
+                _cuePublisher.Publish(BattleCueMessage.Emit(_effect.DeactivateCueId, BattleCueContext.Create(_effect.Context)));
+            }
+
             _onDeactivate.Invoke(this);
         }
 

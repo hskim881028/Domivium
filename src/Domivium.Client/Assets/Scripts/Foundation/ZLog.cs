@@ -137,4 +137,16 @@ public static class ZLog
         Debug.Log(sb.ToString());
 #endif
     }
+
+    public static void Error(this object obj, string message = "", [CallerMemberName] string caller = "")
+    {
+#if UNITY_EDITOR
+        if (!Debug.isDebugBuild) return;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append($"<color=#BA68C8>[Frame: {Time.frameCount}] [{obj.GetType().Name}.");
+        sb.Append($"<color=#D7B2E2>{caller}</color>]</color> {message}");
+        Debug.LogError(sb.ToString());
+#endif
+    }
 }
