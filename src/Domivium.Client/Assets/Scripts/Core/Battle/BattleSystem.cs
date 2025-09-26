@@ -63,7 +63,7 @@ namespace Domivium.Client.Core.Battle
             {
                 effect.Deactivate(true);
             }
-            
+
             _tags.Clear();
             _effectSpecs.Clear();
             _statModifiers.Clear();
@@ -77,10 +77,7 @@ namespace Domivium.Client.Core.Battle
             _abilitySpecs.Add(ability.Id, new BattleAbilitySpec(ability, Stat, _cuePublisher));
         }
 
-        public bool TryActivateAbility(ref BattleAbilityContext context)
-        {
-            return _abilitySpecs.TryGetValue(context.AbilityId, out var spec) && spec.TryActivate(ref context);
-        }
+        public bool TryActivateAbility(ref BattleAbilityContext context) => _abilitySpecs.TryGetValue(context.AbilityId, out var spec) && spec.TryActivate(ref context);
 
         public void ActivateEffect(BattleEffectSpec spec)
         {
@@ -136,7 +133,7 @@ namespace Domivium.Client.Core.Battle
                     {
                         EnqueueModifiers(effect.StatPeriodicModifiers, effect.GaugePeriodicModifiers);
                     }
-                    
+
                     _effectSpecs[write++] = effect;
                 }
                 else

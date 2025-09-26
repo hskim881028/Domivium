@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
-using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Battle;
+using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
@@ -20,7 +20,7 @@ namespace Domivium.Client.Contents.Actors
         private const float Hysteresis = 0.25f;
         private const float HysteresisSq = Hysteresis * Hysteresis;
 
-        protected readonly IActorFinder ActorFinder;
+        protected readonly IBattleService BattleService;
         protected IBattleSystem Target;
         protected Vector3 ChasePosition;
         protected ActorId TargetActionId;
@@ -32,12 +32,12 @@ namespace Domivium.Client.Contents.Actors
         protected UnitPresenter(
             TUnit actor,
             ISystemFactory systemFactory,
-            IActorFinder actorFinder)
+            IBattleService battleService)
             : base(actor, systemFactory)
         {
             BattleSystem = systemFactory.CreateBattle(actor.transform, StateSystem.Tag);
             BattleSystem.AppliedEffect.Subscribe(OnAppliedEffectChanged).AddTo(ref DisposableBag);
-            ActorFinder = actorFinder;
+            BattleService = battleService;
         }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
@@ -71,7 +71,7 @@ namespace Domivium.Client.Contents.Actors
                 BattleSystem.GrantAbility(ability);
             }
 
-            StateSystem.TryTransit(StateTags.Idle);
+            StateSystem.Spawn();
             return base.ActivateAsync(token, param);
         }
 
@@ -105,7 +105,7 @@ namespace Domivium.Client.Contents.Actors
 
             if (Vector3.Distance(BattleSystem.UnitPosition, Target.UnitPosition) < UpdateDistance) return;
 
-            if (ActorFinder.RecalculateChasePosition(BattleSystem, Target, out var chasePosition))
+            if (BattleService.RecalculateChasePosition(BattleSystem, Target, out var chasePosition))
             {
                 ChasePosition = chasePosition;
                 Actor.SetDestination(ChasePosition);
@@ -154,7 +154,8 @@ namespace Domivium.Client.Contents.Actors
         protected override void OnBattle()
         {
             LockOn = true;
-            Actor.Battle();
+            var offset = BattleService.GetPositionOffset(BattleSystem, Target);
+            Actor.Battle(offset);
             base.OnBattle();
         }
 
@@ -167,6 +168,8 @@ namespace Domivium.Client.Contents.Actors
         protected override void OnDie()
         {
             LockOn = false;
+            Target = null;
+            ChasePosition = Vector3.zero;
             this.Log();
             Actor.Die();
             base.OnDie();
@@ -195,7 +198,7 @@ namespace Domivium.Client.Contents.Actors
         {
             if (Target.Id == context.Source.Id) return;
 
-            if (!ActorFinder.TryGetChasePosition(BattleSystem, context.Source, out var chasePosition)) return;
+            if (!BattleService.TryGetChasePosition(BattleSystem, context.Source, out var chasePosition)) return;
 
             if (CheckForceSwapTarget())
             {

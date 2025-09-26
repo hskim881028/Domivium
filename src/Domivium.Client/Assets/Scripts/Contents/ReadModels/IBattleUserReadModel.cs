@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Domivium.Client.Contents.ReadModels
 {
-    public interface IBattleReadModel
+    public interface IBattleUserReadModel
     {
         public ReadOnlyReactiveProperty<IBattleSystem> PickedCharacter { get; }
         public ReadOnlyReactiveProperty<Vector3> PreviewPosition { get; }

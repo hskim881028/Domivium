@@ -1,4 +1,5 @@
-﻿using Domivium.Client.Contents.ReadModels;
+﻿using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
@@ -10,24 +11,26 @@ namespace Domivium.Client.Contents.Actors
 {
     public class CharacterPresenter : UnitPresenter<Character>
     {
-        private readonly IBattleReadModel _read;
+        private readonly IBattleUserReadModel _readModel;
+
+        public override ActorId ActorId => ActorIds.Character;
 
         public CharacterPresenter(
             Character actor,
             ISystemFactory systemFactory,
-            IActorFinder actorFinder,
-            IBattleReadModel read)
-            : base(actor, systemFactory, actorFinder)
+            IBattleService battleService,
+            IBattleUserReadModel readModel)
+            : base(actor, systemFactory, battleService)
         {
-            _read = read;
-            read.TargetPosition.Subscribe(ForceMove).AddTo(ref DisposableBag);
+            _readModel = readModel;
+            readModel.TargetPosition.Subscribe(ForceMove).AddTo(ref DisposableBag);
         }
 
         protected override void OnIdleTick()
         {
             if (StateSystem.Tag.CurrentValue == StateTags.Move) return;
 
-            if (!ActorFinder.FindChaseTarget(TargetActionId, BattleSystem, out var target, out var chasePosition)) return;
+            if (!BattleService.FindChaseTarget(TargetActionId, BattleSystem, out var target, out var chasePosition)) return;
 
             Target = target;
             ChasePosition = chasePosition;
@@ -51,7 +54,7 @@ namespace Domivium.Client.Contents.Actors
 
         private void ForceMove(Vector3 position)
         {
-            if (_read.PickedCharacter.CurrentValue.Id != Id) return;
+            if (_readModel.PickedCharacter.CurrentValue.Id != Id) return;
 
             StateSystem.TryTransit(StateTags.Move);
             Actor.SetDestination(position);

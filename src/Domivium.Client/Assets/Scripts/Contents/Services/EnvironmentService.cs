@@ -2,7 +2,7 @@
 
 namespace Domivium.Client.Contents.Services
 {
-    public class EnvironmentService
+    public sealed class EnvironmentService
     {
         private readonly EnvironmentRig _environmentRig;
 

@@ -72,7 +72,7 @@ namespace Domivium.Client.Core.Battle
             {
                 _cuePublisher.Publish(BattleCueMessage.Emit(_effect.DeactivateCueId, BattleCueContext.Create(_effect.Context)));
             }
-            
+
             _onDeactivate.Invoke(this);
         }
 

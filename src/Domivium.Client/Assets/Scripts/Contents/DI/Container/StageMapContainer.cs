@@ -7,8 +7,8 @@ namespace Domivium.Client.Contents.DI.Container
     [CreateAssetMenu(fileName = "StageMapContainer", menuName = "ScriptableObjects/StageMapContainer")]
     public class StageMapContainer : ScriptableObject
     {
-        [SerializeField] private List<Tilemap> _tilemaps;
+        [SerializeField] private List<Tilemap> _biome;
 
-        public List<Tilemap> Tilemaps => _tilemaps;
+        public List<Tilemap> Biome => _biome;
     }
 }

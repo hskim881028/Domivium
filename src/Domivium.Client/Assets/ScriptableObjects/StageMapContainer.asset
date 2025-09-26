@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4baa93ea1e9447281934df62d3d389b, type: 3}
   m_Name: StageMapContainer
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.DI.Container.StageMapContainer
-  _tilemaps:
-  - {fileID: 5409719874140828228, guid: f0134dc857ca29d42859c08ad8705434, type: 3}
+  _biome:
+  - {fileID: 304236723888885762, guid: a2a8828cb17ef52408be95d4248641f1, type: 3}

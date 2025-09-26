@@ -14,6 +14,7 @@ namespace Domivium.Client.Contents.State
         private readonly IActorPresenter _presenter;
         private readonly IPublisher<ActorStateMessage> _publisher;
         private readonly ReactiveProperty<StateTag> _tag = new();
+        private bool _despawning;
         private bool _isDisposed;
 
         public ReadOnlyReactiveProperty<StateTag> Tag => _tag;
@@ -36,17 +37,30 @@ namespace Domivium.Client.Contents.State
             _tag.Value = next;
         }
 
+        public void Spawn()
+        {
+            _tag.Value = StateTags.Idle;
+        }
+
         public async UniTaskVoid DespawnAsync(float despawnSeconds = 0)
         {
+            if (_despawning) return;
+
+            _despawning = true;
+            _tag.Value = StateTags.Die;
+            _publisher.Publish(ActorStateMessage.Create(StateTags.Die, _presenter.Id, _presenter.ActorId));
             if (despawnSeconds > 0)
             {
-                _tag.Value = StateTags.Die;
-                _publisher.Publish(ActorStateMessage.Create(StateTags.Die, _presenter.Id));
                 await Awaitable.WaitForSecondsAsync(despawnSeconds);
+            }
+            else
+            {
+                await Awaitable.NextFrameAsync();
             }
 
             _tag.Value = StateTags.Despawn;
-            _publisher.Publish(ActorStateMessage.Create(StateTags.Despawn, _presenter.Id));
+            _publisher.Publish(ActorStateMessage.Create(StateTags.Despawn, _presenter.Id, _presenter.ActorId));
+            _despawning = false;
         }
 
         public void Terminate()
@@ -54,7 +68,7 @@ namespace Domivium.Client.Contents.State
             if (IsDead()) return;
 
             _tag.Value = StateTags.Terminated;
-            _publisher.Publish(ActorStateMessage.Create(StateTags.Terminated, _presenter.Id));
+            _publisher.Publish(ActorStateMessage.Create(StateTags.Terminated, _presenter.Id, _presenter.ActorId));
         }
 
         private bool IsDead() => _tag.CurrentValue == StateTags.Die || _tag.CurrentValue == StateTags.Despawn;

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Domivium.Client.Contents.Commands
 {
-    public interface IBattleCommand
+    public interface IBattleUserCommand
     {
         public UniTask InitializeAsync(int stageId);
         public bool PickCharacter(Vector2 position);

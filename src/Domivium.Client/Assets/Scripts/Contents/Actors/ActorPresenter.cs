@@ -17,6 +17,8 @@ namespace Domivium.Client.Contents.Actors
 
         public ushort Id { get; private set; }
 
+        public abstract ActorId ActorId { get; }
+
         protected ActorPresenter(TActor actor, ISystemFactory systemFactory)
         {
             Actor = actor;
@@ -64,12 +66,12 @@ namespace Domivium.Client.Contents.Actors
         protected virtual void OnBattleTick() { }
         protected virtual void OnMoveTick() { }
 
-        protected virtual void OnIdle() => this.Log();
-        protected virtual void OnChase() => this.Log();
-        protected virtual void OnBattle() => this.Log();
-        protected virtual void OnMove() => this.Log();
+        protected virtual void OnIdle() => this.Log(Id);
+        protected virtual void OnChase() => this.Log(Id);
+        protected virtual void OnBattle() => this.Log(Id);
+        protected virtual void OnMove() => this.Log(Id);
         protected virtual void OnDie() { }
-        protected virtual void OnTerminated() => this.Log();
+        protected virtual void OnTerminated() => this.Log(Id);
 
         private void StateTick()
         {

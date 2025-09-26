@@ -9,6 +9,16 @@ namespace Domivium.Client.Core.Actors
     {
         public ushort Id { get; private set; }
 
+        private void Awake()
+        {
+            OnAwake();
+        }
+
+        private void OnDestroy()
+        {
+            OnDestroyInternal();
+        }
+
         public virtual void Initialize(ushort id, Transform parent)
         {
             Id = id;
@@ -21,11 +31,7 @@ namespace Domivium.Client.Core.Actors
 
         public virtual void Tick(float deltaTime) { }
 
+        protected virtual void OnAwake() { }
         protected virtual void OnDestroyInternal() { }
-
-        private void OnDestroy()
-        {
-            OnDestroyInternal();
-        }
     }
 }

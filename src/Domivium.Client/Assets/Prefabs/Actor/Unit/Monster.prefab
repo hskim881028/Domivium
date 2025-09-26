@@ -269,7 +269,7 @@ NavMeshAgent:
   m_AutoRepath: 1
   m_Height: 1
   m_BaseOffset: 0
-  m_WalkableMask: 1
+  m_WalkableMask: 17
   m_ObstacleAvoidanceType: 0
 --- !u!135 &3281363254728579622
 SphereCollider:

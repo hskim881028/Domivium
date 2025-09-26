@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using Domivium.Client.Contents.DI.Container;
 using MasterMemory;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.Compilation;
@@ -36,6 +39,7 @@ namespace Domivium.Client.Editor
                 var so = new SerializedObject(container);
                 so.FindProperty("_masterDB").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TextAsset>(EditorConfig.ToAssetsRelative(EditorConfig.MasterDBPath));
                 so.ApplyModifiedProperties();
+
                 EditorUtility.SetDirty(container);
                 AssetDatabase.SaveAssets();
                 EditorUtility.DisplayDialog("MasterDB", "Build complete!", "OK");
@@ -81,15 +85,32 @@ namespace Domivium.Client.Editor
             EditorGUILayout.Space(10);
             using (new EditorGUI.DisabledScope(false))
             {
+                // if (GUILayout.Button("Generate for json", ButtonStyle))
+                // {
+                //     try
+                //     {
+                //         BuildMasterDBFromAllJson();
+                //         EditorPrefs.SetBool(ContinueBuildFlag, true); // flag to continue building after recompiling the script
+                //         AssetDatabase.Refresh();
+                //         CompilationPipeline.RequestScriptCompilation();
+                //         EditorUtility.DisplayDialog("MasterDB (JSON)", "Build complete!", "OK");
+                //     }
+                //     catch (Exception e)
+                //     {
+                //         Debug.LogException(e);
+                //         EditorUtility.DisplayDialog("MasterDB - Build Error(JSON)", e.Message, "OK");
+                //     }
+                // }
+
                 if (GUILayout.Button("Generate", ButtonStyle))
                 {
                     try
                     {
-                        GenerateAllRowClasses();
+                        GenerateCsvRowClasses();
                         EditorPrefs.SetBool(ContinueBuildFlag, true); // flag to continue building after recompiling the script
                         AssetDatabase.Refresh();
                         CompilationPipeline.RequestScriptCompilation();
-                        EditorUtility.DisplayDialog("MasterDB", "Row class regeneration complete.\nContinue DB build after recompiling.", "OK");
+                        EditorUtility.DisplayDialog("MasterDB", "From csv to row class regeneration complete.\nContinue DB build after recompiling.", "OK");
                     }
                     catch (Exception e)
                     {
@@ -100,7 +121,7 @@ namespace Domivium.Client.Editor
             }
         }
 
-        private static void GenerateAllRowClasses()
+        private static void GenerateCsvRowClasses()
         {
             Directory.CreateDirectory(EditorConfig.RowDataRootPath);
             foreach (var path in Directory.EnumerateFiles(EditorConfig.RowDataRootPath, $"*{EditorConfig.CSharpExtension}", SearchOption.TopDirectoryOnly))
@@ -231,7 +252,24 @@ namespace Domivium.Client.Editor
             try
             {
                 EditorPrefs.DeleteKey(ContinueBuildFlag);
-                BuildMasterDBFromAllCsv();
+                var builder = new DatabaseBuilder();
+
+                var csvData = GetCsvData();
+                foreach (var (rowType, list) in csvData)
+                {
+                    builder.AppendDynamic(rowType, list);
+                }
+
+                var jsonData = GetJsonData();
+                foreach (var (rowType, list) in jsonData)
+                {
+                    builder.AppendDynamic(rowType, list);
+                }
+
+                var bytes = builder.Build();
+                Directory.CreateDirectory(Path.GetDirectoryName(EditorConfig.MasterDBPath)!);
+                File.WriteAllBytes(EditorConfig.MasterDBPath, bytes);
+
                 AssetDatabase.ImportAsset(EditorConfig.ToAssetsRelative(EditorConfig.MasterDBPath));
             }
             catch (Exception e)
@@ -241,7 +279,7 @@ namespace Domivium.Client.Editor
             }
         }
 
-        private static void BuildMasterDBFromAllCsv()
+        private static Dictionary<Type, List<object>> GetCsvData()
         {
             var rowTypes = TypeCache.GetTypesWithAttribute<MemoryTableAttribute>()
                 .Where(t => t.IsClass && !t.IsAbstract && t.Namespace == EditorConfig.RowDataNamespace)
@@ -252,6 +290,7 @@ namespace Domivium.Client.Editor
                 Debug.LogWarning($"No row types found. Check namespace({EditorConfig.RowDataNamespace}) and attributes.");
             }
 
+            var result = new Dictionary<Type, List<object>>();
             var builder = new DatabaseBuilder();
             foreach (var rowType in rowTypes)
             {
@@ -267,12 +306,11 @@ namespace Domivium.Client.Editor
 
                 var typedList = ParseCsvToTypedList(csvPath, rowType);
                 var tableData = ((IEnumerable)typedList).Cast<object>().ToList();
+                result.Add(rowType, tableData);
                 builder.AppendDynamic(rowType, tableData);
             }
 
-            var bytes = builder.Build();
-            Directory.CreateDirectory(Path.GetDirectoryName(EditorConfig.MasterDBPath)!);
-            File.WriteAllBytes(EditorConfig.MasterDBPath, bytes);
+            return result;
         }
 
         private static object ParseCsvToTypedList(string csvPath, Type rowType)
@@ -318,9 +356,9 @@ namespace Domivium.Client.Editor
                     object value = token switch
                     {
                         "int" or "percent" => int.Parse(valStr),
-                        "long" => long.Parse(valStr),
-                        "float" => float.Parse(valStr),
-                        "double" => double.Parse(valStr),
+                        "long" => long.Parse(valStr, NumberStyles.Integer, CultureInfo.InvariantCulture),
+                        "float" => float.Parse(valStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture),
+                        "double" => double.Parse(valStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture),
                         "bool" => ParseBool(valStr),
                         "string" => valStr,
                         _ => valStr // unknown -> string
@@ -346,6 +384,156 @@ namespace Domivium.Client.Editor
                 "0" or "no" or "n" or "false" => false,
                 _ => throw new Exception($"bool Parsing failed: {s}")
             };
+        }
+
+        private static string Stem(Type type)
+        {
+            var name = type.Name;
+            if (name.EndsWith("Row", StringComparison.Ordinal))
+            {
+                name = name[..^3];
+            }
+
+            return name.ToLowerInvariant();
+        }
+
+        private static Dictionary<Type, List<object>> GetJsonData()
+        {
+            var rowTypes = TypeCache.GetTypesWithAttribute<MemoryTableAttribute>()
+                .Where(t => t.IsClass && !t.IsAbstract && t.Namespace == EditorConfig.RowDataNamespace)
+                .ToArray();
+
+            if (rowTypes.Length == 0)
+            {
+                Debug.LogWarning($"No row types found. Check namespace({EditorConfig.RowDataNamespace}) and attributes.");
+            }
+
+            var rowTypeByStem = rowTypes.ToDictionary(Stem, t => t);
+
+            Directory.CreateDirectory(EditorConfig.JsonRootPath);
+            var jsonPaths = Directory.EnumerateFiles(EditorConfig.JsonRootPath, $"*{EditorConfig.JsonExtension}", SearchOption.TopDirectoryOnly).ToArray();
+            if (jsonPaths.Length == 0)
+            {
+                Debug.LogWarning($"No json files in: {EditorConfig.JsonRootPath}");
+            }
+
+            var result = new Dictionary<Type, List<object>>();
+            foreach (var jsonPath in jsonPaths)
+            {
+                var text = File.ReadAllText(jsonPath, Encoding.UTF8);
+                JsonTablesRoot root;
+                try
+                {
+                    root = JsonConvert.DeserializeObject<JsonTablesRoot>(text);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"Skip invalid json: {jsonPath}\n{ex.Message}");
+                    continue;
+                }
+
+                if (root?.Tables == null) continue;
+
+                foreach (var (key, jsonTable) in root.Tables)
+                {
+                    var tableKey = (key ?? "").Trim().ToLowerInvariant();
+                    if (!rowTypeByStem.TryGetValue(tableKey, out var rowType))
+                    {
+                        Debug.LogWarning($"No matching Row type for table '{key}' (json: {jsonPath})");
+                        continue;
+                    }
+
+                    var listObj = ParseJsonTableToTypedList(jsonTable, rowType);
+                    if (listObj is not IEnumerable list) continue;
+
+                    if (!result.TryGetValue(rowType, out var bag))
+                    {
+                        bag = new List<object>();
+                        result[rowType] = bag;
+                    }
+                    bag.AddRange(list.Cast<object>());
+                }
+            }
+            return result;
+        }
+
+        private static object ParseJsonTableToTypedList(JsonTable table, Type rowType)
+        {
+            if (table == null)
+            {
+                throw new Exception("JsonTable is null");
+            }
+
+            if (table.Columns == null || table.Types == null || table.Rows == null)
+            {
+                throw new Exception("JsonTable must contain columns/types/rows");
+            }
+
+            var headers = table.Columns.Select(h => h?.Trim()).ToArray();
+            var types = table.Types.Select(t => t?.Trim().ToLowerInvariant()).ToArray();
+
+            if (headers.Length != types.Length)
+            {
+                throw new Exception($"columns/types length mismatch: {headers.Length} != {types.Length}");
+            }
+
+            var props = headers.Select(h => rowType.GetProperty(h,
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase)).ToArray();
+
+            var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(rowType));
+
+            foreach (var rowToken in table.Rows) // each rowToken is JArray
+            {
+                if (rowToken is not JArray rowVals) continue;
+
+                if (rowVals.Count != headers.Length)
+                {
+                    throw new Exception($"row length mismatch: expected {headers.Length}, got {rowVals.Count}");
+                }
+
+                var row = Activator.CreateInstance(rowType);
+                for (var i = 0; i < headers.Length; i++)
+                {
+                    var p = props[i];
+                    if (p == null) continue;
+
+                    var jt = rowVals[i];
+                    var valStr = jt.Type == JTokenType.String
+                        ? jt.Value<string>() ?? string.Empty
+                        : jt.ToString(Formatting.None);
+
+                    object value = types[i] switch
+                    {
+                        "int" or "percent" => int.Parse(valStr),
+                        "long" => long.Parse(valStr, NumberStyles.Integer, CultureInfo.InvariantCulture),
+                        "float" => float.Parse(valStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture),
+                        "double" => double.Parse(valStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture),
+                        "bool" => ParseBool(valStr),
+                        "string" => valStr,
+                        _ => valStr // unknown -> string
+                    };
+
+                    p.SetValue(row, value);
+                }
+
+                list.Add(row);
+            }
+
+            return list;
+        }
+
+        [Serializable]
+        private sealed class JsonTablesRoot
+        {
+            [JsonProperty("tables")] public Dictionary<string, JsonTable> Tables { get; set; }
+        }
+
+        [Serializable]
+        private sealed class JsonTable
+        {
+            [JsonProperty("columns")] public string[] Columns { get; set; }
+            [JsonProperty("types")] public string[] Types { get; set; }
+            [JsonProperty("rows")] public JArray Rows { get; set; }
         }
     }
 }

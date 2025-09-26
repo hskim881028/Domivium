@@ -1,10 +1,12 @@
 ﻿using System;
 using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Context;
+using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Message;
+using Domivium.Client.Core.State;
 using MessagePipe;
 using R3;
 
@@ -12,15 +14,17 @@ namespace Domivium.Client.Contents.Director
 {
     public sealed class StageDirector : StageDirectorBase
     {
-        private readonly IActorFinder _actorFinder;
+        private readonly IBattleService _battleService;
 
         public StageDirector(
             StageContext stageContext,
-            IActorFinder actorFinder,
-            ISubscriber<SceneMessage> sceneSubscriber) : base(stageContext)
+            IBattleService battleService,
+            ISubscriber<SceneMessage> sceneSubscriber,
+            ISubscriber<ActorStateMessage> actorStateSubscriber) : base(stageContext)
         {
-            _actorFinder = actorFinder;
+            _battleService = battleService;
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
+            actorStateSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
         }
 
         public override bool TrySetMode(StageMode mode)
@@ -38,13 +42,16 @@ namespace Domivium.Client.Contents.Director
             return true;
         }
 
-        public override void Tick(float deltaTime)
+        private void OnActorStateMessage(ActorStateMessage message)
         {
             if (Phase != StagePhases.RunningWave) return;
 
-            if (_actorFinder.IsExistUnit(ActorIds.Nexus)) return;
-
-            TrySetPhase(StagePhases.Failed);
+            if (message.ActorId == ActorIds.Nexus &&
+                message.Tag == StateTag.Die &&
+                !_battleService.IsExistUnit(ActorIds.Nexus))
+            {
+                TrySetPhase(StagePhases.Failed);
+            }
         }
 
         private void OnSceneMessage(SceneMessage message)

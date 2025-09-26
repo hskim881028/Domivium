@@ -22,48 +22,70 @@ namespace Domivium.Client.Contents.Services
 {
     public sealed class TowerPlacementService : Disposable, ITowerPlacementReadModel, ITowerPlacementCommand
     {
+        private readonly MasterDbService _masterDbService;
         private readonly CoordinateService _coordinateService;
         private readonly StageMapProvider _stageMapProvider;
         private readonly IStageDirector _director;
         private readonly IActorSpawner _actorSpawner;
-        private readonly IUnitFactory _unitFactory;
+        private readonly IActorFactory _actorFactory;
         private readonly IStageMapStore _store;
         private readonly ObservableList<Vector3Int> _stagedTower = new();
         private readonly ObservableDictionary<Vector3Int, bool> _previewTower = new();
+        private readonly ReactiveProperty<bool> _ready;
 
         public IReadOnlyObservableList<Vector3Int> StagedTower => _stagedTower;
-
         public IReadOnlyObservableDictionary<Vector3Int, bool> PreviewTower => _previewTower;
+        public ReadOnlyReactiveProperty<bool> Ready => _ready;
 
         public TowerPlacementService(
+            MasterDbService masterDbService,
             CoordinateService coordinateService,
             StageMapProvider stageMapProvider,
             IStageDirector director,
             IActorSpawner actorSpawner,
-            IUnitFactory unitFactory,
+            IActorFactory actorFactory,
             IStageMapStore store,
             ISubscriber<SceneMessage> sceneSubscriber)
         {
+            _masterDbService = masterDbService;
             _coordinateService = coordinateService;
             _stageMapProvider = stageMapProvider;
             _director = director;
             _actorSpawner = actorSpawner;
-            _unitFactory = unitFactory;
+            _actorFactory = actorFactory;
             _store = store;
+            _ready = new ReactiveProperty<bool>().AddTo(ref DisposableBag);
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTask InitializeAsync(int stageId)
         {
-            var tilemap = _stageMapProvider.Get(stageId);
-            var cells = new HashSet<Vector3Int>();
-            foreach (var cell in tilemap.cellBounds.allPositionsWithin)
+            var biome = _stageMapProvider.Get(stageId);
+            _store.Initialize(biome.cellBounds);
+
+            await _actorSpawner.SpawnAsync(ActorIds.Map, new StageMapParams(biome.cellBounds));
+
+            var cells = new List<Vector3Int>();
+            var stageRow = _masterDbService.DB.StageRowTable.FindByStageId(stageId);
+            foreach (var row in stageRow)
             {
-                cells.Add(cell);
+                var actorId = row.CampType.FromCampTypeToActorId();
+                var campIndex = row.CampIndex;
+                var cell = new Vector3Int(row.X, row.Y, 0);
+                _store.GetNeighbors(cell, cells);
+                _stagedTower.Clear();
+                foreach (var c in cells)
+                {
+                    _stagedTower.Add(c);
+                }
+
+                _store.Occupy(_stagedTower, cell);
+
+                var param = _actorFactory.CreateCamp(stageId, actorId, campIndex, cell);
+                await _actorSpawner.SpawnAsync(actorId, param);
             }
 
-            _store.Initialize(tilemap.cellBounds);
-            await _actorSpawner.SpawnAsync(ActorIds.Map, new ActorParams(cells));
+            _ready.Value = true;
         }
 
         public void Show(int index)
@@ -108,8 +130,9 @@ namespace Domivium.Client.Contents.Services
                     _stagedTower.Add(cell);
                 }
 
-                _store.Occupy(_stagedTower);
-                var param = _unitFactory.CreateTower(1, _stagedTower.First());
+                var tower = _stagedTower.First();
+                _store.Occupy(_stagedTower, tower);
+                var param = _actorFactory.CreateTower(1, tower);
                 _actorSpawner.SpawnAsync(ActorIds.Tower, param).Forget();
             }
 
@@ -121,6 +144,7 @@ namespace Domivium.Client.Contents.Services
         {
             _stagedTower.Clear();
             _previewTower.Clear();
+            _ready.Value = false;
         }
 
         private void OnSceneMessage(SceneMessage message)
