@@ -1,7 +1,6 @@
 ﻿using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Core.Message;
-using Domivium.Client.Core.Utility;
 using MessagePipe;
 using R3;
 using UnityEngine;
@@ -11,7 +10,6 @@ namespace Domivium.Client.Contents.Services
 {
     public sealed class CoordinateService : Disposable
     {
-        private readonly Plane _groundPlane = new(Vector3.up, Vector3.zero);
         private readonly ICameraReadModel _cameraRead;
         private Tilemap _grid;
 
@@ -30,34 +28,21 @@ namespace Domivium.Client.Contents.Services
         public bool TryScreenToCell(Vector2 screenPosition, out Vector3Int cell)
         {
             cell = default;
-            var ray = _cameraRead.MainCamera.ScreenPointToRay(screenPosition);
-            if (!_groundPlane.Raycast(ray, out var hit)) return false;
+            if (!_cameraRead.TryScreenToWorld(screenPosition, out var worldPosition)) return false;
 
-            var world = ray.GetPoint(hit);
-            cell = _grid.WorldToCell(world);
+            cell = _grid.WorldToCell(worldPosition);
             cell.z = 0;
             return true;
         }
 
         public bool TryScreenToWorld(Vector2 screenPosition, out Vector3 worldPosition)
         {
-            worldPosition = Vector3.zero;
-            var ray = _cameraRead.MainCamera.ScreenPointToRay(screenPosition);
-            if (!_groundPlane.Raycast(ray, out var hit)) return false;
-
-            worldPosition = ray.GetPoint(hit);
-            return true;
+            return _cameraRead.TryScreenToWorld(screenPosition, out worldPosition);
         }
 
         public bool TryScreenToCollider(Vector2 screenPosition, out Collider collider)
         {
-            collider = null;
-
-            var ray = _cameraRead.MainCamera.ScreenPointToRay(screenPosition);
-            if (!Physics.Raycast(ray, out var hit, Mathf.Infinity, Layer.CharacterMask)) return false;
-
-            collider = hit.collider;
-            return true;
+            return _cameraRead.TryScreenToCollider(screenPosition, out collider);
         }
 
         private void OnSpawnerMessage(SpawnActorMessage message)

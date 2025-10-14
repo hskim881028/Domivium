@@ -21,6 +21,7 @@ namespace Domivium.Client.Contents.Input.Consumer
         public InputPriority Priority => InputPriorities.Battle;
 
         private bool IsBattleMode => _stageContext.Mode.CurrentValue == StageModes.Battle;
+        private bool IsMoveCharacterMode => _stageContext.Mode.CurrentValue == StageModes.MoveCharacter;
         private bool IsTerminated => _stageContext.Phase.CurrentValue == StagePhases.Cleared || _stageContext.Phase.CurrentValue == StagePhases.Failed;
 
         public bool TryHandle(InputMessage message)
@@ -32,11 +33,11 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.Submit:
                 case InputMessageType.Cancel:
                 case InputMessageType.Point:
-                    return IsBattleMode && _userCommand.UpdateMoveTarget(message.Value);
+                    return IsMoveCharacterMode && _userCommand.UpdateMoveTarget(message.Value);
                 case InputMessageType.ClickEnter:
                     return IsBattleMode && _userCommand.PickCharacter(message.Value);
                 case InputMessageType.ClickExit:
-                    return IsBattleMode && _userCommand.SelectCharacter(message.Value);
+                    return IsMoveCharacterMode && _userCommand.SelectCharacter(message.Value);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

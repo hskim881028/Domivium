@@ -3,11 +3,13 @@ using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Commands;
+using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Message;
 using MessagePipe;
@@ -18,7 +20,9 @@ namespace Domivium.Client.Contents.Services
 {
     public sealed class BattleUserService : Disposable, IBattleUserReadModel, IBattleUserCommand
     {
+        private readonly MasterDbService _masterDbService;
         private readonly CoordinateService _coordinateService;
+        private readonly IStageDirector _director;
         private readonly IActorSpawner _actorSpawner;
         private readonly IBattleService _battleService;
         private readonly IActorFactory _actorFactory;
@@ -32,7 +36,9 @@ namespace Domivium.Client.Contents.Services
         public ReadOnlyReactiveProperty<Vector3> TargetPosition => _targetPosition;
 
         public BattleUserService(
+            MasterDbService masterDbService,
             CoordinateService coordinateService,
+            IStageDirector director,
             IActorSpawner actorSpawner,
             IBattleService battleService,
             IActorFactory actorFactory,
@@ -42,7 +48,9 @@ namespace Domivium.Client.Contents.Services
             _previewPosition = new ReactiveProperty<Vector3>().AddTo(ref DisposableBag);
             _targetPosition = new ReactiveProperty<Vector3>().AddTo(ref DisposableBag);
 
+            _masterDbService = masterDbService;
             _coordinateService = coordinateService;
+            _director = director;
             _actorSpawner = actorSpawner;
             _battleService = battleService;
             _actorFactory = actorFactory;
@@ -53,12 +61,15 @@ namespace Domivium.Client.Contents.Services
         public async UniTask InitializeAsync(int stageId)
         {
             await _actorSpawner.SpawnAsync(ActorIds.CharacterPathIndicator, ActorParam.Empty);
+            
+            var stageRow = _masterDbService.DB.StageRowTable.FindByStageId(stageId);
+            foreach (var row in stageRow)
+            {
+                if (row.CampType.FromCampTypeToActorId() != ActorIds.CharacterCamp) continue;
 
-            var character = _actorFactory.CreateCharacter(1, new Vector3(2, 0, 2));
-            await _actorSpawner.SpawnAsync(ActorIds.Character, character);
-
-            var support = _actorFactory.CreateCharacter(3, new Vector3(-2, 0, 2));
-            await _actorSpawner.SpawnAsync(ActorIds.Character, support);
+                var character = _actorFactory.CreateCharacter(row.CampIndex, new Vector3(row.X, 0, row.Y));
+                await _actorSpawner.SpawnAsync(ActorIds.Character, character);
+            }
         }
 
         public bool PickCharacter(Vector2 position)
@@ -76,7 +87,7 @@ namespace Domivium.Client.Contents.Services
 
             _pickedCharacter.Value = target;
             _previewPosition.Value = target.UnitPosition;
-            return true;
+            return _director.TrySetMode(StageModes.MoveCharacter);
         }
 
         public bool UpdateMoveTarget(Vector2 position)
@@ -111,7 +122,7 @@ namespace Domivium.Client.Contents.Services
 
             _previewPosition.Value = Vector3.zero;
             _pickedCharacter.Value = null;
-            return true;
+            return _director.TrySetMode(StageModes.Battle);
         }
 
         private void OnSceneMessage(SceneMessage message)

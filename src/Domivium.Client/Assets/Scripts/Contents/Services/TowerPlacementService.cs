@@ -81,7 +81,7 @@ namespace Domivium.Client.Contents.Services
 
                 _store.Occupy(_stagedTower, cell);
 
-                var param = _actorFactory.CreateCamp(stageId, actorId, campIndex, cell);
+                var param = _actorFactory.CreateCamp(actorId, campIndex, cell);
                 await _actorSpawner.SpawnAsync(actorId, param);
             }
 

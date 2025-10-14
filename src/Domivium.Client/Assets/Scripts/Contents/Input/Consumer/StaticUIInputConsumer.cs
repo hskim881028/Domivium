@@ -26,9 +26,9 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.Submit:
                 case InputMessageType.Point:
                     return false;
-                case InputMessageType.ClickEnter:
+                 case InputMessageType.ClickEnter:
                 case InputMessageType.ClickExit:
-                    return _inputEventSystem.IsPointerOverUI(message.Value);
+                    return !_inputEventSystem.BlockUI && _inputEventSystem.IsPointerOverUI(message.Value);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

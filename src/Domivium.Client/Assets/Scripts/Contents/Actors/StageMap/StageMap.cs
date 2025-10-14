@@ -15,8 +15,8 @@ namespace Domivium.Client.Contents.Actors
         [SerializeField] private Tilemap _background;
         [SerializeField] private Tilemap _grid;
         [SerializeField] private Tilemap _preview;
+        [SerializeField] private TileBase _backgroundBase;
         [SerializeField] private TileBase _gridBase;
-        [SerializeField] private TileBase _towerBase;
         [SerializeField] private NavMeshSurface _navMeshSurface;
 
         private readonly HashSet<Vector3Int> _tower = new();
@@ -25,9 +25,11 @@ namespace Domivium.Client.Contents.Actors
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
-            foreach (var cell in param.As<StageMapParams>().CellBounds.allPositionsWithin)
+            var bounds = param.As<StageMapParams>().CellBounds;
+            _navMeshSurface.size = new Vector3(bounds.size.x - 1, 1, bounds.size.y - 1);
+            foreach (var cell in bounds.allPositionsWithin)
             {
-                _background.SetTile(cell, _gridBase);
+                _background.SetTile(cell, _backgroundBase);
                 _grid.SetTile(cell, _gridBase);
                 _grid.SetColor(cell, Color.gray);
                 _preview.SetTile(cell, _gridBase);
@@ -63,7 +65,6 @@ namespace Domivium.Client.Contents.Actors
 
         public void Placement(Vector3Int cell)
         {
-            _background.SetTile(cell, _towerBase);
             _grid.SetColor(cell, Color.black);
         }
     }

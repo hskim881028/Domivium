@@ -12,6 +12,7 @@ namespace Domivium.Client.Core.Actors
         private PointerEventData _eventData;
         private readonly List<RaycastResult> _hits = new();
 
+        public bool BlockUI { get; set; }
         public InputSystemUIInputModule InputModule { get; private set; }
 
         [Inject]

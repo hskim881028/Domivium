@@ -7,7 +7,6 @@ using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
-using Domivium.Client.Core.Actors.Unit;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Provider;
@@ -60,7 +59,6 @@ namespace Domivium.Client.Contents.Factory
         }
 
         public ActorParam CreateCamp(
-            int stageId,
             ActorId actorId,
             int index,
             Vector3Int spawnPoint)
@@ -74,41 +72,11 @@ namespace Domivium.Client.Contents.Factory
 
             if (actorId == ActorIds.CharacterCamp || actorId == ActorIds.MonsterCamp)
             {
-                return CreateCamp(stageId, index, spawnPoint);
+                return new CampParams(index, spawnPoint);
             }
 
-            throw new Exception("Invalid actor");
-        }
-
-        private ActorParam CreateCamp(int stageId, int index, Vector3Int spawnPoint)
-        {
-            var ground = _stageMapProvider.Get(stageId).cellBounds;
-            var xMin = ground.xMin;
-            var xMax = ground.xMax - 1;
-            var yMin = ground.yMin;
-            var yMax = ground.yMax - 1;
-
-            if (spawnPoint.x < xMin) // left
-            {
-                return new CampParams(index, spawnPoint, new Vector3(1.5f, -0.1f, 0.5f), new Vector3(0.6f, 1, 0.4f));
-            }
-
-            if (spawnPoint.x > xMax) // right
-            {
-                return new CampParams(index, spawnPoint, new Vector3(-1.5f, -0.1f, 0.5f), new Vector3(0.6f, 1, 0.4f));
-            }
-
-            if (spawnPoint.y < yMin) // bottom
-            {
-                return new CampParams(index, spawnPoint, new Vector3(0, -0.1f, 2), new Vector3(0.4f, 1, 0.6f));
-            }
-
-            if (spawnPoint.y > yMax) // top
-            {
-                return new CampParams(index, spawnPoint, new Vector3(0, -0.1f, -1), new Vector3(0.4f, 1, 0.6f));
-            }
-
-            throw new Exception("Invalid camp spawn position");
+            this.Error("Invalid actor");
+            throw new Exception();
         }
 
         private List<BattleAbility> GetDefaultAbility(UnitType unitType) // temp

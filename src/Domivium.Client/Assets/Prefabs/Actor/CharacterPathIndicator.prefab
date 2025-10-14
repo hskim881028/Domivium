@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4151704678742656059}
   - component: {fileID: 7214975708751510984}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: CharacterPathIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,7 +56,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4408424733434310240}
   - component: {fileID: 4690789671458999096}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: LineRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -46,7 +46,7 @@ namespace Domivium.Client.Contents.Controller
             _actorFactory = actorFactory;
 
             stageContext.Phase.Subscribe(OnChangedPhase).AddTo(ref DisposableBag);
-            actorTagSubscriber.Subscribe(OnActorTagMessage).AddTo(ref DisposableBag);
+            actorTagSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
             subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
             _remainCount.Subscribe(OnUpdateRemainCount).AddTo(ref DisposableBag);
         }
@@ -106,7 +106,7 @@ namespace Domivium.Client.Contents.Controller
 
         private void OnUpdateRemainCount(int count)
         {
-            this.Log($"[RemainCount] {_remainCount.CurrentValue}");
+            this.Log($"[{_waveId} Wave] RemainCount: {_remainCount.CurrentValue}");
             if (_stageContext.Phase.CurrentValue != StagePhases.RunningWave) return;
 
             if (_remainCount.CurrentValue > 0) return;
@@ -128,10 +128,9 @@ namespace Domivium.Client.Contents.Controller
             _pendingRemoves.Clear();
             _currentWaves.Clear();
             _currentWaves.AddRange(waves);
-            this.Log($"#### Run : {_waveId} {_remainCount.CurrentValue}");
         }
 
-        private void OnActorTagMessage(ActorStateMessage message)
+        private void OnActorStateMessage(ActorStateMessage message)
         {
             if (message.ActorId == ActorIds.Monster && message.Tag == StateTags.Die)
             {

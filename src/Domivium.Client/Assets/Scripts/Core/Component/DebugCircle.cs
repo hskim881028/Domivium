@@ -4,25 +4,28 @@ namespace Domivium.Client.Core.Component
 {
     public class DebugCircle : MonoBehaviour
     {
+        private static readonly int TintId = Shader.PropertyToID("_Tint");
+        private const int Segments = 64;
+
         private LineRenderer _lineRenderer;
-        private readonly int _segments = 64;
-        private Material _material;
+        private MaterialPropertyBlock _materialPropertyBlock;
 
         private void Awake()
         {
             _lineRenderer = GetComponent<LineRenderer>();
             _lineRenderer.useWorldSpace = false;
             _lineRenderer.loop = true;
-            _material = _lineRenderer.material;
         }
 
         public void Draw(float radius, Color color)
         {
-            _material.color = color;
-            _lineRenderer.positionCount = _segments;
-            for (var i = 0; i < _segments; i++)
+            var materialPropertyBlock = new MaterialPropertyBlock();
+            materialPropertyBlock.SetColor(TintId, color);
+            _lineRenderer.SetPropertyBlock(materialPropertyBlock);
+            _lineRenderer.positionCount = Segments;
+            for (var i = 0; i < Segments; i++)
             {
-                var t = 2 * Mathf.PI * i / _segments;
+                var t = 2 * Mathf.PI * i / Segments;
                 _lineRenderer.SetPosition(i, new Vector3(Mathf.Cos(t) * radius, 0.1f, Mathf.Sin(t) * radius));
             }
         }

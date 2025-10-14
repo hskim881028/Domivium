@@ -1,5 +1,5 @@
 ﻿using Domivium.Client.Contents.Actors;
-using Domivium.Client.Core.Actors.Unit;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Data.Stat;
 using UnityEngine;

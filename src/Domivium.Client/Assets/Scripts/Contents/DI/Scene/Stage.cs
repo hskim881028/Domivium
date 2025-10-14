@@ -21,6 +21,7 @@ namespace Domivium.Client.Contents.DI.Scene
         {
             builder.Register<TowerPlacementInputConsumer>(lifetime);
             builder.Register<BattleInputConsumer>(lifetime);
+            builder.Register<BattleCameraInputConsumer>(lifetime);
             builder.Register<IInputComposition, StageInputComposition>(lifetime);
         }
     }

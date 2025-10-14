@@ -17,7 +17,9 @@ namespace Domivium.Client.Core.Provider
         {
             // todo: stage를 Biome으로 묶기 
             var index = Math.Clamp(stageId - 1, 0, _biome.Count - 1);
-            return _biome[index];
+            var biome = _biome[index];
+            biome.CompressBounds();
+            return biome;
         }
     }
 }

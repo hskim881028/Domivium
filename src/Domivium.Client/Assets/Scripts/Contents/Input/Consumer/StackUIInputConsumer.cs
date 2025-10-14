@@ -28,7 +28,7 @@ namespace Domivium.Client.Contents.Input.Consumer
                     return _uiNavigation.HasOpenStackUI;
                 case InputMessageType.ClickEnter:
                 case InputMessageType.ClickExit:
-                    return _inputEventSystem.IsPointerOverUI(message.Value);
+                    return !_inputEventSystem.BlockUI && _inputEventSystem.IsPointerOverUI(message.Value);
                 case InputMessageType.Point:
                     return false;
                 default:

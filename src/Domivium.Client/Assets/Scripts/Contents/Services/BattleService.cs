@@ -52,7 +52,7 @@ namespace Domivium.Client.Contents.Services
             return offset;
         }
 
-        public bool FindTarget(ActorId actorId, ushort id, out IBattleSystem target) => _actorManager.TryGetUnit(actorId, id, out target);
+        public bool FindTarget(ActorId actorId, ushort id, out IBattleSystem target) => _actorManager.TryGetPawn(actorId, id, out target);
 
 
         public bool TryGetChasePosition(IBattleSystem source, IBattleSystem target, out Vector3 chasePosition)

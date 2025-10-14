@@ -9,6 +9,6 @@ namespace Domivium.Client.Core.Factory
         public ActorParam CreateCharacter(int id, Vector3 spawnPosition);
         public ActorParam CreateMonster(int id, Vector3Int spawnPoint);
         public ActorParam CreateTower(int id, Vector3Int spawnPoint);
-        public ActorParam CreateCamp(int stageId, ActorId actorId, int index, Vector3Int spawnPoint);
+        public ActorParam CreateCamp(ActorId actorId, int index, Vector3Int spawnPoint);
     }
 }

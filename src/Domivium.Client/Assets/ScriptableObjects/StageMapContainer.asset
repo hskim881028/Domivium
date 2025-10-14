@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: StageMapContainer
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.DI.Container.StageMapContainer
   _biome:
-  - {fileID: 304236723888885762, guid: a2a8828cb17ef52408be95d4248641f1, type: 3}
+  - {fileID: 304236723888885762, guid: c8c90b399cfdf5f45b460030e1864faa, type: 3}

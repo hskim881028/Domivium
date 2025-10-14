@@ -22,8 +22,6 @@ namespace Domivium.Client.Contents.Actors
         {
             var p = param.As<CampParams>();
             transform.localPosition = new Vector3(p.SpawnPoint.x + 0.5f, 0, p.SpawnPoint.y);
-            _volume.transform.localPosition = p.VolumePosition;
-            _volume.transform.localScale = p.VolumeScale;
             return base.ActivateAsync(token, param);
         }
     }

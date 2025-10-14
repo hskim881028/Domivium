@@ -12,11 +12,7 @@ namespace Domivium.Client.Contents.Actors.Contract
         UnitContext UnitContext,
         IReadOnlyList<BattleAbility> Abilities) : ActorParam;
 
-    public record CampParams(
-        int Index,
-        Vector3Int SpawnPoint,
-        Vector3 VolumePosition,
-        Vector3 VolumeScale) : ActorParam;
+    public record CampParams(int Index, Vector3Int SpawnPoint) : ActorParam;
 
     public record DamageTextParams(Vector3 Position, int Damage, float DespawnTime) : ActorParam;
 

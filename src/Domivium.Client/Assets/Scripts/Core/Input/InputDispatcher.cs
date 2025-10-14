@@ -1,7 +1,6 @@
 ﻿using System;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Message;
-using Domivium.Client.Core.Utility;
 using MessagePipe;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -51,7 +50,6 @@ namespace Domivium.Client.Core.Input
             {
                 action.canceled += canceled;
             }
-
 
             action.Enable();
         }

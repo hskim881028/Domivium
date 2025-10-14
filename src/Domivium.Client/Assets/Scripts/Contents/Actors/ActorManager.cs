@@ -66,13 +66,13 @@ namespace Domivium.Client.Contents.Actors
             return false;
         }
 
-        public bool TryGetUnit(ActorId actorId, ushort id, out IBattleSystem unit)
+        public bool TryGetPawn(ActorId actorId, ushort id, out IBattleSystem pawn)
         {
-            unit = null;
-            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetUnit(id, out unit);
+            pawn = null;
+            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetPawn(id, out pawn);
         }
 
-        public int GetUnits(ActorId actorId, List<IBattleSystem> buffer) => !_buckets.TryGetValue(actorId, out var bucket) ? 0 : bucket.CollectUnits(buffer);
+        public int GetUnits(ActorId actorId, List<IBattleSystem> buffer) => !_buckets.TryGetValue(actorId, out var bucket) ? 0 : bucket.CollectPawns(buffer);
 
         public int GetUnits(ReadOnlySpan<ActorId> actorIds, List<IBattleSystem> buffer)
         {
@@ -81,7 +81,7 @@ namespace Domivium.Client.Contents.Actors
             {
                 if (_buckets.TryGetValue(actorId, out var bucket))
                 {
-                    total += bucket.CollectUnits(buffer);
+                    total += bucket.CollectPawns(buffer);
                 }
             }
             return total;

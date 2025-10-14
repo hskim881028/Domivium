@@ -1,12 +1,9 @@
 ﻿using System;
-using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Context;
-using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Message;
-using Domivium.Client.Core.State;
 using MessagePipe;
 using R3;
 
@@ -14,17 +11,17 @@ namespace Domivium.Client.Contents.Director
 {
     public sealed class StageDirector : StageDirectorBase
     {
-        private readonly IBattleService _battleService;
+        private readonly InputEventSystem _inputEventSystem;
 
         public StageDirector(
             StageContext stageContext,
-            IBattleService battleService,
+            InputEventSystem inputEventSystem,
             ISubscriber<SceneMessage> sceneSubscriber,
             ISubscriber<ActorStateMessage> actorStateSubscriber) : base(stageContext)
         {
-            _battleService = battleService;
+            _inputEventSystem = inputEventSystem;
+            stageContext.Mode.Subscribe(OnChangeMode).AddTo(ref DisposableBag);
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
-            actorStateSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
         }
 
         public override bool TrySetMode(StageMode mode)
@@ -42,15 +39,17 @@ namespace Domivium.Client.Contents.Director
             return true;
         }
 
-        private void OnActorStateMessage(ActorStateMessage message)
+        private void OnChangeMode(StageMode mode)
         {
-            if (Phase != StagePhases.RunningWave) return;
-
-            if (message.ActorId == ActorIds.Nexus &&
-                message.Tag == StateTag.Die &&
-                !_battleService.IsExistUnit(ActorIds.Nexus))
+            if (mode == StageModes.TowerPlacement ||
+                mode == StageModes.MoveCharacter ||
+                mode == StageModes.MoveCamera)
             {
-                TrySetPhase(StagePhases.Failed);
+                _inputEventSystem.BlockUI = true;
+            }
+            else
+            {
+                _inputEventSystem.BlockUI = false;
             }
         }
 

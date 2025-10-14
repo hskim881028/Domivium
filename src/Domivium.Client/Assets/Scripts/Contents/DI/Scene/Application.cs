@@ -76,6 +76,7 @@ namespace Domivium.Client.Contents.DI.Scene
         private void Environment()
         {
             AppEnv.LocalMode = _configContainer.LocalMode;
+            AppEnv.DrawRange = _configContainer.DrawRange;
             AppEnv.ServerUrl = _configContainer.ServerUrl;
         }
 
