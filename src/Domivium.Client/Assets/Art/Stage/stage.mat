@@ -41,6 +41,18 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DecoA:
+        m_Texture: {fileID: 2800000, guid: a4dcbd210fee9bf4b8c90bb68e132d49, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecoB:
+        m_Texture: {fileID: 2800000, guid: 7df06ba4f8448d3448eab078366514c6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecoC:
+        m_Texture: {fileID: 2800000, guid: c8f46d0647a9f354ebe177465dcc07e7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -67,6 +79,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: edb87cf8820015e439c5bf7b90cc81c8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -111,6 +127,17 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _DecoADensity: 0.05
+    - _DecoAScale: 0.5
+    - _DecoASize: 0
+    - _DecoBDensity: 0.06
+    - _DecoCDensity: 0.08
+    - _DecoRatio: -0.6
+    - _DecoScale: 0.5
+    - _Density: 0.18
+    - _DensityA: 0.01
+    - _DensityB: 0.03
+    - _DensityC: 0.061
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
@@ -120,8 +147,11 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _GrassAlpha: 0.7
+    - _GrassScale: 2.17
     - _Metallic: 0
     - _NoiseScale: 4.04
+    - _NoiseScaleA: 10.16
+    - _NoiseScaleB: 1
     - _NoiseStrength: 1.85
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -130,7 +160,8 @@ Material:
     - _ReceiveShadows: 1
     - _SampleGI: 0
     - _Scale: 1
-    - _Seed: 1
+    - _Seed: 1.52
+    - _SeedB: 0.59
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -139,6 +170,12 @@ Material:
     - _StrokeRepeat: 3.2
     - _StrokeWidth: 0.12
     - _Surface: 1
+    - _Test: 0.11
+    - _TintADensity: 0.1
+    - _TintBDensity: 0.5
+    - _TintCDensity: 0
+    - _TintScale: 1
+    - _TintSmooth: 4
     - _VignetteRadius: 25
     - _VignetteSoftness: 12
     - _WorkflowMode: 1
@@ -150,18 +187,23 @@ Material:
     - _BaseColorA: {r: 0, g: 0.5176468, b: 1, a: 1}
     - _BaseColorB: {r: 1, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 0.75, b: 0.75, a: 1}
+    - _DecoATilling: {r: 1, g: 1, b: 0, a: 0}
+    - _DecoTilling: {r: 1, g: 1, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GrassTilling: {r: 1, g: 1, b: 0, a: 0}
-    - _GrassTint: {r: 0.40784314, g: 0.6862745, b: 0.4509804, a: 1}
+    - _GrassTint: {r: 0.36078432, g: 0.6901961, b: 0.4117647, a: 1}
     - _GrassTintA: {r: 0.35385758, g: 0.4811321, b: 0.34269315, a: 1}
     - _GrassTintB: {r: 0.9292453, g: 1, b: 0.93581015, a: 1}
-    - _GroundTintA: {r: 0.58431375, g: 0.77254903, b: 0.47843137, a: 1}
-    - _GroundTintB: {r: 0.41095358, g: 0.6862745, b: 0.40784314, a: 1}
+    - _GroundTintA: {r: 0.77254903, g: 0.8392157, b: 0.46666667, a: 1}
+    - _GroundTintB: {r: 0.5137255, g: 0.7176471, b: 0.48235294, a: 1}
+    - _GroundTintC: {r: 0.38431373, g: 0.654902, b: 0.43137255, a: 1}
     - _Offset: {r: 0, g: 0, b: 0, a: 0}
+    - _Seed: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _StrokeTint: {r: 1, g: 1, b: 1, a: 1}
     - _Tilling: {r: 1, g: 1, b: 0, a: 0}
     - _Tint: {r: 0, g: 0, b: 0, a: 1}
+    - _TintTilling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7078786691518272388
