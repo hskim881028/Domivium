@@ -44,11 +44,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.005, y: 0.5, z: 0.005}
+  m_Extents: {x: 0.4, y: 0.5, z: 0.5}
   m_MoveThreshold: 0.3
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0.5}
+  m_Center: {x: 0, y: 0, z: 1}
   m_TimeToStationary: 0.5
 --- !u!114 &4055049818437373291
 MonoBehaviour:
@@ -64,7 +64,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.Actors.Nexus
   _debugCircle: {fileID: 8639209759297644148, guid: d5fe6efa69380924dbd347b91badc325, type: 3}
   _healthDisplay: {fileID: 8326440876751832435}
-  _agent: {fileID: 0}
   _renderer:
   - {fileID: 2498246790171062864}
 --- !u!1 &4096675139041607442
@@ -93,7 +92,7 @@ Transform:
   m_GameObject: {fileID: 4096675139041607442}
   serializedVersion: 2
   m_LocalRotation: {x: 0.2588191, y: -0, z: -0, w: 0.9659258}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -168,7 +167,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4970078658410116591, guid: 3c6f97ca90182454a85450835674a802, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5738927828610465392, guid: 3c6f97ca90182454a85450835674a802, type: 3}
       propertyPath: m_LocalPosition.x
@@ -176,7 +175,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5738927828610465392, guid: 3c6f97ca90182454a85450835674a802, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.9
+      value: 1.6
       objectReference: {fileID: 0}
     - target: {fileID: 5738927828610465392, guid: 3c6f97ca90182454a85450835674a802, type: 3}
       propertyPath: m_LocalPosition.z
@@ -214,13 +213,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: HealthDisplay
       objectReference: {fileID: 0}
-    - target: {fileID: 5781228287648782121, guid: 3c6f97ca90182454a85450835674a802, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
     - target: {fileID: 8772469214410366657, guid: 3c6f97ca90182454a85450835674a802, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

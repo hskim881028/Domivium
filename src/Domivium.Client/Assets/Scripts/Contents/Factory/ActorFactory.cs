@@ -9,7 +9,6 @@ using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
-using Domivium.Client.Core.Provider;
 using UnityEngine;
 
 namespace Domivium.Client.Contents.Factory
@@ -17,28 +16,19 @@ namespace Domivium.Client.Contents.Factory
     public sealed class ActorFactory : IActorFactory
     {
         private readonly MasterDbService _masterDbService;
-        private readonly CoordinateService _coordinateService;
-        private readonly StageMapProvider _stageMapProvider;
         private readonly IBattleAbilityFactory _abilityFactory;
 
-        public ActorFactory(
-            MasterDbService masterDbService,
-            CoordinateService coordinateService,
-            StageMapProvider stageMapProvider,
-            IBattleAbilityFactory abilityFactory)
+        public ActorFactory(MasterDbService masterDbService, IBattleAbilityFactory abilityFactory)
         {
             _masterDbService = masterDbService;
-            _coordinateService = coordinateService;
-            _stageMapProvider = stageMapProvider;
             _abilityFactory = abilityFactory;
         }
 
-        public ActorParam CreateCharacter(int id, Vector3 spawnPosition)
+        public ActorParam CreateCharacter(int id, Vector3Int spawnPoint)
         {
             var row = _masterDbService.DB.CharacterRowTable.FindById(id);
             var abilities = GetDefaultAbility(row.Job.ToUnitType());
             var context = new UnitContext(row);
-            var spawnPoint = _coordinateService.GetCellPoint(spawnPosition);
             return new UnitParams(spawnPoint, context, abilities);
         }
 

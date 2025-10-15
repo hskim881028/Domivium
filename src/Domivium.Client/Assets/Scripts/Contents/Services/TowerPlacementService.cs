@@ -70,6 +70,8 @@ namespace Domivium.Client.Contents.Services
             foreach (var row in stageRow)
             {
                 var actorId = row.CampType.FromCampTypeToActorId();
+                if (actorId == ActorIds.CharacterCamp) continue;
+                
                 var campIndex = row.CampIndex;
                 var cell = new Vector3Int(row.X, row.Y, 0);
                 _store.GetNeighbors(cell, cells);

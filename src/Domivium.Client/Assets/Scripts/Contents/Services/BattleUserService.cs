@@ -61,13 +61,23 @@ namespace Domivium.Client.Contents.Services
         public async UniTask InitializeAsync(int stageId)
         {
             await _actorSpawner.SpawnAsync(ActorIds.CharacterPathIndicator, ActorParam.Empty);
-            
+
             var stageRow = _masterDbService.DB.StageRowTable.FindByStageId(stageId);
             foreach (var row in stageRow)
             {
                 if (row.CampType.FromCampTypeToActorId() != ActorIds.CharacterCamp) continue;
 
-                var character = _actorFactory.CreateCharacter(row.CampIndex, new Vector3(row.X, 0, row.Y));
+                var characterId = row.CampIndex switch
+                {
+                    0 => 1,
+                    1 => 3,
+                    2 => 2,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                
+                if(characterId == 2) continue; // temp
+
+                var character = _actorFactory.CreateCharacter(characterId, new Vector3Int(row.X, row.Y, 0));
                 await _actorSpawner.SpawnAsync(ActorIds.Character, character);
             }
         }

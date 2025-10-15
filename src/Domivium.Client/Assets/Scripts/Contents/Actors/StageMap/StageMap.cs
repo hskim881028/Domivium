@@ -20,7 +20,6 @@ namespace Domivium.Client.Contents.Actors
         [SerializeField] private NavMeshSurface _navMeshSurface;
 
         private readonly HashSet<Vector3Int> _tower = new();
-
         public Tilemap Background => _background;
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)

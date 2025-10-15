@@ -36,6 +36,7 @@ namespace Domivium.Client.Contents.Actors
                 materialPropertyBlock.SetFloat(AlphaId, 1);
                 _renderer[i].SetPropertyBlock(materialPropertyBlock);
                 MaterialPropertyBlocks[i] = materialPropertyBlock;
+                
             }
 
             base.Initialize(id, parent);
