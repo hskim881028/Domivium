@@ -16,38 +16,46 @@ namespace Domivium.Client.Contents.Actors
         {
             _agent.updateUpAxis = false;
             _agent.updateRotation = false;
-
             base.Initialize(id, parent);
         }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             _agent.updatePosition = true;
-
+            SetFlip(-1);
             return base.ActivateAsync(token, param);
+        }
+
+        public override void Tick(float deltaTime)
+        {
+            if (_agent.isStopped) return;
+
+            if (Mathf.Approximately(_agent.velocity.x, 0)) return;
+
+            SetFlip(_agent.velocity.x > 0 ? 1 : -1);
+            base.Tick(deltaTime);
         }
 
         public override void Die()
         {
             _agent.updatePosition = false;
-
             base.Die();
         }
 
-        public override void StartBattle(Vector3 offset, float targetX)
+        public override void StartBattle(Vector3 offset, Vector3 target)
         {
             _agent.isStopped = true;
             _agent.ResetPath();
             _agent.Move(offset);
             _agent.velocity = Vector3.zero;
-            SetFlip(targetX);
-            base.StartBattle(offset, targetX);
+            SetFlip(transform.position.x < target.x ? 1 : -1);
+            base.StartBattle(offset, target);
         }
 
-        public override void Battle(float targetX)
+        public override void Battle(Vector3 target)
         {
-            SetFlip(targetX);
-            base.Battle(targetX);
+            SetFlip(transform.position.x < target.x ? 1 : -1);
+            base.Battle(target);
         }
 
         public void SetSpeed(float speed)
@@ -55,21 +63,19 @@ namespace Domivium.Client.Contents.Actors
             _agent.speed = speed;
         }
 
-        public void SetDestination(Vector3 position)
+        public void SetDestination(Vector3 target)
         {
             _agent.isStopped = false;
             _agent.ResetPath();
-            _agent.SetDestination(position);
-            SetFlip(position.x);
+            _agent.SetDestination(target);
+            SetFlip(transform.position.x < target.x ? 1 : -1);
         }
 
-        private void SetFlip(float targetX)
+        private void SetFlip(int direction)
         {
-            if (_renderer.Count <= 0) return;
-
-            var isLeft = transform.position.x < targetX;
-            _renderer[0].flipX = isLeft;
-            MaterialPropertyBlocks[0].SetFloat(FlipDirectionId, isLeft ? -1 : 1);
+            // true -> right
+            _renderer[0].flipX = direction > 0;
+            MaterialPropertyBlocks[0].SetFloat(FlipDirectionId, direction);
             _renderer[0].SetPropertyBlock(MaterialPropertyBlocks[0]);
         }
     }

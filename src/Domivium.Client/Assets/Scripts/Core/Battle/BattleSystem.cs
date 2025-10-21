@@ -16,10 +16,10 @@ namespace Domivium.Client.Core.Battle
         private readonly List<BattleEffectSpec> _effectSpecs = new();
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
+        private readonly Transform _unit;
         private readonly ReadOnlyReactiveProperty<StateTag> _state;
         private readonly HashSet<BattleTag> _tags = new();
         private readonly ReactiveProperty<BattleEffectContext> _appliedEffect = new();
-
         private bool _isDisposed;
 
         public ushort Id { get; private set; }
@@ -27,8 +27,7 @@ namespace Domivium.Client.Core.Battle
         public UnitType Type { get; private set; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
-        public Transform Unit { get; }
-        public Vector3 UnitPosition => Unit.position;
+        public Vector3 UnitPosition => _unit.position;
         public StateTag State => _state.CurrentValue;
         public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect => _appliedEffect;
 
@@ -37,9 +36,9 @@ namespace Domivium.Client.Core.Battle
             ReadOnlyReactiveProperty<StateTag> state,
             IPublisher<BattleCueMessage> cuePublisher)
         {
-            Unit = unit;
             Stat = new StatSet();
             Gauge = new GaugeSet(Stat);
+            _unit = unit;
             _state = state;
             _cuePublisher = cuePublisher;
         }

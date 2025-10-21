@@ -9,7 +9,7 @@ namespace Domivium.Client.Core.Component
     {
         private static readonly int FillId = Shader.PropertyToID("_Fill");
 
-        [SerializeField] private MeshRenderer _meshRenderer;
+        [SerializeField] private SpriteRenderer _renderer;
         [SerializeField] private TextMeshPro _text;
 
         private readonly char[] _buf = new char[32];
@@ -27,9 +27,9 @@ namespace Domivium.Client.Core.Component
         public void Set(int current, int max)
         {
             var ratio = (float)current / max;
-            _meshRenderer.GetPropertyBlock(_mpb);
+            _renderer.GetPropertyBlock(_mpb);
             _mpb.SetFloat(FillId, ratio);
-            _meshRenderer.SetPropertyBlock(_mpb);
+            _renderer.SetPropertyBlock(_mpb);
 
             var length = TextWriteUtils.WriteIntGrouped(current, _buf, ',');
             _buf[length++] = '/';

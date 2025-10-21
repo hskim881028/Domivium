@@ -15,7 +15,7 @@ namespace Domivium.Client.Contents.Services
         private Plane _dragPlane = new(Vector3.up, Vector3.zero);
 
         private readonly CameraRig _cameraRig;
-        private readonly StageMapProvider _stageMapProvider;
+        private readonly StageFieldProvider _stageFieldProvider;
         private readonly IStageDirector _director;
         private Vector3 _position;
         private bool _isPressed;
@@ -27,11 +27,11 @@ namespace Domivium.Client.Contents.Services
 
         public CameraService(
             CameraRig cameraRig,
-            StageMapProvider stageMapProvider,
+            StageFieldProvider stageFieldProvider,
             IStageDirector director)
         {
             _cameraRig = cameraRig;
-            _stageMapProvider = stageMapProvider;
+            _stageFieldProvider = stageFieldProvider;
             _director = director;
         }
 
@@ -42,7 +42,7 @@ namespace Domivium.Client.Contents.Services
 
         public void Initialize(int stageId)
         {
-            var biome = _stageMapProvider.Get(stageId);
+            var biome = _stageFieldProvider.Get(stageId);
             _limitX = biome.cellBounds.xMax / 2;
             _limitZ = biome.cellBounds.yMax / 2;
         }

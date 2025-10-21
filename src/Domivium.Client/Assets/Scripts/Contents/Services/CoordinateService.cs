@@ -35,21 +35,15 @@ namespace Domivium.Client.Contents.Services
             return true;
         }
 
-        public bool TryScreenToWorld(Vector2 screenPosition, out Vector3 worldPosition)
-        {
-            return _cameraRead.TryScreenToWorld(screenPosition, out worldPosition);
-        }
+        public bool TryScreenToWorld(Vector2 screenPosition, out Vector3 worldPosition) => _cameraRead.TryScreenToWorld(screenPosition, out worldPosition);
 
-        public bool TryScreenToCollider(Vector2 screenPosition, out Collider collider)
-        {
-            return _cameraRead.TryScreenToCollider(screenPosition, out collider);
-        }
+        public bool TryScreenToCollider(Vector2 screenPosition, out Collider collider) => _cameraRead.TryScreenToCollider(screenPosition, out collider);
 
         private void OnSpawnerMessage(SpawnActorMessage message)
         {
-            if (message.Presenter is StageMapPresenter stageMapPresenter)
+            if (message.Presenter is StageFieldPresenter presenter)
             {
-                _grid = stageMapPresenter.Grid;
+                _grid = presenter.Grid;
             }
         }
     }

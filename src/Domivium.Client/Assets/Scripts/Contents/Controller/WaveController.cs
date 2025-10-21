@@ -38,7 +38,7 @@ namespace Domivium.Client.Contents.Controller
             IActorSpawner actorSpawner,
             IActorFactory actorFactory,
             ISubscriber<ActorStateMessage> actorTagSubscriber,
-            ISubscriber<SceneMessage> subscriber)
+            ISubscriber<SceneMessage> sceneSubscriber)
         {
             _stageContext = stageContext;
             _masterDbService = masterDbService;
@@ -47,7 +47,7 @@ namespace Domivium.Client.Contents.Controller
 
             stageContext.Phase.Subscribe(OnChangedPhase).AddTo(ref DisposableBag);
             actorTagSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
-            subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
+            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
             _remainCount.Subscribe(OnUpdateRemainCount).AddTo(ref DisposableBag);
         }
 

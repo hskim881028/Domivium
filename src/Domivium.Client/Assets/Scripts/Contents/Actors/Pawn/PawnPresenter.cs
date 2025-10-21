@@ -98,7 +98,7 @@ namespace Domivium.Client.Contents.Actors
             {
                 var context = BattleAbilityContext.Create(BattleAbilityId, BattleSystem, Target);
                 BattleSystem.TryActivateAbility(ref context);
-                Actor.Battle(Target.UnitPosition.x);
+                Actor.Battle(Target.UnitPosition);
             }
             else
             {
@@ -118,7 +118,7 @@ namespace Domivium.Client.Contents.Actors
         {
             LockOn = true;
             var offset = BattleService.GetPositionOffset(BattleSystem, Target);
-            Actor.StartBattle(offset, Target.UnitPosition.x);
+            Actor.StartBattle(offset, Target.UnitPosition);
             base.OnBattle();
         }
 

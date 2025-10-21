@@ -16,7 +16,7 @@ namespace Domivium.Client.Contents.Input.Composition
             ISubscriber<InputMessage> subscriber,
             TowerPlacementInputConsumer towerPlacementInputConsumer,
             BattleInputConsumer battleInputConsumer,
-            BattleCameraInputConsumer  battleCameraInputConsumer)
+            BattleCameraInputConsumer battleCameraInputConsumer)
             : base(router, subscriber)
         {
             _towerPlacementInputConsumer = towerPlacementInputConsumer;

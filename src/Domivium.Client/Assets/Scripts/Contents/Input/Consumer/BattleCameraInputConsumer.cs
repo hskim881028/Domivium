@@ -19,7 +19,7 @@ namespace Domivium.Client.Contents.Input.Consumer
         }
 
         public InputPriority Priority => InputPriorities.Camera;
-        
+
         private bool IsBattleMode => _stageContext.Mode.CurrentValue == StageModes.Battle;
         private bool IsMoveCameraMode => _stageContext.Mode.CurrentValue == StageModes.MoveCamera;
         private bool IsTerminated => _stageContext.Phase.CurrentValue == StagePhases.Cleared || _stageContext.Phase.CurrentValue == StagePhases.Failed;

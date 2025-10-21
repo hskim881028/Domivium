@@ -14,7 +14,6 @@ namespace Domivium.Client.Core.Battle
         public UnitType Type { get; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
-        public Transform Unit { get; }
         public Vector3 UnitPosition { get; }
         public StateTag State { get; }
         public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect { get; }

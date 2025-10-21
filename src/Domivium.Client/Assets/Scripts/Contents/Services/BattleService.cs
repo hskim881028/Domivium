@@ -17,7 +17,7 @@ namespace Domivium.Client.Contents.Services
         private const int TryCount = 32;
         private readonly IActorManager _actorManager;
         private readonly CoordinateService _coordinateService;
-        private readonly IStageMapStore _stageMapStore;
+        private readonly IStageFieldStore _stageFieldStore;
         private readonly NavMeshPath _path = new();
         private readonly Vector3[] _cornerBuffer = new Vector3[64];
 
@@ -26,11 +26,11 @@ namespace Domivium.Client.Contents.Services
         public BattleService(
             CoordinateService coordinateService,
             IActorManager actorManager,
-            IStageMapStore stageMapStore)
+            IStageFieldStore stageFieldStore)
         {
             _actorManager = actorManager;
             _coordinateService = coordinateService;
-            _stageMapStore = stageMapStore;
+            _stageFieldStore = stageFieldStore;
         }
 
         public bool IsExistUnit(ActorId actorId) => _actorManager.Any(actorId);
@@ -249,7 +249,7 @@ namespace Domivium.Client.Contents.Services
                 if (!BattleCalculator.CanBattle(sourceUnitType, candidate, targetPosition, sourceAttackRange, targetHitRange)) continue;
 
                 var cell = _coordinateService.GetCellPoint(candidate);
-                if (!_stageMapStore.CanMove(cell)) continue;
+                if (!_stageFieldStore.CanMove(cell)) continue;
 
                 offset = candidate - sourcePosition;
                 return true;

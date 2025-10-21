@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors.Contract;
 using UnityEngine;
@@ -12,6 +13,11 @@ namespace Domivium.Client.Core.Actors
         private void Awake()
         {
             OnAwake();
+        }
+
+        private void Update()
+        {
+            OnUpdate();
         }
 
         private void OnDestroy()
@@ -32,6 +38,7 @@ namespace Domivium.Client.Core.Actors
         public virtual void Tick(float deltaTime) { }
 
         protected virtual void OnAwake() { }
+        protected virtual void OnUpdate() { }
         protected virtual void OnDestroyInternal() { }
     }
 }

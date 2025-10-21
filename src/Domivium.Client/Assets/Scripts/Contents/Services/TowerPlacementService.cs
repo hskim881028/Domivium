@@ -24,11 +24,11 @@ namespace Domivium.Client.Contents.Services
     {
         private readonly MasterDbService _masterDbService;
         private readonly CoordinateService _coordinateService;
-        private readonly StageMapProvider _stageMapProvider;
+        private readonly StageFieldProvider _stageFieldProvider;
         private readonly IStageDirector _director;
         private readonly IActorSpawner _actorSpawner;
         private readonly IActorFactory _actorFactory;
-        private readonly IStageMapStore _store;
+        private readonly IStageFieldStore _store;
         private readonly ObservableList<Vector3Int> _stagedTower = new();
         private readonly ObservableDictionary<Vector3Int, bool> _previewTower = new();
         private readonly ReactiveProperty<bool> _ready;
@@ -40,16 +40,16 @@ namespace Domivium.Client.Contents.Services
         public TowerPlacementService(
             MasterDbService masterDbService,
             CoordinateService coordinateService,
-            StageMapProvider stageMapProvider,
+            StageFieldProvider stageFieldProvider,
             IStageDirector director,
             IActorSpawner actorSpawner,
             IActorFactory actorFactory,
-            IStageMapStore store,
+            IStageFieldStore store,
             ISubscriber<SceneMessage> sceneSubscriber)
         {
             _masterDbService = masterDbService;
             _coordinateService = coordinateService;
-            _stageMapProvider = stageMapProvider;
+            _stageFieldProvider = stageFieldProvider;
             _director = director;
             _actorSpawner = actorSpawner;
             _actorFactory = actorFactory;
@@ -60,10 +60,10 @@ namespace Domivium.Client.Contents.Services
 
         public async UniTask InitializeAsync(int stageId)
         {
-            var biome = _stageMapProvider.Get(stageId);
+            var biome = _stageFieldProvider.Get(stageId);
             _store.Initialize(biome.cellBounds);
 
-            await _actorSpawner.SpawnAsync(ActorIds.Map, new StageMapParams(biome.cellBounds));
+            await _actorSpawner.SpawnAsync(ActorIds.Map, new StageFieldParams(biome.cellBounds));
 
             var cells = new List<Vector3Int>();
             var stageRow = _masterDbService.DB.StageRowTable.FindByStageId(stageId);
@@ -71,7 +71,7 @@ namespace Domivium.Client.Contents.Services
             {
                 var actorId = row.CampType.FromCampTypeToActorId();
                 if (actorId == ActorIds.CharacterCamp) continue;
-                
+
                 var campIndex = row.CampIndex;
                 var cell = new Vector3Int(row.X, row.Y, 0);
                 _store.GetNeighbors(cell, cells);

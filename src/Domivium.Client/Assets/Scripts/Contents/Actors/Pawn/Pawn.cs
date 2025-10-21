@@ -24,7 +24,6 @@ namespace Domivium.Client.Contents.Actors
 
         protected MaterialPropertyBlock[] MaterialPropertyBlocks;
 
-
         public override void Initialize(ushort id, Transform parent)
         {
             MaterialPropertyBlocks = new MaterialPropertyBlock[_renderer.Count];
@@ -36,7 +35,6 @@ namespace Domivium.Client.Contents.Actors
                 materialPropertyBlock.SetFloat(AlphaId, 1);
                 _renderer[i].SetPropertyBlock(materialPropertyBlock);
                 MaterialPropertyBlocks[i] = materialPropertyBlock;
-                
             }
 
             base.Initialize(id, parent);
@@ -68,12 +66,11 @@ namespace Domivium.Client.Contents.Actors
             }
         }
 
-        public virtual void StartBattle(Vector3 offset, float targetX) { }
+        public virtual void StartBattle(Vector3 offset, Vector3 target) { }
 
-        public virtual void Battle(float targetX) { }
+        public virtual void Battle(Vector3 target) { }
 
         public void SetHealth(int current, int max) => _healthDisplay.Set(current, max);
-
 
         public void SetRange(StatId statId, float range, Color color)
         {

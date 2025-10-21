@@ -45,7 +45,7 @@ namespace Domivium.Client.Contents.DI.Scene
         [SerializeField] private GlobalActorContainer _globalActorContainer;
         [SerializeField] private UIContainer _uiContainer;
         [SerializeField] private StageActorContainer _stageActorContainer;
-        [SerializeField] private StageMapContainer _stageMapContainer;
+        [SerializeField] private StageFieldContainer _stageFieldContainer;
         [SerializeField] private AudioContainer _audioContainer;
 
         protected override void Configure(IContainerBuilder builder)
@@ -143,7 +143,7 @@ namespace Domivium.Client.Contents.DI.Scene
 
         private void Provider(IContainerBuilder builder, Lifetime lifetime)
         {
-            builder.Register<StageMapProvider>(lifetime).WithParameter(_stageMapContainer.Biome);
+            builder.Register<StageFieldProvider>(lifetime).WithParameter(_stageFieldContainer.Biome);
         }
 
         private void Audio(IContainerBuilder builder, Lifetime lifetime)
@@ -182,7 +182,7 @@ namespace Domivium.Client.Contents.DI.Scene
         {
             builder.Register<StageContext>(lifetime);
             builder.Register<IStageDirector, StageDirector>(lifetime);
-            builder.Register<IStageMapStore, StageMapStore>(lifetime);
+            builder.Register<IStageFieldStore, StageFieldStore>(lifetime);
             builder.Register<IWaveController, WaveController>(lifetime);
         }
 

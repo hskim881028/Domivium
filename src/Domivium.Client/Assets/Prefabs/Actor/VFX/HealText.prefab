@@ -49,6 +49,7 @@ MonoBehaviour:
   _driver: {fileID: 5852253018984404763}
   _axis: {fileID: 2534857921206570022}
   _text: {fileID: 9042325449094708099}
+  _renderer: {fileID: 6262784019636620816}
 --- !u!1 &6433732003739299648
 GameObject:
   m_ObjectHideFlags: 0
@@ -111,7 +112,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -6765837094796606205, guid: 7b9e61ae3491fba4595d1b39190ca84f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -156,15 +157,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 123
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 7b9e61ae3491fba4595d1b39190ca84f, type: 2}
+  m_sharedMaterial: {fileID: -6765837094796606205, guid: 7b9e61ae3491fba4595d1b39190ca84f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4282253187
-  m_fontColor: {r: 0.5148804, g: 1, b: 0.23921567, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -187,7 +188,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 10
   m_fontSizeMax: 25
-  m_fontStyle: 2
+  m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535

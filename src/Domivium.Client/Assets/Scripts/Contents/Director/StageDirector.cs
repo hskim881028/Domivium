@@ -16,8 +16,7 @@ namespace Domivium.Client.Contents.Director
         public StageDirector(
             StageContext stageContext,
             InputEventSystem inputEventSystem,
-            ISubscriber<SceneMessage> sceneSubscriber,
-            ISubscriber<ActorStateMessage> actorStateSubscriber) : base(stageContext)
+            ISubscriber<SceneMessage> sceneSubscriber) : base(stageContext)
         {
             _inputEventSystem = inputEventSystem;
             stageContext.Mode.Subscribe(OnChangeMode).AddTo(ref DisposableBag);

@@ -26,6 +26,17 @@ namespace Domivium.Client.Contents.Services
             {
                 _actorSpawner.SpawnAsync(ActorIds.HealText, new HealTextParams(context.Position, context.Value, 1.6f));
             }
+
+            if (cueId == BattleCueIds.Attack)
+            {
+                _actorSpawner.SpawnAsync(ActorIds.SlashEffect,
+                    new SlashEffectParams(
+                        context.ActorId,
+                        context.Position,
+                        context.Direction,
+                        context.Value,
+                        1.6f));
+            }
         }
     }
 }

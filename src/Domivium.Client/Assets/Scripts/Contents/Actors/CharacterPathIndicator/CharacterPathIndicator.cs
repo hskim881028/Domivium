@@ -37,7 +37,7 @@ namespace Domivium.Client.Contents.Actors
             _targetPosition.y = 0.1f;
         }
 
-        private void Update()
+        protected override void OnUpdate()
         {
             if (!_isPicked) return;
 
@@ -45,6 +45,7 @@ namespace Domivium.Client.Contents.Actors
             position.y = 0.1f;
             _lineRenderer.SetPosition(0, position);
             _lineRenderer.SetPosition(1, _targetPosition);
+            base.OnUpdate();
         }
 
         private void Release()

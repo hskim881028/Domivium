@@ -31,6 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6670279762087515028}
+  - {fileID: 390762876339547704}
   m_Father: {fileID: 7200333091600057830}
   m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!212 &8766347558825205706
@@ -183,9 +184,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.Actors.Character.Character
   _debugCircle: {fileID: 8639209759297644148, guid: d5fe6efa69380924dbd347b91badc325, type: 3}
   _healthDisplay: {fileID: 8927887093921616774}
-  _agent: {fileID: 3782234119407253875}
   _renderer:
   - {fileID: 8766347558825205706}
+  _agent: {fileID: 3782234119407253875}
+  _particleSystem: {fileID: 3513695858035884322}
 --- !u!1001 &1384114089820302820
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -263,3 +265,70 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bdeaa62dd774954a8079a254aa80d4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Domivium.Client.Core::Domivium.Client.Core.Component.HealthDisplay
+--- !u!1001 &2033213649291499240
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3955780527399787310}
+    m_Modifications:
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.035
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8065801913358684802, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+      propertyPath: m_Name
+      value: Smoke
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+--- !u!4 &390762876339547704 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1827100041351674064, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+  m_PrefabInstance: {fileID: 2033213649291499240}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &3513695858035884322 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 3239296283235801034, guid: d7729ba6ab68a074db4aea2853277443, type: 3}
+  m_PrefabInstance: {fileID: 2033213649291499240}
+  m_PrefabAsset: {fileID: 0}

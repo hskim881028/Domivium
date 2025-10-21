@@ -12,6 +12,7 @@ using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Message;
+using Domivium.Client.Core.State;
 using MessagePipe;
 using R3;
 using UnityEngine;
@@ -27,10 +28,12 @@ namespace Domivium.Client.Contents.Services
         private readonly IBattleService _battleService;
         private readonly IActorFactory _actorFactory;
 
+        private readonly ReactiveProperty<IBattleSystem> _selectedCharacter;
         private readonly ReactiveProperty<IBattleSystem> _pickedCharacter;
         private readonly ReactiveProperty<Vector3> _previewPosition;
         private readonly ReactiveProperty<Vector3> _targetPosition;
 
+        public ReadOnlyReactiveProperty<IBattleSystem> SelectedCharacter => _selectedCharacter;
         public ReadOnlyReactiveProperty<IBattleSystem> PickedCharacter => _pickedCharacter;
         public ReadOnlyReactiveProperty<Vector3> PreviewPosition => _previewPosition;
         public ReadOnlyReactiveProperty<Vector3> TargetPosition => _targetPosition;
@@ -42,8 +45,10 @@ namespace Domivium.Client.Contents.Services
             IActorSpawner actorSpawner,
             IBattleService battleService,
             IActorFactory actorFactory,
+            ISubscriber<ActorStateMessage> actorTagSubscriber,
             ISubscriber<SceneMessage> subscriber)
         {
+            _selectedCharacter = new ReactiveProperty<IBattleSystem>().AddTo(ref DisposableBag);
             _pickedCharacter = new ReactiveProperty<IBattleSystem>().AddTo(ref DisposableBag);
             _previewPosition = new ReactiveProperty<Vector3>().AddTo(ref DisposableBag);
             _targetPosition = new ReactiveProperty<Vector3>().AddTo(ref DisposableBag);
@@ -55,12 +60,14 @@ namespace Domivium.Client.Contents.Services
             _battleService = battleService;
             _actorFactory = actorFactory;
 
+            actorTagSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
             subscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTask InitializeAsync(int stageId)
         {
             await _actorSpawner.SpawnAsync(ActorIds.CharacterPathIndicator, ActorParam.Empty);
+            await _actorSpawner.SpawnAsync(ActorIds.CharacterSelectIndicator, ActorParam.Empty);
 
             var stageRow = _masterDbService.DB.StageRowTable.FindByStageId(stageId);
             foreach (var row in stageRow)
@@ -74,8 +81,8 @@ namespace Domivium.Client.Contents.Services
                     2 => 2,
                     _ => throw new ArgumentOutOfRangeException()
                 };
-                
-                if(characterId == 2) continue; // temp
+
+                if (characterId == 2) continue; // temp
 
                 var character = _actorFactory.CreateCharacter(characterId, new Vector3Int(row.X, row.Y, 0));
                 await _actorSpawner.SpawnAsync(ActorIds.Character, character);
@@ -131,8 +138,26 @@ namespace Domivium.Client.Contents.Services
             }
 
             _previewPosition.Value = Vector3.zero;
+            _selectedCharacter.Value = _pickedCharacter.Value;
             _pickedCharacter.Value = null;
             return _director.TrySetMode(StageModes.Battle);
+        }
+
+        private void OnActorStateMessage(ActorStateMessage message)
+        {
+            if (_pickedCharacter.Value != null &&
+                message.Id == _pickedCharacter.Value.Id &&
+                message.Tag == StateTag.Die)
+            {
+                _pickedCharacter.Value = null;
+            }
+
+            if (_selectedCharacter.Value != null &&
+                message.Id == _selectedCharacter.Value.Id &&
+                message.Tag == StateTag.Die)
+            {
+                _selectedCharacter.Value = null;
+            }
         }
 
         private void OnSceneMessage(SceneMessage message)
@@ -141,6 +166,8 @@ namespace Domivium.Client.Contents.Services
             {
                 case SceneMessageType.Unload:
                 case SceneMessageType.Load:
+                    _selectedCharacter.Value = null;
+                    _pickedCharacter.Value = null;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

@@ -13,24 +13,27 @@ namespace Domivium.Client.Contents.Actors
 {
     public class DamageText : VFX
     {
-        private static readonly Vector3 Punch1 = new(0f, 0.8f, 0f);
-        private static readonly Vector3 Punch2 = new(0f, 0.4f, 0f);
-        private static readonly Vector3 Punch3 = new(0f, 0.2f, 0f);
+        private static readonly int ColorId = Shader.PropertyToID("_FaceColor");
+        private static readonly int OutlineId = Shader.PropertyToID("_OutlineWidth");
+
+        private const float MoveY = 0.8f;
+        private static readonly Vector3 Punch1 = new(0f, -0.2f, 0f);
+        private static readonly Vector3 Punch2 = new(0f, -0.1f, 0f);
         private static readonly Vector3 Shake = new(0.05f, 0f, 0f);
 
         [SerializeField] private Transform _driver;
         [SerializeField] private Transform _axis;
         [SerializeField] private TextMeshPro _text;
+        [SerializeField] private MeshRenderer _renderer;
 
         private readonly char[] _buf = new char[16];
 
         private Sequence _punch;
         private Sequence _shake;
 
-        private Color _baseColor;
+        private MaterialPropertyBlock _materialPropertyBlock;
         private Vector3 _basePos;
         private Vector3 _currentPosition;
-
 
         public override void Initialize(ushort id, Transform parent)
         {
@@ -38,13 +41,19 @@ namespace Domivium.Client.Contents.Actors
             _text.ForceMeshUpdate();
             _text.SetCharArray(Array.Empty<char>(), 0, 0);
 
-            _baseColor = _text.color;
+            var mpb = new MaterialPropertyBlock();
+            _renderer.GetPropertyBlock(mpb);
+            _materialPropertyBlock = mpb;
+            _materialPropertyBlock.SetColor(ColorId, Color.orangeRed);
+            _materialPropertyBlock.SetFloat(OutlineId, 0.3f);
+            _renderer.SetPropertyBlock(_materialPropertyBlock);
+
             _punch = DOTween.Sequence()
                 .SetAutoKill(false)
                 .Pause()
-                .Append(_driver.DOPunchPosition(Punch1, 0.3f, 1, 0.8f).SetRecyclable(true))
-                .Append(_driver.DOPunchPosition(Punch2, 0.3f, 2, 0.8f).SetRecyclable(true))
-                .Append(_driver.DOPunchPosition(Punch3, 0.4f, 3, 0.5f).SetRecyclable(true))
+                .Append(_driver.DOLocalMoveY(MoveY, 0.3f).SetEase(Ease.OutCirc).SetRecyclable(true))
+                .Append(_driver.DOPunchPosition(Punch1, 0.3f, 2, 0.8f).SetRecyclable(true))
+                .Append(_driver.DOPunchPosition(Punch2, 0.4f, 3, 0.5f).SetRecyclable(true))
                 .Join(_text.DOFade(0f, 0.5f).SetDelay(0.4f).SetRecyclable(true))
                 .OnUpdate(() =>
                 {
@@ -55,7 +64,7 @@ namespace Domivium.Client.Contents.Actors
             _shake = DOTween.Sequence()
                 .SetAutoKill(false)
                 .Pause()
-                .Append(_axis.DOShakePosition(0.8f, Shake).SetRecyclable(true));
+                .Append(_axis.DOShakePosition(0.8f, Shake).SetDelay(0.3f).SetRecyclable(true));
 
             base.Initialize(id, parent);
         }
@@ -73,7 +82,7 @@ namespace Domivium.Client.Contents.Actors
             _axis.localPosition = Vector3.zero;
             _driver.localPosition = Vector3.zero;
 
-            _text.color = _baseColor;
+            _text.color = Color.white;
             SetText(p.Damage);
 
             _punch.Rewind();

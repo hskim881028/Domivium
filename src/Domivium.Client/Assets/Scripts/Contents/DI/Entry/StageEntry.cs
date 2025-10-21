@@ -23,7 +23,7 @@ namespace Domivium.Client.Contents.DI.Entry
 {
     public class StageEntry : Entry, ITickable
     {
-        private readonly StageMapProvider _stageMapProvider;
+        private readonly StageFieldProvider _stageFieldProvider;
         private readonly IStageDirector _stageDirector;
         private readonly IWaveController _waveController;
         private readonly IBattleService _battleService;
