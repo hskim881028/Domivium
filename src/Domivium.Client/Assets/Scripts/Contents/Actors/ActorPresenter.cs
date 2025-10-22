@@ -15,9 +15,10 @@ namespace Domivium.Client.Contents.Actors
         protected TActor Actor { get; }
         protected IStateSystem StateSystem { get; }
 
-        public ushort Id { get; private set; }
+        public ushort Uid { get; private set; }
 
         public abstract ActorId ActorId { get; }
+        public int Id { get; protected set; }
 
         protected ActorPresenter(TActor actor, ISystemFactory systemFactory)
         {
@@ -26,10 +27,10 @@ namespace Domivium.Client.Contents.Actors
             StateSystem.Tag.DistinctUntilChanged().Subscribe(OnStateChanged).AddTo(ref DisposableBag);
         }
 
-        public virtual void Initialize(ushort id, Transform parent)
+        public virtual void Initialize(ushort uid, Transform parent)
         {
-            Id = id;
-            Actor.Initialize(id, parent);
+            Uid = uid;
+            Actor.Initialize(uid, parent);
         }
 
         public virtual async UniTask ActivateAsync(CancellationToken token, ActorParam param)
@@ -66,12 +67,12 @@ namespace Domivium.Client.Contents.Actors
         protected virtual void OnBattleTick() { }
         protected virtual void OnMoveTick() { }
 
-        protected virtual void OnIdle() => this.Log(Id);
-        protected virtual void OnChase() => this.Log(Id);
-        protected virtual void OnBattle() => this.Log(Id);
-        protected virtual void OnMove() => this.Log(Id);
+        protected virtual void OnIdle() => this.Log(Uid);
+        protected virtual void OnChase() => this.Log(Uid);
+        protected virtual void OnBattle() => this.Log(Uid);
+        protected virtual void OnMove() => this.Log(Uid);
         protected virtual void OnDie() { }
-        protected virtual void OnTerminated() => this.Log(Id);
+        protected virtual void OnTerminated() => this.Log(Uid);
 
         private void StateTick()
         {

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.ReadModels;
@@ -7,6 +9,7 @@ using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Data.Stat;
 using Domivium.Client.Data.Store;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -21,7 +24,7 @@ namespace Domivium.Client.Contents.Services
         private readonly NavMeshPath _path = new();
         private readonly Vector3[] _cornerBuffer = new Vector3[64];
 
-        private readonly List<IBattleSystem> _units = new(256);
+        private readonly List<IBattleSystem> _pawns = new(256);
 
         public BattleService(
             CoordinateService coordinateService,
@@ -35,16 +38,22 @@ namespace Domivium.Client.Contents.Services
 
         public bool IsExistUnit(ActorId actorId) => _actorManager.Any(actorId);
 
+        public IBattleSystem GetNexus()
+        {
+            var count = _actorManager.GetPawns(ActorIds.Nexus, _pawns);
+            return count > 0 ? _pawns.First() : throw new Exception("Nexus not found");
+        }
+
         public Vector3 GetPositionOffset(IBattleSystem source, IBattleSystem target)
         {
             var offset = Vector3.zero;
-            var total = _actorManager.GetUnits(stackalloc ActorId[] { ActorIds.Character, ActorIds.Monster }, _units);
+            var total = _actorManager.GetPawns(stackalloc ActorId[] { ActorIds.Character, ActorIds.Monster }, _pawns);
             if (total == 0) return offset;
 
             for (var i = 0; i < TryCount; i++)
             {
                 var position = source.UnitPosition + offset;
-                if (!IsPositionOccupied(source.Id, position, _units)) return offset;
+                if (!IsPositionOccupied(source.Uid, position, _pawns)) return offset;
 
                 if (!TryFindBattleOffset(source, target, out offset)) break;
             }
@@ -52,8 +61,7 @@ namespace Domivium.Client.Contents.Services
             return offset;
         }
 
-        public bool FindTarget(ActorId actorId, ushort id, out IBattleSystem target) => _actorManager.TryGetPawn(actorId, id, out target);
-
+        public bool FindTarget(ActorId actorId, ushort uid, out IBattleSystem target) => _actorManager.TryGetPawn(actorId, uid, out target);
 
         public bool TryGetChasePosition(IBattleSystem source, IBattleSystem target, out Vector3 chasePosition)
         {
@@ -69,14 +77,14 @@ namespace Domivium.Client.Contents.Services
         {
             target = null;
             chasePosition = Vector3.zero;
-            if (_actorManager.GetUnits(actorId, _units) == 0) return false;
+            if (_actorManager.GetPawns(actorId, _pawns) == 0) return false;
 
             var bestPathLen = float.PositiveInfinity;
             var sourcePosition = source.UnitPosition;
             var detectionRange = source.Stat.RateValue(StatId.DetectionRange);
-            foreach (var newTarget in GetUnitsWithinRadius(_units, sourcePosition, detectionRange))
+            foreach (var newTarget in GetUnitsWithinRadius(_pawns, sourcePosition, detectionRange))
             {
-                if (source.Id == newTarget.Id) continue;
+                if (source.Uid == newTarget.Uid) continue;
 
                 var targetPosition = newTarget.UnitPosition;
                 var offsetX = BattleCalculator.GetAttackOffset(source, newTarget);
@@ -99,14 +107,14 @@ namespace Domivium.Client.Contents.Services
             out IBattleSystem target)
         {
             target = null;
-            if (_actorManager.GetUnits(actorId, _units) == 0) return false;
+            if (_actorManager.GetPawns(actorId, _pawns) == 0) return false;
 
             var bestDistance = float.PositiveInfinity;
             var sourcePosition = source.UnitPosition;
             var attackRange = source.Stat.RateValue(StatId.AttackRange);
-            foreach (var newTarget in GetUnitsWithinRadius(_units, sourcePosition, attackRange))
+            foreach (var newTarget in GetUnitsWithinRadius(_pawns, sourcePosition, attackRange))
             {
-                if (source.Id == newTarget.Id) continue;
+                if (source.Uid == newTarget.Uid) continue;
 
                 if (!BattleCalculator.CanBattle(source, newTarget)) continue;
 
@@ -209,11 +217,11 @@ namespace Domivium.Client.Contents.Services
             return length;
         }
 
-        private static bool IsPositionOccupied(ushort id, Vector3 position, IReadOnlyList<IBattleSystem> units)
+        private static bool IsPositionOccupied(ushort uid, Vector3 position, IReadOnlyList<IBattleSystem> units)
         {
             foreach (var unit in units)
             {
-                if (unit.Id == id) continue;
+                if (unit.Uid == uid) continue;
 
                 if (unit.State != StateTags.Battle) continue;
 

@@ -28,6 +28,7 @@ namespace Domivium.Client.Contents.DI.Entry
         private readonly IWaveController _waveController;
         private readonly IBattleService _battleService;
         private readonly ICameraCommand _cameraCommand;
+        private readonly IStageInventoryCommand _stageInventoryCommand;
         private readonly ITowerPlacementCommand _towerPlacementCommand;
         private readonly IBattleUserCommand _battleUserCommand;
         private readonly IActorManager _actorManager;
@@ -40,6 +41,7 @@ namespace Domivium.Client.Contents.DI.Entry
             IAudioController audioController,
             IBattleService battleService,
             ICameraCommand cameraCommand,
+            IStageInventoryCommand stageInventoryCommand,
             ITowerPlacementCommand towerPlacementCommand,
             IBattleUserCommand battleUserCommand,
             IActorManager actorManager,
@@ -49,6 +51,7 @@ namespace Domivium.Client.Contents.DI.Entry
             _waveController = waveController;
             _battleService = battleService;
             _cameraCommand = cameraCommand;
+            _stageInventoryCommand = stageInventoryCommand;
             _towerPlacementCommand = towerPlacementCommand;
             _battleUserCommand = battleUserCommand;
             _actorManager = actorManager;
@@ -69,6 +72,7 @@ namespace Domivium.Client.Contents.DI.Entry
             _stageDirector.TrySetPhase(StagePhases.PreparingWave);
             _cameraCommand.Initialize(cfg.StageId);
             _waveController.Initialize(cfg.StageId);
+            _stageInventoryCommand.Initialize(2, 3);
             await _towerPlacementCommand.InitializeAsync(cfg.StageId); //data 만들기
             await _battleUserCommand.InitializeAsync(cfg.StageId);
 

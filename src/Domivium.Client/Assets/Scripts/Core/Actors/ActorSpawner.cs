@@ -21,13 +21,13 @@ namespace Domivium.Client.Core.Actors
         private readonly Dictionary<ActorId, (Type presenter, Type view)> _container;
         private readonly Dictionary<Type, Actor> _prefabs = new();
         private readonly IPublisher<SpawnActorMessage> _publisher;
-        private readonly Dictionary<ActorId, Queue<(ushort id, ActorScope scope)>> _pool = new();
+        private readonly Dictionary<ActorId, Queue<(ushort uid, ActorScope scope)>> _pool = new();
         private readonly Dictionary<ushort, (ActorId actorId, ActorScope scope)> _activeActors = new();
 
         private ActorRootScope _root;
         private SceneMessageType _sceneMessageType;
         private CancellationTokenSource _cts = new();
-        private ushort _id;
+        private ushort _uid;
 
         public ActorSpawner(
             Dictionary<ActorId, (Type presenter, Type view)> container,
@@ -49,12 +49,12 @@ namespace Domivium.Client.Core.Actors
         {
             if (TryGet(actorId, out var actor))
             {
-                await SpawnInternalAsync(actor.scope, actor.scope.Presenter, actor.id, actorId, param);
+                await SpawnInternalAsync(actor.scope, actor.scope.Presenter, actor.uid, actorId, param);
                 return;
             }
 
             var actorScope = CreateActor(actorId);
-            await SpawnInternalAsync(actorScope, actorScope.Presenter, actorScope.Id, actorId, param);
+            await SpawnInternalAsync(actorScope, actorScope.Presenter, actorScope.Uid, actorId, param);
         }
 
         private ActorScope CreateActor(ActorId actorId)
@@ -73,9 +73,9 @@ namespace Domivium.Client.Core.Actors
                 },
                 $"{presenterType.Name.AsActor()}(Scope)");
 
-            _id++;
+            _uid++;
             var presenter = (IActorPresenter)actorScope.Container.Resolve(presenterType);
-            actorScope.Initialize(_id, presenter);
+            actorScope.Initialize(_uid, presenter);
             return actorScope;
         }
 
@@ -88,22 +88,22 @@ namespace Domivium.Client.Core.Actors
         private async UniTask SpawnInternalAsync(
             ActorScope scope,
             IActorPresenter presenter,
-            ushort id,
+            ushort uid,
             ActorId actorId,
             ActorParam param)
         {
             await scope.SpawnAsync(param, _cts.Token);
-            _activeActors.Add(id, (actorId, scope));
-            _publisher.Publish(SpawnActorMessage.Create(id, actorId, presenter, Return));
+            _activeActors.Add(uid, (actorId, scope));
+            _publisher.Publish(SpawnActorMessage.Create(uid, actorId, presenter, Return));
         }
 
-        private void Return(ushort id)
+        private void Return(ushort uid)
         {
             if (_sceneMessageType == SceneMessageType.Unload) return;
 
-            if (!_activeActors.Remove(id, out var value))
+            if (!_activeActors.Remove(uid, out var value))
             {
-                throw new InvalidOperationException($"Actor scope not found for scope: {id}");
+                throw new InvalidOperationException($"Actor scope not found for scope: {uid}");
             }
 
             if (!_pool.ContainsKey(value.actorId))
@@ -114,7 +114,7 @@ namespace Domivium.Client.Core.Actors
             if (_pool[value.actorId].Count < MaxPoolPerActor)
             {
                 value.scope.Despawn();
-                _pool[value.actorId].Enqueue((id, value.scope));
+                _pool[value.actorId].Enqueue((uid, value.scope));
             }
             else
             {
@@ -139,7 +139,7 @@ namespace Domivium.Client.Core.Actors
             }
         }
 
-        private bool TryGet(ActorId actorId, out (ushort id, ActorScope scope) actor)
+        private bool TryGet(ActorId actorId, out (ushort uid, ActorScope scope) actor)
         {
             if (!_pool.TryGetValue(actorId, out var queue))
             {
@@ -162,7 +162,7 @@ namespace Domivium.Client.Core.Actors
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
-            _id = 0;
+            _uid = 0;
             _activeActors.Clear();
             _pool.Clear();
         }

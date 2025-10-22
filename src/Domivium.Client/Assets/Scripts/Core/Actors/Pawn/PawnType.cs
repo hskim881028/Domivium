@@ -3,5 +3,5 @@
 namespace Domivium.Client.Core.Actors
 {
     [UnitOf(typeof(int))]
-    public readonly partial struct UnitType { }
+    public readonly partial struct PawnType { }
 }

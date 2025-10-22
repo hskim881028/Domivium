@@ -11,7 +11,7 @@ namespace Domivium.Client.Contents.Battle
         public const float MinZDistance = 0.5f;
         private const float AttackOffset = 0.1f;
 
-        public static bool IsMelee(UnitType unitType) => unitType == UnitTypes.Melee || unitType == UnitTypes.Tank;
+        public static bool IsMelee(PawnType pawnType) => pawnType == PawnTypes.Melee || pawnType == PawnTypes.Tank;
 
         public static int GetDamage(StatSet attacker, StatSet defender)
         {
@@ -49,7 +49,7 @@ namespace Domivium.Client.Contents.Battle
         }
 
         public static bool CanBattle(
-            UnitType sourceUnitType,
+            PawnType sourcePawnType,
             Vector3 sourcePosition,
             Vector3 targetPosition,
             float sourceAttackRange,
@@ -57,7 +57,7 @@ namespace Domivium.Client.Contents.Battle
         {
             var distance = Vector3.Distance(sourcePosition, targetPosition);
             var range = sourceAttackRange + targetHitRange;
-            if (sourceUnitType == UnitTypes.Ranged || sourceUnitType == UnitTypes.Support)
+            if (sourcePawnType == PawnTypes.Ranged || sourcePawnType == PawnTypes.Support)
             {
                 return distance < range;
             }

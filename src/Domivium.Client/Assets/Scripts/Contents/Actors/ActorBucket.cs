@@ -13,12 +13,12 @@ namespace Domivium.Client.Contents.Actors
         public int Count => _map.Count;
         public IReadOnlyDictionary<ushort, IActorPresenter> Map => _map;
 
-        public bool TryGet(ushort id, out IActorPresenter p) => _map.TryGetValue(id, out p);
+        public bool TryGet(ushort uid, out IActorPresenter p) => _map.TryGetValue(uid, out p);
 
-        public bool TryGetPawn(ushort id, out IBattleSystem unit)
+        public bool TryGetPawn(ushort uid, out IBattleSystem unit)
         {
             unit = null;
-            if (!TryGet(id, out var presenter)) return false;
+            if (!TryGet(uid, out var presenter)) return false;
 
             if (presenter is not IPawnPresenter pawnPresenter) return false;
 
@@ -38,19 +38,19 @@ namespace Domivium.Client.Contents.Actors
             return buffer.Count;
         }
 
-        public void Remove(ushort id)
+        public void Remove(ushort uid)
         {
-            if (_map.Remove(id, out var presenter))
+            if (_map.Remove(uid, out var presenter))
             {
                 presenter.Terminate();
             }
         }
 
-        public void Add(ushort id, IActorPresenter presenter)
+        public void Add(ushort uid, IActorPresenter presenter)
         {
-            if (!_map.TryAdd(id, presenter))
+            if (!_map.TryAdd(uid, presenter))
             {
-                throw new InvalidOperationException($"Presenter already exists: {id}");
+                throw new InvalidOperationException($"Presenter already exists: {uid}");
             }
         }
 

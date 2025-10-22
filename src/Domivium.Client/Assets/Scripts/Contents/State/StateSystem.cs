@@ -48,7 +48,7 @@ namespace Domivium.Client.Contents.State
 
             _despawning = true;
             _tag.Value = StateTags.Die;
-            _publisher.Publish(ActorStateMessage.Create(StateTags.Die, _presenter.Id, _presenter.ActorId));
+            _publisher.Publish(ActorStateMessage.Create(StateTags.Die, _presenter));
             if (despawnSeconds > 0)
             {
                 await Awaitable.WaitForSecondsAsync(despawnSeconds);
@@ -59,7 +59,7 @@ namespace Domivium.Client.Contents.State
             }
 
             _tag.Value = StateTags.Despawn;
-            _publisher.Publish(ActorStateMessage.Create(StateTags.Despawn, _presenter.Id, _presenter.ActorId));
+            _publisher.Publish(ActorStateMessage.Create(StateTags.Despawn, _presenter));
             _despawning = false;
         }
 
@@ -68,7 +68,7 @@ namespace Domivium.Client.Contents.State
             if (IsDead()) return;
 
             _tag.Value = StateTags.Terminated;
-            _publisher.Publish(ActorStateMessage.Create(StateTags.Terminated, _presenter.Id, _presenter.ActorId));
+            _publisher.Publish(ActorStateMessage.Create(StateTags.Terminated, _presenter));
         }
 
         private bool IsDead() => _tag.CurrentValue == StateTags.Die || _tag.CurrentValue == StateTags.Despawn;

@@ -24,7 +24,7 @@ namespace Domivium.Client.Contents.Actors
 
         protected MaterialPropertyBlock[] MaterialPropertyBlocks;
 
-        public override void Initialize(ushort id, Transform parent)
+        public override void Initialize(ushort uid, Transform parent)
         {
             MaterialPropertyBlocks = new MaterialPropertyBlock[_renderer.Count];
             for (var i = 0; i < _renderer.Count; i++)
@@ -37,7 +37,7 @@ namespace Domivium.Client.Contents.Actors
                 MaterialPropertyBlocks[i] = materialPropertyBlock;
             }
 
-            base.Initialize(id, parent);
+            base.Initialize(uid, parent);
         }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)

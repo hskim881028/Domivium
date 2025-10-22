@@ -12,11 +12,11 @@ namespace Domivium.Client.Contents.Actors
 
         [SerializeField] protected NavMeshAgent _agent;
 
-        public override void Initialize(ushort id, Transform parent)
+        public override void Initialize(ushort uid, Transform parent)
         {
             _agent.updateUpAxis = false;
             _agent.updateRotation = false;
-            base.Initialize(id, parent);
+            base.Initialize(uid, parent);
         }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)

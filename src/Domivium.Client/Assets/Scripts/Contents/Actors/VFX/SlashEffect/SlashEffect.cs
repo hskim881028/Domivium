@@ -43,7 +43,7 @@ namespace Domivium.Client.Contents.Actors
             base.OnAwake();
         }
 
-        public override void Initialize(ushort id, Transform parent)
+        public override void Initialize(ushort uid, Transform parent)
         {
             _renderers = new Renderer[_particleSystem.Count];
             _materialPropertyBlocks = new MaterialPropertyBlock[_particleSystem.Count];
@@ -55,7 +55,7 @@ namespace Domivium.Client.Contents.Actors
                 _materialPropertyBlocks[i] = mpb;
             }
 
-            base.Initialize(id, parent);
+            base.Initialize(uid, parent);
         }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)

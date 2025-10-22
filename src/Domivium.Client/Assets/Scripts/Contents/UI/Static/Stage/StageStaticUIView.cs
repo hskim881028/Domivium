@@ -12,6 +12,9 @@ namespace Domivium.Client.Contents.UI.Static
     {
         [SerializeField] private DvmButton _enterLobbyButton;
         [SerializeField] private List<SelectTowerItem> _towerItems;
+        [SerializeField] private RerollTowerItem _rerollTowerItem;
+        [SerializeField] private CostText _soul;
+        [SerializeField] private CostPairText _towerCount;
 
         public override async UniTask InitializeAsync(CancellationToken token)
         {
@@ -23,7 +26,49 @@ namespace Domivium.Client.Contents.UI.Static
                 _towerItems[i].PointerUp = () => Message.Cancel();
             }
 
+            _rerollTowerItem.Button.onClick.AddListener(Message.Reroll);
+
             await base.InitializeAsync(token);
+        }
+
+        public void SetRerollCost(int cost)
+        {
+            _rerollTowerItem.SetCost(cost);
+        }
+
+        public void SetSoul(int soul)
+        {
+            _soul.Cost = soul;
+        }
+
+        public void SetTowerCount(int count)
+        {
+            _towerCount.Cost = count;
+        }
+
+        public void SetTowerLimit(int limit)
+        {
+            _towerCount.Limit = limit;
+        }
+
+        public void SetRerollDimmed(bool value)
+        {
+            _rerollTowerItem.SetDimmed(value);
+        }
+
+        public void SetDimmed(int slotIndex, bool value)
+        {
+            _towerItems[slotIndex].SetDimmed(value);
+        }
+
+        public void RefillTower(int slotIndex, int cost)
+        {
+            _towerItems[slotIndex].Refill(cost);
+        }
+
+        public void UserTower(int slotIndex)
+        {
+            _towerItems[slotIndex].Use();
         }
     }
 }

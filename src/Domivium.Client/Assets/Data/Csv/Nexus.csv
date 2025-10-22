@@ -1,3 +1,3 @@
-Id,Job,Target,Health,Attack,Defense,MoveSpeed,AttackSpeed,HitRange,AttackRange,DetectionRange,CriticalRate,CriticalDamage
-int,string,string,int,int,int,percent,percent,percent,percent,percent,percent,percent
-1,Ranged,Monster,1000,0,0,0,0,100,0,0,0,0
+Id,Job,Rarity,Target,Health,Attack,Defense,MoveSpeed,AttackSpeed,HitRange,AttackRange,DetectionRange,CriticalRate,CriticalDamage
+int,string,string,string,int,int,int,percent,percent,percent,percent,percent,percent,percent
+1,Ranged,Common,Monster,1000,0,0,0,0,100,0,0,0,0

@@ -27,67 +27,58 @@ namespace Domivium.Client.Contents.Factory
         public ActorParam CreateCharacter(int id, Vector3Int spawnPoint)
         {
             var row = _masterDbService.DB.CharacterRowTable.FindById(id);
-            var abilities = GetDefaultAbility(row.Job.ToUnitType());
-            var context = new UnitContext(row);
+            var abilities = GetDefaultAbility(row.Job.ToPawnType());
+            var context = new PawnContext(row);
             return new UnitParams(spawnPoint, context, abilities);
         }
 
         public ActorParam CreateMonster(int id, Vector3Int spawnPoint)
         {
             var row = _masterDbService.DB.MonsterRowTable.FindById(id);
-            var abilities = GetDefaultAbility(row.Job.ToUnitType());
-            var context = new UnitContext(row);
+            var abilities = GetDefaultAbility(row.Job.ToPawnType());
+            var context = new PawnContext(row);
             return new UnitParams(spawnPoint, context, abilities);
         }
 
         public ActorParam CreateTower(int id, Vector3Int spawnPoint)
         {
             var row = _masterDbService.DB.TowerRowTable.FindById(id);
-            var abilities = GetDefaultAbility(row.Job.ToUnitType());
-            var context = new UnitContext(row);
+            var abilities = GetDefaultAbility(row.Job.ToPawnType());
+            var context = new PawnContext(row);
             return new UnitParams(spawnPoint, context, abilities);
         }
 
-        public ActorParam CreateCamp(
-            ActorId actorId,
-            int index,
-            Vector3Int spawnPoint)
+        public ActorParam CreateNexus(int id, Vector3Int spawnPoint)
         {
-            if (actorId == ActorIds.Nexus)
-            {
-                var row = _masterDbService.DB.NexusRowTable.FindById(1);
-                var context = new UnitContext(row);
-                return new UnitParams(spawnPoint, context, new List<BattleAbility>());
-            }
-
-            if (actorId == ActorIds.CharacterCamp || actorId == ActorIds.MonsterCamp)
-            {
-                return new CampParams(index, spawnPoint);
-            }
-
-            this.Error("Invalid actor");
-            throw new Exception();
+            var row = _masterDbService.DB.NexusRowTable.FindById(id);
+            var context = new PawnContext(row);
+            return new UnitParams(spawnPoint, context, new List<BattleAbility>());
         }
 
-        private List<BattleAbility> GetDefaultAbility(UnitType unitType) // temp
+        public ActorParam CreateMonsterCamp(int index, Vector3Int spawnPoint)
+        {
+            return new CampParams(index, spawnPoint);
+        }
+
+        private List<BattleAbility> GetDefaultAbility(PawnType pawnType) // temp
         {
             var abilities = new List<BattleAbility>();
-            if (unitType == UnitTypes.Melee)
+            if (pawnType == PawnTypes.Melee)
             {
                 abilities.Add(_abilityFactory.Create(BattleAbilityIds.Attack));
             }
 
-            if (unitType == UnitTypes.Ranged)
+            if (pawnType == PawnTypes.Ranged)
             {
                 abilities.Add(_abilityFactory.Create(BattleAbilityIds.Attack));
             }
 
-            if (unitType == UnitTypes.Tank)
+            if (pawnType == PawnTypes.Tank)
             {
                 abilities.Add(_abilityFactory.Create(BattleAbilityIds.Attack));
             }
 
-            if (unitType == UnitTypes.Support)
+            if (pawnType == PawnTypes.Support)
             {
                 abilities.Add(_abilityFactory.Create(BattleAbilityIds.Heal));
             }

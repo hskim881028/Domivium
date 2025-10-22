@@ -49,10 +49,10 @@ namespace Domivium.Client.Contents.Actors
             return bucket.Count > removeCount;
         }
 
-        public bool TryGet(ActorId actorId, ushort id, out IActorPresenter presenter)
+        public bool TryGet(ActorId actorId, ushort uid, out IActorPresenter presenter)
         {
             presenter = null;
-            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGet(id, out presenter);
+            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGet(uid, out presenter);
         }
 
         public bool TryGetAll(ActorId actorId, out IReadOnlyDictionary<ushort, IActorPresenter> map)
@@ -66,15 +66,15 @@ namespace Domivium.Client.Contents.Actors
             return false;
         }
 
-        public bool TryGetPawn(ActorId actorId, ushort id, out IBattleSystem pawn)
+        public bool TryGetPawn(ActorId actorId, ushort uid, out IBattleSystem pawn)
         {
             pawn = null;
-            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetPawn(id, out pawn);
+            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetPawn(uid, out pawn);
         }
 
-        public int GetUnits(ActorId actorId, List<IBattleSystem> buffer) => !_buckets.TryGetValue(actorId, out var bucket) ? 0 : bucket.CollectPawns(buffer);
+        public int GetPawns(ActorId actorId, List<IBattleSystem> buffer) => !_buckets.TryGetValue(actorId, out var bucket) ? 0 : bucket.CollectPawns(buffer);
 
-        public int GetUnits(ReadOnlySpan<ActorId> actorIds, List<IBattleSystem> buffer)
+        public int GetPawns(ReadOnlySpan<ActorId> actorIds, List<IBattleSystem> buffer)
         {
             var total = 0;
             foreach (var actorId in actorIds)
@@ -169,27 +169,27 @@ namespace Domivium.Client.Contents.Actors
 
         private void OnSpawnActorMessage(SpawnActorMessage message)
         {
-            if (!_index.TryAdd(message.Id, (message.ActorId, message.OnDespawn)))
+            if (!_index.TryAdd(message.Uid, (message.ActorId, message.OnDespawn)))
             {
-                throw new InvalidOperationException($"Actor already exists: {message.Id}");
+                throw new InvalidOperationException($"Actor already exists: {message.Uid}");
             }
 
-            GetOrAddBucket(message.ActorId).Add(message.Id, message.Presenter);
+            GetOrAddBucket(message.ActorId).Add(message.Uid, message.Presenter);
         }
 
         private void OnActorStateMessage(ActorStateMessage message)
         {
             if (message.Tag == StateTags.Die)
             {
-                _pendingRemove.TryAdd(message.Id, message.ActorId);
+                _pendingRemove.TryAdd(message.Uid, message.ActorId);
                 return;
             }
 
             if (message.Tag == StateTags.Despawn)
             {
-                if (_awaitDespawn.Remove(message.Id, out var cb))
+                if (_awaitDespawn.Remove(message.Uid, out var cb))
                 {
-                    cb?.Invoke(message.Id);
+                    cb?.Invoke(message.Uid);
                 }
             }
         }

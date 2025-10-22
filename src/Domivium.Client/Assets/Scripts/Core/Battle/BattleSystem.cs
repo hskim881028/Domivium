@@ -22,9 +22,10 @@ namespace Domivium.Client.Core.Battle
         private readonly ReactiveProperty<BattleEffectContext> _appliedEffect = new();
         private bool _isDisposed;
 
-        public ushort Id { get; private set; }
+        public ushort Uid { get; private set; }
         public ActorId ActorId { get; private set; }
-        public UnitType Type { get; private set; }
+        public PawnType Type { get; private set; }
+        public PawnRarityType Rarity { get; private set; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
         public Vector3 UnitPosition => _unit.position;
@@ -45,11 +46,12 @@ namespace Domivium.Client.Core.Battle
 
         public bool Contains(BattleTag tag) => _tags.Contains(tag);
 
-        public void Initialize(ushort id, ActorId actorId, UnitType type)
+        public void Initialize(ushort uid, ActorId actorId, PawnType type, PawnRarityType rarity)
         {
-            Id = id;
+            Uid = uid;
             ActorId = actorId;
             Type = type;
+            Rarity = rarity;
             Reset();
         }
 

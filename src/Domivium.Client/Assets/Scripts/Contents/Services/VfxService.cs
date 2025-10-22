@@ -34,8 +34,12 @@ namespace Domivium.Client.Contents.Services
                         context.ActorId,
                         context.Position,
                         context.Direction,
-                        context.Value,
                         1.6f));
+            }
+
+            if (cueId == BattleCueIds.DropSoul)
+            {
+                _actorSpawner.SpawnAsync(ActorIds.SoulEffect, new SoulEffectParams(context.Position, context.EndPosition, 3f));
             }
         }
     }

@@ -7,6 +7,7 @@ namespace Domivium.Client.Core.Battle
     {
         public ActorId ActorId { get; private init; }
         public Vector3 Position { get; private init; }
+        public Vector3 EndPosition { get; private init; }
         public int Direction { get; private init; }
         public int Value { get; private init; }
 
@@ -22,6 +23,13 @@ namespace Domivium.Client.Core.Battle
             Position = context.Owner.UnitPosition,
             Direction = context.Owner.UnitPosition.x < context.Source.UnitPosition.x ? 1 : -1,
             Value = context.Value
+        };
+
+        public static BattleCueContext Create(ActorId actorId, Vector3 position, Vector3 endPosition) => new()
+        {
+            ActorId = actorId,
+            Position = position,
+            EndPosition = endPosition
         };
     }
 }

@@ -54,7 +54,7 @@ namespace Domivium.Client.Contents.Actors
 
         private void ForceMove(Vector3 position)
         {
-            if (_readModel.PickedCharacter.CurrentValue.Id != Id) return;
+            if (_readModel.PickedCharacter.CurrentValue.Uid != Uid) return;
 
             StateSystem.TryTransit(StateTags.Move);
             Actor.SetDestination(position);

@@ -1,6 +1,6 @@
-Id,Job,Target,Health,Attack,Defense,MoveSpeed,AttackSpeed,HitRange,AttackRange,DetectionRange,CriticalRate,CriticalDamage
-int,string,string,int,int,int,percent,percent,percent,percent,percent,percent,percent
-1,Melee,Monster,200,20,10,200,100,50,100,500,1500,3000
-2,Ranged,Monster,100,30,5,300,100,50,200,500,2000,4000
-3,Support,Character,150,5,5,200,100,50,200,500,500,1000
-4,Tank,Monster,300,10,15,100,100,50,100,500,1000,2000
+Id,Job,Rarity,Target,Health,Attack,Defense,MoveSpeed,AttackSpeed,HitRange,AttackRange,DetectionRange,CriticalRate,CriticalDamage
+int,string,string,string,int,int,int,percent,percent,percent,percent,percent,percent,percent
+1,Melee,Common,Monster,200,20,10,200,100,50,100,500,1500,3000
+2,Ranged,Common,Monster,100,30,5,300,100,50,200,500,2000,4000
+3,Support,Common,Character,150,5,5,200,100,50,200,500,500,1000
+4,Tank,Common,Monster,300,10,15,100,100,50,100,500,1000,2000

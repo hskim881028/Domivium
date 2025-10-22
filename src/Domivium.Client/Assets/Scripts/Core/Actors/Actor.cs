@@ -8,7 +8,7 @@ namespace Domivium.Client.Core.Actors
 {
     public class Actor : MonoBehaviour, IActorActivatable, ITicker
     {
-        public ushort Id { get; private set; }
+        public ushort Uid { get; private set; }
 
         private void Awake()
         {
@@ -25,9 +25,9 @@ namespace Domivium.Client.Core.Actors
             OnDestroyInternal();
         }
 
-        public virtual void Initialize(ushort id, Transform parent)
+        public virtual void Initialize(ushort uid, Transform parent)
         {
-            Id = id;
+            Uid = uid;
             transform.SetParent(parent);
         }
 

@@ -26,7 +26,7 @@ namespace Domivium.Client.Contents.Actors
         protected ActorId TargetActionId;
         protected BattleAbilityId BattleAbilityId;
         protected bool LockOn;
-
+        
         public IBattleSystem BattleSystem { get; }
 
         protected PawnPresenter(TPawn actor, ISystemFactory systemFactory, IBattleService battleService)
@@ -40,12 +40,13 @@ namespace Domivium.Client.Contents.Actors
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             var p = param.As<UnitParams>();
-            var row = p.UnitContext;
+            var row = p.PawnContext;
 
+            Id = row.Id;
             TargetActionId = row.TargetActionId;
             BattleAbilityId = row.BattleAbilityId;
 
-            BattleSystem.Initialize(Id, row.ActorId, row.UnitType);
+            BattleSystem.Initialize(Uid, row.ActorId, row.PawnType, row.PawnRarityType);
 
             BattleSystem.Stat.Register(StatId.Health, row.Health, OnHealthStatChanged);
             BattleSystem.Stat.Register(StatId.Attack, row.Attack, OnAttackStatChanged);
@@ -151,7 +152,7 @@ namespace Domivium.Client.Contents.Actors
 
         protected void CheckSwapTarget(BattleEffectContext context)
         {
-            if (Target.Id == context.Source.Id) return;
+            if (Target.Uid == context.Source.Uid) return;
 
             if (!BattleService.TryGetChasePosition(BattleSystem, context.Source, out var chasePosition)) return;
 

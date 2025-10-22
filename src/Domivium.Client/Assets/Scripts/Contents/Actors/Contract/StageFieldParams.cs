@@ -10,7 +10,7 @@ namespace Domivium.Client.Contents.Actors.Contract
 
     public record UnitParams(
         Vector3Int SpawnPoint,
-        UnitContext UnitContext,
+        PawnContext PawnContext,
         IReadOnlyList<BattleAbility> Abilities) : ActorParam;
 
     public record CampParams(int Index, Vector3Int SpawnPoint) : ActorParam;
@@ -25,6 +25,7 @@ namespace Domivium.Client.Contents.Actors.Contract
         ActorId ActorId,
         Vector3 Position,
         int Direction,
-        int Damage,
         float DespawnTime) : VFXParams(DespawnTime);
+    
+    public record SoulEffectParams(Vector3 Position, Vector3 EndPosition, float DespawnTime) : VFXParams(DespawnTime);
 }

@@ -10,14 +10,14 @@ namespace Domivium.Client.Core.Scene
     {
         private bool _isDespawn;
 
-        public ushort Id { get; private set; }
+        public ushort Uid { get; private set; }
         public IActorPresenter Presenter { get; private set; }
 
-        public void Initialize(ushort id, IActorPresenter presenter)
+        public void Initialize(ushort uid, IActorPresenter presenter)
         {
-            Id = id;
+            Uid = uid;
             Presenter = presenter;
-            Presenter.Initialize(id, transform);
+            Presenter.Initialize(uid, transform);
         }
 
         public async UniTask SpawnAsync(ActorParam param, CancellationToken token)

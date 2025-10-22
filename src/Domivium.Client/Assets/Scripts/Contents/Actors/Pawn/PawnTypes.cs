@@ -5,14 +5,14 @@ using Domivium.Client.Core.Battle;
 
 namespace Domivium.Client.Contents.Actors
 {
-    public static class UnitTypes
+    public static class PawnTypes
     {
-        public static UnitType Melee = new(0);
-        public static UnitType Ranged = new(1);
-        public static UnitType Tank = new(2);
-        public static UnitType Support = new(3);
+        public static PawnType Melee = new(0);
+        public static PawnType Ranged = new(1);
+        public static PawnType Tank = new(2);
+        public static PawnType Support = new(3);
 
-        public static UnitType ToUnitType(this string type)
+        public static PawnType ToPawnType(this string type)
         {
             return type switch
             {
@@ -20,7 +20,7 @@ namespace Domivium.Client.Contents.Actors
                 "Ranged" => Ranged,
                 "Tank" => Tank,
                 "Support" => Support,
-                _ => throw new Exception($"Unknown Unit type: {type}")
+                _ => throw new Exception($"Unknown Pawn type: {type}")
             };
         }
 
@@ -30,7 +30,7 @@ namespace Domivium.Client.Contents.Actors
             {
                 "Melee" or "Ranged" or "Tank" => BattleAbilityIds.Attack,
                 "Support" => BattleAbilityIds.Heal,
-                _ => throw new Exception($"Unknown Unit type: {type}")
+                _ => throw new Exception($"Unknown Pawn type: {type}")
             };
         }
     }

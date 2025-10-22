@@ -6,6 +6,7 @@ namespace Domivium.Client.Contents.UI.Static
     {
         public void EnterLobby();
         public void SelectTower(int index);
+        public void Reroll();
         public void Cancel();
     }
 }

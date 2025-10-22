@@ -139,6 +139,7 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<PointerService>(lifetime).AsImplementedInterfaces();
             builder.Register<TowerPlacementService>(lifetime).AsImplementedInterfaces();
             builder.Register<BattleUserService>(lifetime).AsImplementedInterfaces();
+            builder.Register<StageInventoryService>(lifetime).AsImplementedInterfaces();
         }
 
         private void Provider(IContainerBuilder builder, Lifetime lifetime)

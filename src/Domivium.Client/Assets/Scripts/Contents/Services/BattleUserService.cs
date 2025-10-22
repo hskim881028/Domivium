@@ -98,7 +98,7 @@ namespace Domivium.Client.Contents.Services
             var character = collider.GetComponent<Character>();
             if (character == null) return false;
 
-            if (!_battleService.FindTarget(ActorIds.Character, character.Id, out var target)) return false;
+            if (!_battleService.FindTarget(ActorIds.Character, character.Uid, out var target)) return false;
 
             if (target.State == StateTags.Die || target.State == StateTags.Despawn) return false;
 
@@ -146,14 +146,14 @@ namespace Domivium.Client.Contents.Services
         private void OnActorStateMessage(ActorStateMessage message)
         {
             if (_pickedCharacter.Value != null &&
-                message.Id == _pickedCharacter.Value.Id &&
+                message.Uid == _pickedCharacter.Value.Uid &&
                 message.Tag == StateTag.Die)
             {
                 _pickedCharacter.Value = null;
             }
 
             if (_selectedCharacter.Value != null &&
-                message.Id == _selectedCharacter.Value.Id &&
+                message.Uid == _selectedCharacter.Value.Uid &&
                 message.Tag == StateTag.Die)
             {
                 _selectedCharacter.Value = null;

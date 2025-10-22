@@ -32,6 +32,7 @@ namespace Domivium.Client.Contents.Services
         private readonly ObservableList<Vector3Int> _stagedTower = new();
         private readonly ObservableDictionary<Vector3Int, bool> _previewTower = new();
         private readonly ReactiveProperty<bool> _ready;
+        private int _selectedSlot;
 
         public IReadOnlyObservableList<Vector3Int> StagedTower => _stagedTower;
         public IReadOnlyObservableDictionary<Vector3Int, bool> PreviewTower => _previewTower;
@@ -83,8 +84,15 @@ namespace Domivium.Client.Contents.Services
 
                 _store.Occupy(_stagedTower, cell);
 
-                var param = _actorFactory.CreateCamp(actorId, campIndex, cell);
-                await _actorSpawner.SpawnAsync(actorId, param);
+                if (actorId == ActorIds.Nexus)
+                {
+                    await _actorSpawner.SpawnAsync(actorId, _actorFactory.CreateNexus(1, cell));
+                }
+
+                if (actorId == ActorIds.MonsterCamp)
+                {
+                    await _actorSpawner.SpawnAsync(actorId, _actorFactory.CreateMonsterCamp(campIndex, cell));
+                }
             }
 
             _ready.Value = true;
@@ -92,14 +100,14 @@ namespace Domivium.Client.Contents.Services
 
         public void Show(int index)
         {
-            var size = index switch
-            {
-                1 => new Vector2Int(1, 2),
-                2 => new Vector2Int(2, 1),
-                _ => new Vector2Int(1, 1)
-            };
-
-            _store.SetSize(size);
+            // var size = index switch
+            // {
+            //     1 => new Vector2Int(1, 2),
+            //     2 => new Vector2Int(2, 1),
+            //     _ => new Vector2Int(1, 1)
+            // };
+            _selectedSlot = index;
+            _store.SetSize(new Vector2Int(1, 1));
             _director.TrySetMode(StageModes.TowerPlacement);
         }
 
@@ -120,7 +128,7 @@ namespace Domivium.Client.Contents.Services
             return true;
         }
 
-        public bool Placement(Vector2 position)
+        public int Placement(Vector2 position)
         {
             Update(position);
 
@@ -139,7 +147,7 @@ namespace Domivium.Client.Contents.Services
             }
 
             Hide();
-            return true;
+            return _selectedSlot;
         }
 
         private void ResetReadModel()

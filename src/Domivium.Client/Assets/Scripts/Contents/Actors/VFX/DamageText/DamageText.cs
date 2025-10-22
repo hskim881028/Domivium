@@ -35,7 +35,7 @@ namespace Domivium.Client.Contents.Actors
         private Vector3 _basePos;
         private Vector3 _currentPosition;
 
-        public override void Initialize(ushort id, Transform parent)
+        public override void Initialize(ushort uid, Transform parent)
         {
             SetText(int.MinValue);
             _text.ForceMeshUpdate();
@@ -66,7 +66,7 @@ namespace Domivium.Client.Contents.Actors
                 .Pause()
                 .Append(_axis.DOShakePosition(0.8f, Shake).SetDelay(0.3f).SetRecyclable(true));
 
-            base.Initialize(id, parent);
+            base.Initialize(uid, parent);
         }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)

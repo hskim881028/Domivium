@@ -9,6 +9,7 @@ namespace Domivium.Client.Data.Row
 	{
 		[PrimaryKey] public int Id { get; set; }
 		public string Job { get; set; } = string.Empty;
+		public string Rarity { get; set; } = string.Empty;
 		public string Target { get; set; } = string.Empty;
 		public int Health { get; set; }
 		public int Attack { get; set; }

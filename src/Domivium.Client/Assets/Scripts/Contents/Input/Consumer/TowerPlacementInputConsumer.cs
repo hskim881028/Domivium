@@ -10,31 +10,46 @@ namespace Domivium.Client.Contents.Input.Consumer
     public sealed class TowerPlacementInputConsumer : IInputConsumer
     {
         private readonly StageContext _stageContext;
-        private readonly ITowerPlacementCommand _command;
+        private readonly ITowerPlacementCommand _towerPlacementCommand;
+        private readonly IStageInventoryCommand _inventoryCommand;
 
         public InputPriority Priority => InputPriorities.TowerPlacement;
         private bool IsTowerPlacementMode => _stageContext.Mode.CurrentValue == StageModes.TowerPlacement;
         private bool IsTerminated => _stageContext.Phase.CurrentValue == StagePhases.Cleared || _stageContext.Phase.CurrentValue == StagePhases.Failed;
 
-        public TowerPlacementInputConsumer(StageContext stageContext, ITowerPlacementCommand command)
+        public TowerPlacementInputConsumer(
+            StageContext stageContext,
+            ITowerPlacementCommand towerPlacementCommand,
+            IStageInventoryCommand inventoryCommand)
         {
             _stageContext = stageContext;
-            _command = command;
+            _towerPlacementCommand = towerPlacementCommand;
+            _inventoryCommand = inventoryCommand;
         }
 
         public bool TryHandle(InputMessage message)
         {
             if (IsTerminated) return false;
 
-            return message.Type switch
+            switch (message.Type)
             {
-                InputMessageType.Submit => false,
-                InputMessageType.Cancel => IsTowerPlacementMode && _command.Hide(),
-                InputMessageType.ClickEnter => false,
-                InputMessageType.ClickExit => IsTowerPlacementMode && _command.Placement(message.Value),
-                InputMessageType.Point => IsTowerPlacementMode && _command.Update(message.Value),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                case InputMessageType.Submit:
+                    return false;
+                case InputMessageType.Cancel:
+                    return IsTowerPlacementMode && _towerPlacementCommand.Hide();
+                case InputMessageType.ClickEnter:
+                    return false;
+                case InputMessageType.ClickExit:
+                    if (!IsTowerPlacementMode) return false;
+
+                    var slotIndex = _towerPlacementCommand.Placement(message.Value);
+                    _inventoryCommand.Use(slotIndex);
+                    return true;
+                case InputMessageType.Point:
+                    return IsTowerPlacementMode && _towerPlacementCommand.Update(message.Value);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

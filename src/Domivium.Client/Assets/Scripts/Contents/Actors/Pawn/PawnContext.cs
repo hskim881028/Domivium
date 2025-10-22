@@ -5,7 +5,7 @@ using Domivium.Client.Data.Row;
 
 namespace Domivium.Client.Core.Battle
 {
-    public readonly struct UnitContext
+    public readonly struct PawnContext
     {
         public int Id { get; }
         public int Health { get; }
@@ -22,9 +22,10 @@ namespace Domivium.Client.Core.Battle
         public ActorId ActorId { get; }
         public ActorId TargetActionId { get; }
         public BattleAbilityId BattleAbilityId { get; }
-        public UnitType UnitType { get; }
+        public PawnType PawnType { get; }
+        public PawnRarityType PawnRarityType { get; }
 
-        public UnitContext(CharacterRow row)
+        public PawnContext(CharacterRow row)
         {
             Id = row.Id;
             Health = row.Health;
@@ -41,10 +42,11 @@ namespace Domivium.Client.Core.Battle
             ActorId = ActorIds.Character;
             TargetActionId = row.Target.ToActorId();
             BattleAbilityId = row.Job.ToBattleAbilityId();
-            UnitType = row.Job.ToUnitType();
+            PawnType = row.Job.ToPawnType();
+            PawnRarityType = row.Rarity.ToPawnRarityType();
         }
 
-        public UnitContext(MonsterRow row)
+        public PawnContext(MonsterRow row)
         {
             Id = row.Id;
             Health = row.Health;
@@ -61,10 +63,11 @@ namespace Domivium.Client.Core.Battle
             ActorId = ActorIds.Monster;
             TargetActionId = row.Target.ToActorId();
             BattleAbilityId = row.Job.ToBattleAbilityId();
-            UnitType = row.Job.ToUnitType();
+            PawnType = row.Job.ToPawnType();
+            PawnRarityType = row.Rarity.ToPawnRarityType();
         }
 
-        public UnitContext(TowerRow row)
+        public PawnContext(TowerRow row)
         {
             Id = row.Id;
             Health = row.Health;
@@ -81,10 +84,11 @@ namespace Domivium.Client.Core.Battle
             ActorId = ActorIds.Tower;
             TargetActionId = row.Target.ToActorId();
             BattleAbilityId = row.Job.ToBattleAbilityId();
-            UnitType = row.Job.ToUnitType();
+            PawnType = row.Job.ToPawnType();
+            PawnRarityType = row.Rarity.ToPawnRarityType();
         }
 
-        public UnitContext(NexusRow row)
+        public PawnContext(NexusRow row)
         {
             Id = row.Id;
             Health = row.Health;
@@ -101,7 +105,8 @@ namespace Domivium.Client.Core.Battle
             ActorId = ActorIds.Nexus;
             TargetActionId = row.Target.ToActorId();
             BattleAbilityId = row.Job.ToBattleAbilityId();
-            UnitType = row.Job.ToUnitType();
+            PawnType = row.Job.ToPawnType();
+            PawnRarityType = row.Rarity.ToPawnRarityType();
         }
     }
 }
