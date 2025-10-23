@@ -23,6 +23,7 @@ namespace Domivium.Client.Core.Battle
         private bool _isDisposed;
 
         public ushort Uid { get; private set; }
+        public int Id { get; private set; }
         public ActorId ActorId { get; private set; }
         public PawnType Type { get; private set; }
         public PawnRarityType Rarity { get; private set; }
@@ -46,10 +47,11 @@ namespace Domivium.Client.Core.Battle
 
         public bool Contains(BattleTag tag) => _tags.Contains(tag);
 
-        public void Initialize(ushort uid, ActorId actorId, PawnType type, PawnRarityType rarity)
+        public void Initialize(ushort uid, ActorId actorId, int id, PawnType type, PawnRarityType rarity)
         {
             Uid = uid;
             ActorId = actorId;
+            Id = id;
             Type = type;
             Rarity = rarity;
             Reset();

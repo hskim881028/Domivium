@@ -31,6 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 235029893846799016}
+  - {fileID: 6527629916286662890}
   m_Father: {fileID: 3609899923141519456}
   m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!212 &9051986001668733312
@@ -157,6 +158,80 @@ MonoBehaviour:
   _healthDisplay: {fileID: 2609093167959249594}
   _renderer:
   - {fileID: 9051986001668733312}
+  _levelDisplay: {fileID: 4228526093365569582}
+--- !u!1001 &4445256616213017928
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1839536296384700426}
+    m_Modifications:
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8867885092113834210, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+      propertyPath: m_Name
+      value: LevelDisplay
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+--- !u!114 &4228526093365569582 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 512855392688184678, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+  m_PrefabInstance: {fileID: 4445256616213017928}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b6fc58d40945a891acbcb7dc672ae2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Domivium.Client.Core::Domivium.Client.Core.Component.LevelDisplay
+--- !u!4 &6527629916286662890 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7432757452764761506, guid: cf28c0b3614ccc3429b4efbac6d8f955, type: 3}
+  m_PrefabInstance: {fileID: 4445256616213017928}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5541180185777810648
 PrefabInstance:
   m_ObjectHideFlags: 0

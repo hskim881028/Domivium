@@ -19,6 +19,13 @@ namespace Domivium.Client.Contents.Factory
             {
                 return new HealEffect(ref context);
             }
+            
+            if (id == BattleEffectIds.LevelUp)
+            {
+                return new LevelUpEffect(ref context);
+            }
+            
+            
 
             throw new Exception($"Invalid battle effect: {id}");
         }

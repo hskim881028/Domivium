@@ -6,8 +6,6 @@ namespace Domivium.Client.Contents.ReadModels
 {
     public interface IBattleService
     {
-        public bool IsExistUnit(ActorId actorId);
-        public IBattleSystem GetNexus();
         public Vector3 GetPositionOffset(IBattleSystem source, IBattleSystem target);
         public bool FindTarget(ActorId actorId, ushort uid, out IBattleSystem target);
         public bool FindChaseTarget(ActorId actorId, IBattleSystem source, out IBattleSystem target, out Vector3 chasePosition);

@@ -82,7 +82,8 @@ namespace Domivium.Client.Data.Stat
 
         private static StatDomain GetDomain(StatId id)
         {
-            if (id == StatId.Health ||
+            if (id == StatId.Level ||
+                id == StatId.Health ||
                 id == StatId.Attack ||
                 id == StatId.Defense)
             {

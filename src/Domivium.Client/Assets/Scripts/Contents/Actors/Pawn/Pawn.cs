@@ -69,7 +69,7 @@ namespace Domivium.Client.Contents.Actors
         public virtual void StartBattle(Vector3 offset, Vector3 target) { }
 
         public virtual void Battle(Vector3 target) { }
-
+        
         public void SetHealth(int current, int max) => _healthDisplay.Set(current, max);
 
         public void SetRange(StatId statId, float range, Color color)

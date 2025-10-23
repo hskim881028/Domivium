@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
@@ -70,6 +71,12 @@ namespace Domivium.Client.Contents.Actors
         {
             pawn = null;
             return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetPawn(uid, out pawn);
+        }
+
+        public bool TryGetFirstPawn(ActorId actorId, out IBattleSystem pawn)
+        {
+            pawn = null;
+            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetFirstPawn(out pawn);
         }
 
         public int GetPawns(ActorId actorId, List<IBattleSystem> buffer) => !_buckets.TryGetValue(actorId, out var bucket) ? 0 : bucket.CollectPawns(buffer);

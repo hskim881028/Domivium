@@ -42,12 +42,12 @@ namespace Domivium.Client.Contents.Actors
             var p = param.As<UnitParams>();
             var row = p.PawnContext;
 
-            Id = row.Id;
             TargetActionId = row.TargetActionId;
             BattleAbilityId = row.BattleAbilityId;
 
-            BattleSystem.Initialize(Uid, row.ActorId, row.PawnType, row.PawnRarityType);
+            BattleSystem.Initialize(Uid, row.ActorId, row.Id, row.PawnType, row.PawnRarityType);
 
+            BattleSystem.Stat.Register(StatId.Level, 1, OnLevelStatChanged);
             BattleSystem.Stat.Register(StatId.Health, row.Health, OnHealthStatChanged);
             BattleSystem.Stat.Register(StatId.Attack, row.Attack, OnAttackStatChanged);
             BattleSystem.Stat.Register(StatId.Defense, row.Defense, OnDefenseStatChanged);
@@ -69,7 +69,7 @@ namespace Domivium.Client.Contents.Actors
                 BattleSystem.GrantAbility(ability);
             }
 
-            StateSystem.Spawn();
+            StateSystem.Activate();
             return base.ActivateAsync(token, param);
         }
 
@@ -87,12 +87,14 @@ namespace Domivium.Client.Contents.Actors
 
         protected bool IsEmptyTarget() => Target == null || Target.State == StateTags.Die || Target.State == StateTags.Despawn;
 
-        protected override void OnBattleTick()
+        protected override bool OnBattleTick()
         {
+            if(!base.OnBattleTick()) return false;
+            
             if (IsEmptyTarget())
             {
                 StateSystem.TryTransit(StateTags.Idle);
-                return;
+                return false;
             }
 
             if (BattleCalculator.CanBattle(BattleSystem, Target))
@@ -106,7 +108,7 @@ namespace Domivium.Client.Contents.Actors
                 StateSystem.TryTransit(StateTags.Chase);
             }
 
-            base.OnBattleTick();
+            return true;
         }
 
         protected override void OnIdle()
@@ -176,6 +178,11 @@ namespace Domivium.Client.Contents.Actors
             LockOnTarget(context.Source, chasePosition);
         }
 
+        protected virtual void OnLevelStatChanged()
+        {
+            SetHealth();
+        }
+
         protected virtual void OnHealthStatChanged()
         {
             SetHealth();
@@ -233,7 +240,7 @@ namespace Domivium.Client.Contents.Actors
                 OnDamagedEffect(context);
             }
         }
-
+  
         private void SetHealth()
         {
             var cur = BattleSystem.Gauge.Current(StatId.Health);

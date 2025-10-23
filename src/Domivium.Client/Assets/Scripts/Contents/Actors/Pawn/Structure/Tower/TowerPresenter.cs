@@ -7,6 +7,7 @@ using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Factory;
+using Domivium.Client.Data.Stat;
 using UnityEngine;
 
 namespace Domivium.Client.Contents.Actors
@@ -33,6 +34,13 @@ namespace Domivium.Client.Contents.Actors
             Target = target;
             StateSystem.TryTransit(StateTags.Battle);
             base.OnIdleTick();
+        }
+
+        protected override void OnLevelStatChanged()
+        {
+            base.OnLevelStatChanged();
+            var level = BattleSystem.Stat.Value(StatId.Level);
+            Actor.SetLevel(level);
         }
     }
 }

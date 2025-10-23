@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.ReadModels;
@@ -8,8 +6,6 @@ using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Data.Stat;
-using Domivium.Client.Data.Store;
-using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -19,8 +15,8 @@ namespace Domivium.Client.Contents.Services
     {
         private const int TryCount = 32;
         private readonly IActorManager _actorManager;
+        private readonly IStageInventoryReadModel _inventoryReadModel;
         private readonly CoordinateService _coordinateService;
-        private readonly IStageFieldStore _stageFieldStore;
         private readonly NavMeshPath _path = new();
         private readonly Vector3[] _cornerBuffer = new Vector3[64];
 
@@ -29,19 +25,11 @@ namespace Domivium.Client.Contents.Services
         public BattleService(
             CoordinateService coordinateService,
             IActorManager actorManager,
-            IStageFieldStore stageFieldStore)
+            IStageInventoryReadModel inventoryReadModel)
         {
-            _actorManager = actorManager;
             _coordinateService = coordinateService;
-            _stageFieldStore = stageFieldStore;
-        }
-
-        public bool IsExistUnit(ActorId actorId) => _actorManager.Any(actorId);
-
-        public IBattleSystem GetNexus()
-        {
-            var count = _actorManager.GetPawns(ActorIds.Nexus, _pawns);
-            return count > 0 ? _pawns.First() : throw new Exception("Nexus not found");
+            _actorManager = actorManager;
+            _inventoryReadModel = inventoryReadModel;
         }
 
         public Vector3 GetPositionOffset(IBattleSystem source, IBattleSystem target)
@@ -257,7 +245,7 @@ namespace Domivium.Client.Contents.Services
                 if (!BattleCalculator.CanBattle(sourceUnitType, candidate, targetPosition, sourceAttackRange, targetHitRange)) continue;
 
                 var cell = _coordinateService.GetCellPoint(candidate);
-                if (!_stageFieldStore.CanMove(cell)) continue;
+                if (!_inventoryReadModel.CanMove(cell)) continue;
 
                 offset = candidate - sourcePosition;
                 return true;

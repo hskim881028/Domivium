@@ -12,6 +12,7 @@ namespace Domivium.Client.Contents.Battle.Effect
 
         protected override bool OnActivate(BattleSystem owner)
         {
+            // Context.Source.Level.CurrentValue
             var damage = BattleCalculator.GetDamage(Context.Source.Stat, owner.Stat);
             Context.Value = damage;
             AddGaugeModifier(StatId.Health, -damage, GaugeChannel.Add);

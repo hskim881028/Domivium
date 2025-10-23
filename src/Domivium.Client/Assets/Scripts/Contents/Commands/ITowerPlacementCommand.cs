@@ -9,6 +9,6 @@ namespace Domivium.Client.Contents.Commands
         public void Show(int index);
         public bool Hide();
         public bool Update(Vector2 position);
-        public int Placement(Vector2 position);
+        public void Placement(Vector2 position);
     }
 }

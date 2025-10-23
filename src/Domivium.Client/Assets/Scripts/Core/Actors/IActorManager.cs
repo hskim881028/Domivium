@@ -10,6 +10,7 @@ namespace Domivium.Client.Core.Actors
         public bool TryGet(ActorId actorId, ushort uid, out IActorPresenter presenter);
         public bool TryGetAll(ActorId actorId, out IReadOnlyDictionary<ushort, IActorPresenter> map);
         public bool TryGetPawn(ActorId actorId, ushort uid, out IBattleSystem pawn);
+        public bool TryGetFirstPawn(ActorId actorId, out IBattleSystem pawn);
         public int GetPawns(ActorId actorId, List<IBattleSystem> buffer);
         public int GetPawns(ReadOnlySpan<ActorId> actorIds, List<IBattleSystem> buffer);
     }

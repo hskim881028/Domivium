@@ -15,21 +15,23 @@ namespace Domivium.Client.Contents.Actors
         protected UnitPresenter(TUnit actor, ISystemFactory systemFactory, IBattleService battleService)
             : base(actor, systemFactory, battleService) { }
 
-        protected override void OnChaseTick()
+        protected override bool OnChaseTick()
         {
+            if (!base.OnChaseTick()) return false;
+            
             if (IsEmptyTarget())
             {
                 StateSystem.TryTransit(StateTags.Idle);
-                return;
+                return false;
             }
 
             if (BattleCalculator.CanBattle(BattleSystem, Target))
             {
                 StateSystem.TryTransit(StateTags.Battle);
-                return;
+                return false;
             }
 
-            if (Vector3.Distance(BattleSystem.UnitPosition, Target.UnitPosition) < UpdateDistance) return;
+            if (Vector3.Distance(BattleSystem.UnitPosition, Target.UnitPosition) < UpdateDistance) return false;
 
             if (BattleService.RecalculateChasePosition(BattleSystem, Target, out var chasePosition))
             {
@@ -41,7 +43,7 @@ namespace Domivium.Client.Contents.Actors
                 StateSystem.TryTransit(StateTags.Idle);
             }
 
-            base.OnChaseTick();
+            return true;
         }
 
         protected override void OnChase()

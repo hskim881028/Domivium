@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Actors.Generated;
@@ -12,9 +11,9 @@ using Domivium.Client.Core.Director;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Provider;
-using Domivium.Client.Data.Store;
+using Domivium.Client.Data.Info;
+using Domivium.Client.Data.StageField;
 using MessagePipe;
-using ObservableCollections;
 using R3;
 using UnityEngine;
 
@@ -28,15 +27,14 @@ namespace Domivium.Client.Contents.Services
         private readonly IStageDirector _director;
         private readonly IActorSpawner _actorSpawner;
         private readonly IActorFactory _actorFactory;
-        private readonly IStageFieldStore _store;
-        private readonly ObservableList<Vector3Int> _stagedTower = new();
-        private readonly ObservableDictionary<Vector3Int, bool> _previewTower = new();
+        private readonly IStageInventoryReadModel _inventoryReadModel;
+        private readonly IStageInventoryCommand _inventoryCommand;
         private readonly ReactiveProperty<bool> _ready;
+        private readonly ReactiveProperty<StageCellInfo> _previewTower;
         private int _selectedSlot;
 
-        public IReadOnlyObservableList<Vector3Int> StagedTower => _stagedTower;
-        public IReadOnlyObservableDictionary<Vector3Int, bool> PreviewTower => _previewTower;
         public ReadOnlyReactiveProperty<bool> Ready => _ready;
+        public ReadOnlyReactiveProperty<StageCellInfo> PreviewTower => _previewTower;
 
         public TowerPlacementService(
             MasterDbService masterDbService,
@@ -45,7 +43,8 @@ namespace Domivium.Client.Contents.Services
             IStageDirector director,
             IActorSpawner actorSpawner,
             IActorFactory actorFactory,
-            IStageFieldStore store,
+            IStageInventoryReadModel inventoryReadModel,
+            IStageInventoryCommand inventoryCommand,
             ISubscriber<SceneMessage> sceneSubscriber)
         {
             _masterDbService = masterDbService;
@@ -54,16 +53,16 @@ namespace Domivium.Client.Contents.Services
             _director = director;
             _actorSpawner = actorSpawner;
             _actorFactory = actorFactory;
-            _store = store;
+            _inventoryReadModel = inventoryReadModel;
+            _inventoryCommand = inventoryCommand;
             _ready = new ReactiveProperty<bool>().AddTo(ref DisposableBag);
+            _previewTower = new ReactiveProperty<StageCellInfo>().AddTo(ref DisposableBag);
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTask InitializeAsync(int stageId)
         {
             var biome = _stageFieldProvider.Get(stageId);
-            _store.Initialize(biome.cellBounds);
-
             await _actorSpawner.SpawnAsync(ActorIds.Map, new StageFieldParams(biome.cellBounds));
 
             var cells = new List<Vector3Int>();
@@ -75,14 +74,13 @@ namespace Domivium.Client.Contents.Services
 
                 var campIndex = row.CampIndex;
                 var cell = new Vector3Int(row.X, row.Y, 0);
-                _store.GetNeighbors(cell, cells);
-                _stagedTower.Clear();
+                _inventoryCommand.Restrict(cell);
+
+                _stageFieldProvider.GetNeighbors(stageId, cell, cells, true);
                 foreach (var c in cells)
                 {
-                    _stagedTower.Add(c);
+                    _inventoryCommand.Restrict(c);
                 }
-
-                _store.Occupy(_stagedTower, cell);
 
                 if (actorId == ActorIds.Nexus)
                 {
@@ -100,14 +98,7 @@ namespace Domivium.Client.Contents.Services
 
         public void Show(int index)
         {
-            // var size = index switch
-            // {
-            //     1 => new Vector2Int(1, 2),
-            //     2 => new Vector2Int(2, 1),
-            //     _ => new Vector2Int(1, 1)
-            // };
             _selectedSlot = index;
-            _store.SetSize(new Vector2Int(1, 1));
             _director.TrySetMode(StageModes.TowerPlacement);
         }
 
@@ -119,41 +110,35 @@ namespace Domivium.Client.Contents.Services
 
         public bool Update(Vector2 position)
         {
-            _previewTower.Clear();
-            if (_coordinateService.TryScreenToCell(position, out var cell))
-            {
-                _store.GetTower(cell, _previewTower);
-            }
-
+            _previewTower.Value = _coordinateService.TryScreenToCell(position, out var cell)
+                ? StageCellInfo.Create(cell, _inventoryReadModel.GetCellTag(cell, _selectedSlot))
+                : StageCellInfo.Empty;
             return true;
         }
 
-        public int Placement(Vector2 position)
+        public void Placement(Vector2 position)
         {
             Update(position);
 
-            if (_previewTower.All(x => x.Value))
+            if (_previewTower.CurrentValue.Tag == StageCellTag.Occupiable)
             {
-                _stagedTower.Clear();
-                foreach (var (cell, _) in _previewTower)
-                {
-                    _stagedTower.Add(cell);
-                }
-
-                var tower = _stagedTower.First();
-                _store.Occupy(_stagedTower, tower);
-                var param = _actorFactory.CreateTower(1, tower);
+                var towerId = _inventoryReadModel.TowerSlot[_selectedSlot].TowerId;
+                var param = _actorFactory.CreateTower(towerId, _previewTower.CurrentValue.Cell);
+                _inventoryCommand.BuildTower(_selectedSlot);
                 _actorSpawner.SpawnAsync(ActorIds.Tower, param).Forget();
             }
 
+            if (_previewTower.CurrentValue.Tag == StageCellTag.Upgradeable)
+            {
+                _inventoryCommand.UpgradeTower(_selectedSlot, _previewTower.CurrentValue.Cell);
+            }
+
             Hide();
-            return _selectedSlot;
         }
 
         private void ResetReadModel()
         {
-            _stagedTower.Clear();
-            _previewTower.Clear();
+            _previewTower.Value = StageCellInfo.Empty;
             _ready.Value = false;
         }
 
@@ -164,7 +149,6 @@ namespace Domivium.Client.Contents.Services
                 case SceneMessageType.Unload:
                 case SceneMessageType.Load:
                     ResetReadModel();
-                    _store.Reset();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

@@ -5,8 +5,10 @@ using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Factory;
+using Domivium.Client.Data.Info;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -16,8 +18,7 @@ namespace Domivium.Client.Contents.Actors
 {
     public sealed class StageFieldPresenter : ActorPresenter<StageField>
     {
-        private readonly ITowerPlacementReadModel _read;
-
+        private readonly IStageInventoryReadModel _inventoryReadModel;
         public Tilemap Grid => Actor.Background;
         public override ActorId ActorId => ActorIds.Map;
 
@@ -25,22 +26,23 @@ namespace Domivium.Client.Contents.Actors
             StageField actor,
             ISystemFactory systemFactory,
             StageContext stageContext,
-            ITowerPlacementReadModel read)
+            IStageInventoryReadModel inventoryReadModel,
+            ITowerPlacementReadModel towerPlacementReadModel)
             : base(actor, systemFactory)
         {
+            _inventoryReadModel = inventoryReadModel;
+            _inventoryReadModel.Towers.CollectionChanged += OnChangedTowers;
+            _inventoryReadModel.Barrier.CollectionChanged += OnChangedBarrier;
+
             stageContext.Mode.Subscribe(OnChangeMode).AddTo(ref DisposableBag);
-
-            _read = read;
-            _read.Ready.Subscribe(OnReady).AddTo(ref DisposableBag);
-            _read.StagedTower.CollectionChanged += OnChangedStagedTower;
-            _read.PreviewTower.CollectionChanged += OnChangedPreviewTower;
+            towerPlacementReadModel.Ready.Subscribe(OnReady).AddTo(ref DisposableBag);
+            towerPlacementReadModel.PreviewTower.Subscribe(OnPreviewTower).AddTo(ref DisposableBag);
         }
-
 
         protected override void OnDispose()
         {
-            _read.StagedTower.CollectionChanged -= OnChangedStagedTower;
-            _read.PreviewTower.CollectionChanged -= OnChangedPreviewTower;
+            _inventoryReadModel.Towers.CollectionChanged -= OnChangedTowers;
+            _inventoryReadModel.Barrier.CollectionChanged -= OnChangedBarrier;
             base.OnDispose();
         }
 
@@ -51,22 +53,28 @@ namespace Domivium.Client.Contents.Actors
             Actor.BuildNavMesh();
         }
 
-        private void OnChangeMode(StageMode mode) => Actor.SetActivePreviewGrid(mode == StageModes.TowerPlacement);
+        private void OnPreviewTower(StageCellInfo cellInfo)
+        {
+            Actor.DrawPreview(cellInfo.Cell, cellInfo.Tag);
+        }
 
-        private void OnChangedStagedTower(in NotifyCollectionChangedEventArgs<Vector3Int> e)
+        private void OnChangeMode(StageMode mode)
+        {
+            Actor.SetActivePreviewGrid(mode == StageModes.TowerPlacement);
+        }
+
+        private void OnChangedTowers(in NotifyCollectionChangedEventArgs<KeyValuePair<Vector3Int, IBattleSystem>> e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    Actor.Placement(e.NewItem);
-                    foreach (var item in e.NewItems)
-                    {
-                        Actor.Placement(item);
-                    }
+                case NotifyCollectionChangedAction.Replace:
+                    Actor.Placement(e.NewItem.Key);
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    Actor.Release(e.OldItem.Key);
                     break;
                 case NotifyCollectionChangedAction.Move:
-                case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Replace:
                 case NotifyCollectionChangedAction.Reset:
                     break;
                 default:
@@ -74,23 +82,20 @@ namespace Domivium.Client.Contents.Actors
             }
         }
 
-        private void OnChangedPreviewTower(in NotifyCollectionChangedEventArgs<KeyValuePair<Vector3Int, bool>> e)
+        private void OnChangedBarrier(in NotifyCollectionChangedEventArgs<Vector3Int> e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
                 case NotifyCollectionChangedAction.Replace:
-                    Actor.DrawPreview(e.NewItem.Key, e.NewItem.Value);
-                    foreach (var item in e.NewItems)
-                    {
-                        Actor.DrawPreview(item.Key, item.Value);
-                    }
+                    Actor.Placement(e.NewItem);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Reset:
-                    Actor.ResetPreview();
+                    Actor.Release(e.OldItem);
                     break;
                 case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Reset:
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

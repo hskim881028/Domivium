@@ -37,7 +37,7 @@ namespace Domivium.Client.Contents.State
             _tag.Value = next;
         }
 
-        public void Spawn()
+        public void Activate()
         {
             _tag.Value = StateTags.Idle;
         }

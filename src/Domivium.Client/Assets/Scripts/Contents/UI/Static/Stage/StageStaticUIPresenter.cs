@@ -7,11 +7,14 @@ using Domivium.Client.Contents.DI;
 using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Audio;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.Presenter;
+using Domivium.Client.Data.Info;
 using ObservableCollections;
 using R3;
+using UnityEngine;
 
 namespace Domivium.Client.Contents.UI.Static
 {
@@ -46,14 +49,15 @@ namespace Domivium.Client.Contents.UI.Static
             _inventoryReadModel = inventoryReadModel;
             _inventoryReadModel.RerollCost.Subscribe(SetRerollCost).AddTo(ref DisposableBag);
             _inventoryReadModel.Soul.Subscribe(SetSoul).AddTo(ref DisposableBag);
-            _inventoryReadModel.Tower.Subscribe(SetTower).AddTo(ref DisposableBag);
             _inventoryReadModel.TowerLimit.Subscribe(SetTowerLimit).AddTo(ref DisposableBag);
             _inventoryReadModel.TowerSlot.CollectionChanged += OnChangedInventorySlot;
+            _inventoryReadModel.Towers.CollectionChanged += OnChangedTowers;
         }
 
         protected override void OnDispose()
         {
             _inventoryReadModel.TowerSlot.CollectionChanged -= OnChangedInventorySlot;
+            _inventoryReadModel.Towers.CollectionChanged -= OnChangedTowers;
             base.OnDispose();
         }
 
@@ -64,8 +68,8 @@ namespace Domivium.Client.Contents.UI.Static
 
         public void SelectTower(int index)
         {
-            if (!_inventoryReadModel.CanPlacementTower(index)) return;
-
+            if (!_inventoryReadModel.CanSelectTower(index)) return;
+            
             AudioController.PlayUI(UIAudioId.Click);
             _towerPlacementCommand.Show(index);
             _towerPlacementCommand.Update(_pointerRead.Current);
@@ -73,7 +77,7 @@ namespace Domivium.Client.Contents.UI.Static
 
         public void Reroll()
         {
-            _inventoryCommand.Refill(_inventoryReadModel.RerollCost.CurrentValue);
+            _inventoryCommand.RefillTower(_inventoryReadModel.RerollCost.CurrentValue);
         }
 
         public void Cancel()
@@ -93,12 +97,6 @@ namespace Domivium.Client.Contents.UI.Static
             UpdateView();
         }
 
-        private void SetTower(int count)
-        {
-            View.SetTowerCount(count);
-            UpdateView();
-        }
-
         private void SetTowerLimit(int limit)
         {
             View.SetTowerLimit(limit);
@@ -108,21 +106,37 @@ namespace Domivium.Client.Contents.UI.Static
         private void UpdateView()
         {
             View.SetRerollDimmed(!_inventoryReadModel.CanReroll());
-
             foreach (var slotIndex in _inventoryReadModel.TowerSlot.Keys)
             {
-                var dimmed = !_inventoryReadModel.CanPlacementTower(slotIndex);
+                var dimmed = !_inventoryReadModel.CanSelectTower(slotIndex);
                 View.SetDimmed(slotIndex, dimmed);
             }
         }
 
-        private void OnChangedInventorySlot(in NotifyCollectionChangedEventArgs<KeyValuePair<int, (int towerId, int cost)>> e)
+        private void OnChangedTowers(in NotifyCollectionChangedEventArgs<KeyValuePair<Vector3Int, IBattleSystem>> e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
                 case NotifyCollectionChangedAction.Replace:
-                    View.RefillTower(e.NewItem.Key, e.NewItem.Value.cost);
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Reset:
+                    View.SetTowerCount(_inventoryReadModel.Towers.Count);
+                    UpdateView();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void OnChangedInventorySlot(in NotifyCollectionChangedEventArgs<KeyValuePair<int, TowerSlotInfo>> e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Replace:
+                    View.RefillTower(e.NewItem.Key, e.NewItem.Value.Cost);
                     UpdateView();
                     break;
                 case NotifyCollectionChangedAction.Remove:

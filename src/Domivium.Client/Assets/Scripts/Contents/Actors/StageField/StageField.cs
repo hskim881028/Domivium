@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
+using Domivium.Client.Data.StageField;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -19,7 +19,8 @@ namespace Domivium.Client.Contents.Actors
         [SerializeField] private TileBase _gridBase;
         [SerializeField] private NavMeshSurface _navMeshSurface;
 
-        private readonly HashSet<Vector3Int> _tower = new();
+        private Vector3Int _cell;
+
         public Tilemap Background => _background;
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
@@ -46,25 +47,32 @@ namespace Domivium.Client.Contents.Actors
 
         public void BuildNavMesh() => _navMeshSurface.BuildNavMesh();
 
-        public void DrawPreview(Vector3Int cell, bool canPlace)
+        public void DrawPreview(Vector3Int cell, StageCellTag cellTag)
         {
-            _tower.Add(cell);
-            _preview.SetColor(cell, canPlace ? Color.greenYellow : Color.indianRed);
-        }
+            this.Log(cellTag);
+            _preview.SetColor(_cell, Color.clear);
+            _cell = cell;
 
-        public void ResetPreview()
-        {
-            foreach (var cell in _tower)
-            {
-                _preview.SetColor(cell, Color.clear);
-            }
-
-            _tower.Clear();
+            _preview.SetColor(_cell, GetPreviewColor(cellTag));
         }
 
         public void Placement(Vector3Int cell)
         {
             _grid.SetColor(cell, Color.black);
+        }
+
+        public void Release(Vector3Int cell)
+        {
+            _grid.SetColor(cell, Color.gray);
+        }
+
+        private Color GetPreviewColor(StageCellTag cellTag)
+        {
+            if (cellTag == StageCellTag.Occupiable) return Color.greenYellow;
+
+            if (cellTag == StageCellTag.Upgradeable) return Color.deepSkyBlue;
+
+            return Color.indianRed;
         }
     }
 }

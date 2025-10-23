@@ -66,7 +66,6 @@ namespace Domivium.Client.Contents.Actors
         public void SetDestination(Vector3 target)
         {
             _agent.isStopped = false;
-            _agent.ResetPath();
             _agent.SetDestination(target);
             SetFlip(transform.position.x < target.x ? 1 : -1);
         }

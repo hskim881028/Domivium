@@ -11,20 +11,15 @@ namespace Domivium.Client.Contents.Input.Consumer
     {
         private readonly StageContext _stageContext;
         private readonly ITowerPlacementCommand _towerPlacementCommand;
-        private readonly IStageInventoryCommand _inventoryCommand;
 
         public InputPriority Priority => InputPriorities.TowerPlacement;
         private bool IsTowerPlacementMode => _stageContext.Mode.CurrentValue == StageModes.TowerPlacement;
         private bool IsTerminated => _stageContext.Phase.CurrentValue == StagePhases.Cleared || _stageContext.Phase.CurrentValue == StagePhases.Failed;
 
-        public TowerPlacementInputConsumer(
-            StageContext stageContext,
-            ITowerPlacementCommand towerPlacementCommand,
-            IStageInventoryCommand inventoryCommand)
+        public TowerPlacementInputConsumer(StageContext stageContext, ITowerPlacementCommand towerPlacementCommand)
         {
             _stageContext = stageContext;
             _towerPlacementCommand = towerPlacementCommand;
-            _inventoryCommand = inventoryCommand;
         }
 
         public bool TryHandle(InputMessage message)
@@ -42,8 +37,7 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.ClickExit:
                     if (!IsTowerPlacementMode) return false;
 
-                    var slotIndex = _towerPlacementCommand.Placement(message.Value);
-                    _inventoryCommand.Use(slotIndex);
+                    _towerPlacementCommand.Placement(message.Value);
                     return true;
                 case InputMessageType.Point:
                     return IsTowerPlacementMode && _towerPlacementCommand.Update(message.Value);

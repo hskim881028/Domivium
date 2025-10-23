@@ -28,7 +28,6 @@ using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Data.Cache;
 using Domivium.Client.Data.SecureStore;
-using Domivium.Client.Data.Store;
 using Domivium.Client.Network;
 using Domivium.Client.Network.ClientFilters;
 using MagicOnion.Client;
@@ -183,7 +182,6 @@ namespace Domivium.Client.Contents.DI.Scene
         {
             builder.Register<StageContext>(lifetime);
             builder.Register<IStageDirector, StageDirector>(lifetime);
-            builder.Register<IStageFieldStore, StageFieldStore>(lifetime);
             builder.Register<IWaveController, WaveController>(lifetime);
         }
 

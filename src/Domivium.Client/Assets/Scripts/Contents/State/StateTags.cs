@@ -7,7 +7,6 @@ namespace Domivium.Client.Contents.State
     {
         public static readonly StateTag Idle = StateTag.Idle;
         public static readonly StateTag Die = StateTag.Die;
-        public static readonly StateTag Spawn = StateTag.Spawn;
         public static readonly StateTag Despawn = StateTag.Despawn;
         public static readonly StateTag Terminated = StateTag.Terminated;
 
@@ -23,9 +22,8 @@ namespace Domivium.Client.Contents.State
             {
                 100 => "Idle",
                 101 => "Die",
-                102 => "Spawn",
-                103 => "Despawn",
-                104 => "Terminated",
+                102 => "Despawn",
+                103 => "Terminated",
                 0 => "Move",
                 1 => "Chase",
                 2 => "Battle",

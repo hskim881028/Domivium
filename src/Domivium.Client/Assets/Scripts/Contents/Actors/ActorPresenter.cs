@@ -63,8 +63,17 @@ namespace Domivium.Client.Contents.Actors
         }
 
         protected virtual void OnIdleTick() { }
-        protected virtual void OnChaseTick() { }
-        protected virtual void OnBattleTick() { }
+
+        protected virtual bool OnChaseTick()
+        {
+            return StateSystem.Tag.CurrentValue != StateTags.Move;
+        }
+
+        protected virtual bool OnBattleTick()
+        {
+            return StateSystem.Tag.CurrentValue != StateTags.Move;
+        }
+
         protected virtual void OnMoveTick() { }
 
         protected virtual void OnIdle() => this.Log(Uid);

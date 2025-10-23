@@ -38,6 +38,7 @@
         public void PostAdd(int value) => PostAddValue += value;
 
         public void AddMultiplier(int percent) => PercentValue += percent;
+        public void SetMultiplier(int percent) => PercentValue = percent;
 
         public void Reset()
         {

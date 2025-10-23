@@ -14,7 +14,8 @@ namespace Domivium.Client.Core.Component
 
         [SerializeField] private SpriteRenderer _renderer;
         [SerializeField] private TextMeshPro _text;
-
+        [SerializeField] private bool _debugMode;
+        
         private readonly char[] _buf = new char[32];
         private MaterialPropertyBlock _mpb;
 
@@ -29,7 +30,7 @@ namespace Domivium.Client.Core.Component
             _text.SetCharArray(_buf, 0, length);
             _text.ForceMeshUpdate();
             _text.SetCharArray(Array.Empty<char>(), 0, 0);
-            _renderer.enabled = false;
+            _renderer.enabled = _debugMode;
         }
 
         private void OnDestroy()
@@ -40,8 +41,11 @@ namespace Domivium.Client.Core.Component
 
         public void Set(int current, int max)
         {
-            if (current == 0 || current == max) return;
-
+            if (!_debugMode)
+            {
+                if (current == 0 || current == max) return;
+            }
+            
             _renderer.enabled = true;
             var ratio = (float)current / max;
             _renderer.GetPropertyBlock(_mpb);
@@ -62,7 +66,7 @@ namespace Domivium.Client.Core.Component
         private async UniTaskVoid Hide()
         {
             await Awaitable.WaitForSecondsAsync(2f, _cts.Token);
-            _renderer.enabled = false;
+            _renderer.enabled = _debugMode;
         }
     }
 }

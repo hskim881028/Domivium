@@ -9,5 +9,6 @@ namespace Domivium.Client.Contents.Battle
         public static BattleCueId Damaged = new(3);
         public static BattleCueId Healed = new(4);
         public static BattleCueId DropSoul = new(5);
+        public static BattleCueId LevelUp = new(6);
     }
 }

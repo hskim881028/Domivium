@@ -11,6 +11,7 @@ namespace Domivium.Client.Core.Battle
     {
         public ushort Uid { get; }
         public ActorId ActorId { get; }
+        public int Id { get; }
         public PawnType Type { get; }
         public PawnRarityType Rarity { get; }
         public StatSet Stat { get; }
@@ -19,7 +20,7 @@ namespace Domivium.Client.Core.Battle
         public StateTag State { get; }
         public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect { get; }
         public bool Contains(BattleTag tag);
-        public void Initialize(ushort uid, ActorId actorId, PawnType type, PawnRarityType rarity);
+        public void Initialize(ushort uid, ActorId actorId, int id, PawnType type, PawnRarityType rarity);
         public void Reset();
         public void GrantAbility(BattleAbility ability);
         public bool TryActivateAbility(ref BattleAbilityContext context);

@@ -6,5 +6,6 @@ namespace Domivium.Client.Contents.Battle
     {
         public static BattleEffectId Damage = new(0);
         public static BattleEffectId Heal = new(1);
+        public static BattleEffectId LevelUp = new(2);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 
@@ -15,14 +16,25 @@ namespace Domivium.Client.Contents.Actors
 
         public bool TryGet(ushort uid, out IActorPresenter p) => _map.TryGetValue(uid, out p);
 
-        public bool TryGetPawn(ushort uid, out IBattleSystem unit)
+        public bool TryGetPawn(ushort uid, out IBattleSystem pawn)
         {
-            unit = null;
+            pawn = null;
             if (!TryGet(uid, out var presenter)) return false;
 
             if (presenter is not IPawnPresenter pawnPresenter) return false;
 
-            unit = pawnPresenter.BattleSystem;
+            pawn = pawnPresenter.BattleSystem;
+            return true;
+        }
+
+        public bool TryGetFirstPawn(out IBattleSystem pawn)
+        {
+            pawn = null;
+            if (_map.Count <= 0) return false;
+
+            if (_map.First().Value is not IPawnPresenter pawnPresenter) return false;
+
+            pawn = pawnPresenter.BattleSystem;
             return true;
         }
 
