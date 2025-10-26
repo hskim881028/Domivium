@@ -77,12 +77,10 @@ namespace Domivium.Client.Contents.Services
                 var characterId = row.CampIndex switch
                 {
                     0 => 1,
-                    1 => 3,
-                    2 => 2,
+                    1 => 2,
+                    2 => 3,
                     _ => throw new ArgumentOutOfRangeException()
                 };
-
-                if (characterId == 2) continue; // temp
 
                 var character = _actorFactory.CreateCharacter(characterId, new Vector3Int(row.X, row.Y, 0));
                 await _actorSpawner.SpawnAsync(ActorIds.Character, character);

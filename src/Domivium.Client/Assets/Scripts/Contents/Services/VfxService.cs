@@ -1,4 +1,5 @@
-﻿using Domivium.Client.Contents.Actors.Contract;
+﻿using Domivium.Client.Contents.Actors;
+using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Core.Actors;
@@ -27,19 +28,31 @@ namespace Domivium.Client.Contents.Services
                 _actorSpawner.SpawnAsync(ActorIds.HealText, new HealTextParams(context.Position, context.Value, 1.6f));
             }
 
-            if (cueId == BattleCueIds.Attack)
-            {
-                _actorSpawner.SpawnAsync(ActorIds.SlashEffect,
-                    new SlashEffectParams(
-                        context.ActorId,
-                        context.Position,
-                        context.Direction,
-                        1.6f));
-            }
-
             if (cueId == BattleCueIds.DropSoul)
             {
                 _actorSpawner.SpawnAsync(ActorIds.SoulEffect, new SoulEffectParams(context.Position, context.EndPosition, 3f));
+            }
+
+            if (cueId == BattleCueIds.Attack)
+            {
+                if (context.PawnType == PawnTypes.Ranged)
+                {
+                    _actorSpawner.SpawnAsync(ActorIds.ProjectileEffect,
+                        new ProjectileEffectParams(
+                            context.ActorId,
+                            context.Position,
+                            context.EndPosition,
+                            0.1f));
+                }
+                else
+                {
+                    _actorSpawner.SpawnAsync(ActorIds.SlashEffect,
+                        new SlashEffectParams(
+                            context.ActorId,
+                            context.Position,
+                            context.Direction,
+                            1.6f));
+                }
             }
         }
     }

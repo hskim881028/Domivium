@@ -74,7 +74,7 @@ namespace Domivium.Client.Contents.Actors
         {
             // true -> right
             _renderer[0].flipX = direction > 0;
-            MaterialPropertyBlocks[0].SetFloat(FlipDirectionId, direction);
+            MaterialPropertyBlocks[0].SetFloat(FlipDirectionId, direction * -1);
             _renderer[0].SetPropertyBlock(MaterialPropertyBlocks[0]);
         }
     }

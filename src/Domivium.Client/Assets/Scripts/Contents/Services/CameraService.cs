@@ -68,7 +68,7 @@ namespace Domivium.Client.Contents.Services
             var diff = _position - worldPosition;
             var target = _cameraRig.Target;
             var x = Mathf.Clamp(target.position.x + diff.x, -_limitX, _limitX);
-            var z = Mathf.Clamp(target.position.z + diff.z, -_limitZ, _limitZ - 2);
+            var z = Mathf.Clamp(target.position.z + diff.z, -_limitZ - 3, _limitZ - 6);
             _cameraRig.Target.position = new Vector3(x, _cameraRig.Target.position.y, z);
             _position = worldPosition;
             return true;

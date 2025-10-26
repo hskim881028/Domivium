@@ -18,8 +18,9 @@ namespace Domivium.Client.Contents.Actors.Generated
             { ActorIds.CharacterSelectIndicator, (typeof(CharacterSelectIndicatorPresenter), typeof(CharacterSelectIndicator)) },
             { ActorIds.DamageText, (typeof(DamageTextPresenter), typeof(DamageText)) },
             { ActorIds.HealText, (typeof(HealTextPresenter), typeof(HealText)) },
+            { ActorIds.SoulEffect, (typeof(SoulEffectPresenter), typeof(SoulEffect)) },
             { ActorIds.SlashEffect, (typeof(SlashEffectPresenter), typeof(SlashEffect)) },
-            { ActorIds.SoulEffect, (typeof(SoulEffectPresenter), typeof(SoulEffect)) }
+            { ActorIds.ProjectileEffect, (typeof(ProjectileEffectPresenter), typeof(ProjectileEffect)) }
         };
     }
 }

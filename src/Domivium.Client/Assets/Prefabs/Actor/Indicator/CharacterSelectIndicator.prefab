@@ -146,7 +146,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2748384938551296092}
   m_Layer: 3
-  m_Name: Render
+  m_Name: Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -180,7 +180,7 @@ GameObject:
   - component: {fileID: 8368928667238095291}
   - component: {fileID: 2297423858061056019}
   m_Layer: 3
-  m_Name: Grow
+  m_Name: Center
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

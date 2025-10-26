@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3930342956090053196}
   - component: {fileID: 8799100427968011594}
   m_Layer: 3
-  m_Name: Smoke
+  m_Name: Smoke_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4782,7 +4782,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0225aa0fe114d954a90fdcd7bc046b1b, type: 2}
+  - {fileID: 2100000, guid: e8a5a385806b6ae49adde308b7f0bb7f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4895,7 +4895,7 @@ GameObject:
   - component: {fileID: 1834697982517375263}
   - component: {fileID: 462422969647067376}
   m_Layer: 3
-  m_Name: Soul
+  m_Name: Smoke_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9666,7 +9666,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e8a5a385806b6ae49adde308b7f0bb7f, type: 2}
+  - {fileID: 2100000, guid: 3e9e381363fefe449a5ceca19af29d97, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

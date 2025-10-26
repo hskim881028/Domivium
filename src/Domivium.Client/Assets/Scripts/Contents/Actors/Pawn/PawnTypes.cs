@@ -2,6 +2,7 @@
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
+using UnityEngine;
 
 namespace Domivium.Client.Contents.Actors
 {
@@ -32,6 +33,31 @@ namespace Domivium.Client.Contents.Actors
                 "Support" => BattleAbilityIds.Heal,
                 _ => throw new Exception($"Unknown Pawn type: {type}")
             };
+        }
+        
+        public static Color ToColor(this PawnType type)
+        {
+            if (type == Melee)
+            {
+                return Constant.MeleeColor;
+            }
+            
+            if (type == Ranged)
+            {
+                return Constant.RangedColor;
+            }
+            
+            if (type == Tank)
+            {
+                return Constant.TankColor;
+            }
+            
+            if (type == Support)
+            {
+                return Constant.SupportColor;
+            }
+
+            throw new Exception($"Unknown Pawn type: {type}");
         }
     }
 }

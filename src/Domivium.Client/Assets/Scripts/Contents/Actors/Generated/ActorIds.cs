@@ -16,8 +16,9 @@ namespace Domivium.Client.Contents.Actors.Generated
         public static ActorId CharacterSelectIndicator = 9;
         public static ActorId DamageText = 10;
         public static ActorId HealText = 11;
-        public static ActorId SlashEffect = 12;
-        public static ActorId SoulEffect = 13;
+        public static ActorId SoulEffect = 12;
+        public static ActorId SlashEffect = 13;
+        public static ActorId ProjectileEffect = 14;
 
         public static ActorId ToActorId(this string type)
         {

@@ -33,6 +33,7 @@ namespace Domivium.Client.Contents.Actors
 
         protected override void OnAwake()
         {
+            base.OnAwake();
             _colors.Add(ActorIds.Character, _allyColors);
             _colors.Add(ActorIds.Tower, _allyColors);
             _colors.Add(ActorIds.Monster, _monsterColors);
@@ -40,7 +41,6 @@ namespace Domivium.Client.Contents.Actors
             _edgeColors.Add(ActorIds.Character, _allyEdgeColor);
             _edgeColors.Add(ActorIds.Tower, _allyEdgeColor);
             _edgeColors.Add(ActorIds.Monster, _monsterEdgeColor);
-            base.OnAwake();
         }
 
         public override void Initialize(ushort uid, Transform parent)

@@ -12,7 +12,7 @@ namespace Domivium.Client.Core.Component
 
         public void Set(int level)
         {
-            var length = TextWriteUtils.WriteLevelText(level, _buf);
+            var length = TextWriteUtils.WriteIntToBuffer(level, _buf);
             _text.SetCharArray(_buf, 0, length);
         }
     }

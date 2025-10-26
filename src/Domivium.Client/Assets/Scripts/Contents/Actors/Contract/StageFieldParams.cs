@@ -26,6 +26,12 @@ namespace Domivium.Client.Contents.Actors.Contract
         Vector3 Position,
         int Direction,
         float DespawnTime) : VFXParams(DespawnTime);
+
+    public record ProjectileEffectParams(
+        ActorId ActorId,
+        Vector3 Position,
+        Vector3 EndPosition,
+        float DespawnTime) : VFXParams(DespawnTime);
     
     public record SoulEffectParams(Vector3 Position, Vector3 EndPosition, float DespawnTime) : VFXParams(DespawnTime);
 }
