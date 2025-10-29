@@ -1,25 +1,19 @@
 ﻿using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Actors;
+using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Audio.Generated;
-using Domivium.Client.Contents.Battle;
-using Domivium.Client.Contents.Commands;
-using Domivium.Client.Contents.Context;
-using Domivium.Client.Contents.Controller;
-using Domivium.Client.Contents.ReadModels;
+using Domivium.Client.Contents.System.Command;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Director;
+using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Input;
-using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Provider;
-using Domivium.Client.Core.State;
 using Domivium.Client.Data.Config;
-using Domivium.Client.Data.Stat;
-using MessagePipe;
-using R3;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using VContainer.Unity;
 
 namespace Domivium.Client.Contents.DI.Entry
@@ -27,41 +21,38 @@ namespace Domivium.Client.Contents.DI.Entry
     public class StageEntry : Entry, ITickable
     {
         private readonly IStageDirector _stageDirector;
-        private readonly IWaveController _waveController;
-        private readonly IBattleService _battleService;
-        private readonly ICameraCommand _cameraCommand;
-        private readonly IStageInventoryCommand _stageInventoryCommand;
-        private readonly ITowerPlacementCommand _towerPlacementCommand;
-        private readonly IBattleUserCommand _battleUserCommand;
         private readonly IActorManager _actorManager;
-        private readonly IBattleEffectPool _effectPool;
+        private readonly IActorSpawner _actorSpawner;
+        private readonly IActorFactory _actorFactory;
+        private readonly IStageSystemCommand _stageSystemCommand;
+        private readonly ICharacterSystemCommand _characterSystemCommand;
+        private readonly ICameraSystemCommand _cameraSystemCommand;
+        private readonly StageFieldProvider _stageFieldProvider;
 
         public StageEntry(
             IInputComposition inputComposition,
-            IBattleCuePlayer cuePlayer,
-            IStageDirector stageDirector,
-            IWaveController waveController,
-            IAudioController audioController,
-            IBattleService battleService,
-            ICameraCommand cameraCommand,
-            IStageInventoryCommand stageInventoryCommand,
-            ITowerPlacementCommand towerPlacementCommand,
-            IBattleUserCommand battleUserCommand,
-            IActorManager actorManager,
             IBattleEffectPool effectPool,
-            ISubscriber<ActorStateMessage> actorTagSubscriber)
+            IBattleCuePlayer cuePlayer,
+            IAudioPlayer audioPlayer,
+            IStageDirector stageDirector,
+            StageFieldProvider stageFieldProvider,
+            IActorManager actorManager,
+            IActorSpawner actorSpawner,
+            IActorFactory actorFactory,
+            IStageSystemCommand stageSystemCommand,
+            ICharacterSystemCommand characterSystemCommand,
+            ICameraSystemCommand cameraSystemCommand)
         {
+            audioPlayer.PlayBGM(BGMAudioId.Stage);
             _stageDirector = stageDirector;
-            _waveController = waveController;
-            _battleService = battleService;
-            _cameraCommand = cameraCommand;
-            _stageInventoryCommand = stageInventoryCommand;
-            _towerPlacementCommand = towerPlacementCommand;
-            _battleUserCommand = battleUserCommand;
+            _stageFieldProvider = stageFieldProvider;
             _actorManager = actorManager;
-            _effectPool = effectPool;
-            audioController.PlayBGM(BGMAudioId.Stage);
-            actorTagSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
+            _actorSpawner = actorSpawner;
+            _actorFactory = actorFactory;
+
+            _stageSystemCommand = stageSystemCommand;
+            _characterSystemCommand = characterSystemCommand;
+            _cameraSystemCommand = cameraSystemCommand;
         }
 
         protected override void OnStart()
@@ -77,44 +68,27 @@ namespace Domivium.Client.Contents.DI.Entry
 
         private async UniTaskVoid RunAsync(StageConfig cfg)
         {
-            _stageDirector.TrySetPhase(StagePhases.PreparingWave);
-            _cameraCommand.Initialize(cfg.StageId);
-            _waveController.Initialize(cfg.StageId);
+            var tilemap = _stageFieldProvider.Get(cfg.StageId);
+            var stageField = await _actorSpawner.SpawnAsync(ActorIds.StageField, new StageFieldParams(tilemap));
+            if (stageField is StageFieldPresenter stageFieldPresenter)
+            {
+                _stageSystemCommand.InitializeAsync(stageFieldPresenter.Grid);
+            }
 
-            _stageInventoryCommand.Initialize(cfg.StageId, cfg.StartSoul, cfg.RerollCost, cfg.TowerLimit);
-            await _towerPlacementCommand.InitializeAsync(cfg.StageId);
-            await _battleUserCommand.InitializeAsync(cfg.StageId);
+            var actorParam = _actorFactory.CreateCharacter(1, new Vector3Int(0, 0, 0));
+            var character = await _actorSpawner.SpawnAsync(ActorIds.Character, actorParam);
+            if (character is CharacterPresenter characterPresenter)
+            {
+                _characterSystemCommand.Initialize(characterPresenter.BattleSystem);
+                _cameraSystemCommand.Initialize(characterPresenter.BattleSystem.Unit);
+            }
 
-            _stageDirector.TrySetMode(StageModes.Battle);
-            _stageDirector.TrySetPhase(StagePhases.RunningWave);
+            _stageDirector.TrySetMode(StageMode.Run);
         }
 
         public void Tick()
         {
-            var dt = Time.deltaTime;
-            _actorManager.Tick(dt);
-            _waveController.Tick(dt);
-
-            if (Keyboard.current.digit1Key.wasPressedThisFrame)
-            {
-                if (_battleService.FindTarget(ActorIds.Character, 8, out var target))
-                {
-                    var context = BattleAbilityContext.Create(BattleAbilityIds.Attack, target, target);
-                    var effectSpec = _effectPool.Get(BattleEffectIds.LevelUp, context);
-                    target.ActivateEffect(effectSpec);
-                    this.Log("#############");
-                }
-            }
-        }
-
-        private void OnActorStateMessage(ActorStateMessage message)
-        {
-            if (message.ActorId == ActorIds.Nexus &&
-                message.Tag == StateTag.Die &&
-                !_actorManager.Any(ActorIds.Nexus))
-            {
-                _stageDirector.TrySetPhase(StagePhases.Failed);
-            }
+            _actorManager.Tick(Time.deltaTime);
         }
     }
 }

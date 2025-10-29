@@ -40,21 +40,6 @@ namespace Domivium.Client.Contents.Factory
             return new UnitParams(spawnPoint, context, abilities);
         }
 
-        public ActorParam CreateTower(int id, Vector3Int spawnPoint)
-        {
-            var row = _masterDbService.DB.TowerRowTable.FindById(id);
-            var abilities = GetDefaultAbility(row.Job.ToPawnType());
-            var context = new PawnContext(row);
-            return new UnitParams(spawnPoint, context, abilities);
-        }
-
-        public ActorParam CreateNexus(int id, Vector3Int spawnPoint)
-        {
-            var row = _masterDbService.DB.NexusRowTable.FindById(id);
-            var context = new PawnContext(row);
-            return new UnitParams(spawnPoint, context, new List<BattleAbility>());
-        }
-
         public ActorParam CreateMonsterCamp(int index, Vector3Int spawnPoint)
         {
             return new CampParams(index, spawnPoint);
@@ -65,22 +50,30 @@ namespace Domivium.Client.Contents.Factory
             var abilities = new List<BattleAbility>();
             if (pawnType == PawnTypes.Melee)
             {
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Move));
                 abilities.Add(_abilityFactory.Create(BattleAbilityIds.Attack));
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Avoid));
             }
 
             if (pawnType == PawnTypes.Ranged)
             {
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Move));
                 abilities.Add(_abilityFactory.Create(BattleAbilityIds.Attack));
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Avoid));
             }
 
             if (pawnType == PawnTypes.Tank)
             {
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Move));
                 abilities.Add(_abilityFactory.Create(BattleAbilityIds.Attack));
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Avoid));
             }
 
             if (pawnType == PawnTypes.Support)
             {
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Move));
                 abilities.Add(_abilityFactory.Create(BattleAbilityIds.Heal));
+                abilities.Add(_abilityFactory.Create(BattleAbilityIds.Avoid));
             }
 
             return abilities;

@@ -22,8 +22,8 @@ namespace Domivium.Client.Core.Battle
         public virtual float PeriodicInterval => 0;
         public virtual BattleCueId PeriodicCueId => BattleCueId.None;
         public virtual BattleCueId DeactivateCueId => BattleCueId.None;
-        public abstract BattleCueId CueId { get; }
         public abstract BattleEffectId Id { get; }
+        public abstract BattleCueId CueId { get; }
         public ref BattleEffectContext Context => ref _context;
         public IReadOnlyList<BattleStatModifier> StatModifiers => _statModifiers;
         public IReadOnlyList<BattleStatModifier> StatPeriodicModifiers => _statPeriodicModifiers;

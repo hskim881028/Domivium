@@ -12,8 +12,8 @@ namespace Domivium.Client.Core.UI.Presenter
         protected abstract HashSet<UILayer> Layer { get; }
         public abstract UIPriority Priority { get; }
 
-        protected StaticUIPresenter(TView view, IUINavigation navigation, IAudioController audioController)
-            : base(view, navigation, audioController) { }
+        protected StaticUIPresenter(TView view, IUINavigation navigation, IAudioPlayer audioPlayer)
+            : base(view, navigation, audioPlayer) { }
 
         public bool HasLayer(UILayer layer) => Layer.Contains(layer);
     }

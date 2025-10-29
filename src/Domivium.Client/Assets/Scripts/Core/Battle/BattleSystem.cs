@@ -16,10 +16,11 @@ namespace Domivium.Client.Core.Battle
         private readonly List<BattleEffectSpec> _effectSpecs = new();
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
-        private readonly Transform _unit;
         private readonly ReadOnlyReactiveProperty<StateTag> _state;
         private readonly HashSet<BattleTag> _tags = new();
         private readonly ReactiveProperty<BattleEffectContext> _appliedEffect = new();
+        private readonly ReactiveProperty<bool> _isRight = new();
+
         private bool _isDisposed;
 
         public ushort Uid { get; private set; }
@@ -29,18 +30,23 @@ namespace Domivium.Client.Core.Battle
         public PawnRarityType Rarity { get; private set; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
-        public Vector3 UnitPosition => _unit.position;
+        public Vector3 UnitPosition => Unit.position;
+        public Vector2 Collider { get; }
+        public ReadOnlyReactiveProperty<bool> IsRight => _isRight;
+        public Transform Unit { get; }
         public StateTag State => _state.CurrentValue;
         public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect => _appliedEffect;
 
         public BattleSystem(
             Transform unit,
+            Vector2 collider,
             ReadOnlyReactiveProperty<StateTag> state,
             IPublisher<BattleCueMessage> cuePublisher)
         {
             Stat = new StatSet();
             Gauge = new GaugeSet(Stat);
-            _unit = unit;
+            Unit = unit;
+            Collider = collider;
             _state = state;
             _cuePublisher = cuePublisher;
         }
@@ -77,6 +83,30 @@ namespace Domivium.Client.Core.Battle
         public void GrantAbility(BattleAbility ability)
         {
             _abilitySpecs.Add(ability.Id, new BattleAbilitySpec(ability, Stat, _cuePublisher));
+        }
+
+        public void SetPosition(Vector3 position)
+        {
+            if (Unit.position.x < position.x)
+            {
+                _isRight.Value = true;
+            }
+            else if (Unit.position.x > position.x)
+            {
+                _isRight.Value = false;
+            }
+
+            Unit.position = position;
+        }
+
+        public bool CanActivateAbility(BattleAbilityId abilityId, out float cooldown)
+        {
+            cooldown = 0;
+
+            if (!_abilitySpecs.TryGetValue(abilityId, out var spec)) return false;
+
+            cooldown = spec.Cooldown;
+            return spec.CanActivateAbility(this);
         }
 
         public bool TryActivateAbility(ref BattleAbilityContext context) => _abilitySpecs.TryGetValue(context.AbilityId, out var spec) && spec.TryActivate(ref context);

@@ -66,47 +66,5 @@ namespace Domivium.Client.Core.Battle
             PawnType = row.Job.ToPawnType();
             PawnRarityType = row.Rarity.ToPawnRarityType();
         }
-
-        public PawnContext(TowerRow row)
-        {
-            Id = row.Id;
-            Health = row.Health;
-            Attack = row.Attack;
-            Defense = row.Defense;
-            MoveSpeed = row.MoveSpeed;
-            AttackSpeed = row.AttackSpeed;
-            AttackRange = row.AttackRange;
-            HitRange = row.HitRange;
-            DetectionRange = row.DetectionRange;
-            CriticalRate = row.CriticalRate;
-            CriticalDamage = row.CriticalDamage;
-
-            ActorId = ActorIds.Tower;
-            TargetActionId = row.Target.ToActorId();
-            BattleAbilityId = row.Job.ToBattleAbilityId();
-            PawnType = row.Job.ToPawnType();
-            PawnRarityType = row.Rarity.ToPawnRarityType();
-        }
-
-        public PawnContext(NexusRow row)
-        {
-            Id = row.Id;
-            Health = row.Health;
-            Attack = row.Attack;
-            Defense = row.Defense;
-            MoveSpeed = row.MoveSpeed;
-            AttackSpeed = row.AttackSpeed;
-            HitRange = row.HitRange;
-            AttackRange = row.AttackRange;
-            DetectionRange = row.DetectionRange;
-            CriticalRate = row.CriticalRate;
-            CriticalDamage = row.CriticalDamage;
-
-            ActorId = ActorIds.Nexus;
-            TargetActionId = row.Target.ToActorId();
-            BattleAbilityId = row.Job.ToBattleAbilityId();
-            PawnType = row.Job.ToPawnType();
-            PawnRarityType = row.Rarity.ToPawnRarityType();
-        }
     }
 }

@@ -3,10 +3,11 @@ using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Domivium.Client.Contents.Actors.Contract
 {
-    public record StageFieldParams(BoundsInt CellBounds) : ActorParam;
+    public record StageFieldParams(Tilemap Tilemap) : ActorParam;
 
     public record UnitParams(
         Vector3Int SpawnPoint,

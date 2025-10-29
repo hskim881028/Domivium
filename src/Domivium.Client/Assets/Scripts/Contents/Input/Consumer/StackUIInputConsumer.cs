@@ -30,6 +30,14 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.ClickExit:
                     return !_inputEventSystem.BlockUI && _inputEventSystem.IsPointerOverUI(message.Value);
                 case InputMessageType.Point:
+                case InputMessageType.Move:
+                case InputMessageType.Look:
+                case InputMessageType.LookCanceled:
+                case InputMessageType.Quick:
+                case InputMessageType.QuickCanceled:
+                case InputMessageType.Inventory:
+                case InputMessageType.Interact:
+                case InputMessageType.Avoid:
                     return false;
                 default:
                     throw new ArgumentOutOfRangeException();

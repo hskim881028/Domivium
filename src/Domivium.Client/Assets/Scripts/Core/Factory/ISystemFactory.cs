@@ -9,6 +9,6 @@ namespace Domivium.Client.Core.Factory
     public interface ISystemFactory
     {
         public IStateSystem CreateState(IActorPresenter presenter);
-        public IBattleSystem CreateBattle(Transform unit, ReadOnlyReactiveProperty<StateTag> tag);
+        public IBattleSystem CreateBattle(Actor actor, ReadOnlyReactiveProperty<StateTag> tag);
     }
 }

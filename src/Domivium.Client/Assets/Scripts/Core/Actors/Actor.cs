@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors.Contract;
 using UnityEngine;
@@ -8,6 +7,7 @@ namespace Domivium.Client.Core.Actors
 {
     public class Actor : MonoBehaviour, IActorActivatable, ITicker
     {
+        [SerializeField] public Vector2 Collder;
         public ushort Uid { get; private set; }
 
         private void Awake()

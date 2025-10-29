@@ -45,16 +45,17 @@ namespace Domivium.Client.Core.Actors
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
-        public async UniTask SpawnAsync(ActorId actorId, ActorParam param)
+        public async UniTask<IActorPresenter> SpawnAsync(ActorId actorId, ActorParam param)
         {
             if (TryGet(actorId, out var actor))
             {
                 await SpawnInternalAsync(actor.scope, actor.scope.Presenter, actor.uid, actorId, param);
-                return;
+                return actor.scope.Presenter;
             }
 
             var actorScope = CreateActor(actorId);
             await SpawnInternalAsync(actorScope, actorScope.Presenter, actorScope.Uid, actorId, param);
+            return actorScope.Presenter;
         }
 
         private ActorScope CreateActor(ActorId actorId)

@@ -21,6 +21,13 @@ namespace Domivium.Client.Core.Input
             BindAction("UI/Cancel", performed: Cancel);
             BindAction("UI/Click", performed: Click);
             BindAction("UI/Point", performed: Point);
+            
+            BindAction("Player/Move", performed: Move, canceled: Move);
+            BindAction("Player/Look", performed: Look, canceled: LookEnd);
+            BindAction("Player/Quick", performed: Quick, canceled: QuickEnd);
+            BindAction("Player/Inventory", performed: Inventory);
+            BindAction("Player/Interact", performed: Interact);
+            BindAction("Player/Avoid", performed: Avoid);
         }
 
         private void BindAction(
@@ -81,6 +88,50 @@ namespace Domivium.Client.Core.Input
         {
             _pointer = context.ReadValue<Vector2>();
             _publisher.Publish(InputMessage.Point(_pointer));
+        }
+
+        private void Move(InputAction.CallbackContext context)
+        {
+            var value = context.ReadValue<Vector2>();
+            _publisher.Publish(InputMessage.Move(value));
+        }
+
+        private void Look(InputAction.CallbackContext context)
+        {
+            var value = context.ReadValue<Vector2>();
+            _publisher.Publish(InputMessage.Look(value));
+        }
+
+        private void LookEnd(InputAction.CallbackContext context)
+        {
+            _publisher.Publish(InputMessage.LookCanceled);
+        }
+
+        private void Quick(InputAction.CallbackContext context)
+        {
+            var value = context.ReadValue<Vector2>();
+            _publisher.Publish(InputMessage.Look(value));
+        }
+
+        private void QuickEnd(InputAction.CallbackContext context)
+        {
+            var value = context.ReadValue<Vector2>();
+            _publisher.Publish(InputMessage.Look(value));
+        }
+
+        private void Inventory(InputAction.CallbackContext context)
+        {
+            _publisher.Publish(InputMessage.Inventory);
+        }
+
+        private void Interact(InputAction.CallbackContext context)
+        {
+            _publisher.Publish(InputMessage.Interact);
+        }
+
+        private void Avoid(InputAction.CallbackContext context)
+        {
+            _publisher.Publish(InputMessage.Avoid);
         }
     }
 }

@@ -3,15 +3,14 @@ using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Audio;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.Battle;
-using Domivium.Client.Contents.Controller;
 using Domivium.Client.Contents.DI.Container;
 using Domivium.Client.Contents.DI.Entry;
 using Domivium.Client.Contents.Director;
 using Domivium.Client.Contents.Factory;
 using Domivium.Client.Contents.Input.Composition;
 using Domivium.Client.Contents.Input.Consumer;
-using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.Services;
+using Domivium.Client.Contents.System;
 using Domivium.Client.Contents.UI.Generated;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
@@ -60,6 +59,7 @@ namespace Domivium.Client.Contents.DI.Scene
             Scene(builder, Lifetime.Singleton);
 
             Services(builder, Lifetime.Singleton);
+            System(builder, Lifetime.Singleton);
             Provider(builder, Lifetime.Singleton);
             Audio(builder, Lifetime.Singleton);
             GlobalActors(builder, Lifetime.Singleton);
@@ -133,12 +133,14 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<SceneService>(lifetime);
             builder.Register<EnvironmentService>(lifetime);
             builder.Register<VfxService>(lifetime);
-            builder.Register<CoordinateService>(lifetime);
-            builder.Register<CameraService>(lifetime).AsImplementedInterfaces();
-            builder.Register<PointerService>(lifetime).AsImplementedInterfaces();
-            builder.Register<TowerPlacementService>(lifetime).AsImplementedInterfaces();
-            builder.Register<BattleUserService>(lifetime).AsImplementedInterfaces();
-            builder.Register<StageInventoryService>(lifetime).AsImplementedInterfaces();
+        }
+
+        private void System(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<PointerSystem>(lifetime).AsImplementedInterfaces();
+            builder.Register<CharacterSystem>(lifetime).AsImplementedInterfaces();
+            builder.Register<StageSystem>(lifetime).AsImplementedInterfaces();
+            builder.Register<CameraSystem>(lifetime).AsImplementedInterfaces();
         }
 
         private void Provider(IContainerBuilder builder, Lifetime lifetime)
@@ -148,7 +150,7 @@ namespace Domivium.Client.Contents.DI.Scene
 
         private void Audio(IContainerBuilder builder, Lifetime lifetime)
         {
-            builder.Register<IAudioController, AudioController>(lifetime).WithParameter(AudioMapping.Names);
+            builder.Register<IAudioPlayer, AudioPlayer>(lifetime).WithParameter(AudioMapping.Names);
             builder.Register<IAudioSpawner, AudioSpawner>(lifetime).WithParameter(_audioContainer.Resources);
         }
 
@@ -182,12 +184,10 @@ namespace Domivium.Client.Contents.DI.Scene
         {
             builder.Register<StageContext>(lifetime);
             builder.Register<IStageDirector, StageDirector>(lifetime);
-            builder.Register<IWaveController, WaveController>(lifetime);
         }
 
         private void Battle(IContainerBuilder builder, Lifetime lifetime)
         {
-            builder.Register<IBattleService, BattleService>(lifetime);
             builder.Register<IBattleEffectPool, BattleEffectPool>(lifetime);
             builder.Register<IBattleCuePlayer, BattleCuePlayer>(lifetime);
         }

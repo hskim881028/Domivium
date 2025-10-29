@@ -26,7 +26,6 @@ namespace Domivium.Client.Contents.Actors
         {
             base.OnAwake();
             _colors.Add(ActorIds.Character, _allyColor);
-            _colors.Add(ActorIds.Tower, _allyColor);
             _colors.Add(ActorIds.Monster, _monsterColor);
         }
 

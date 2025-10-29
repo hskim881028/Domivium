@@ -9,8 +9,9 @@ namespace Domivium.Client.Core.Utility
         public static readonly int Map = LayerMask.NameToLayer("Map");
         public static readonly int Effect = LayerMask.NameToLayer("Effect");
         public static readonly int Character = LayerMask.NameToLayer("Character");
-        public static readonly int Tower = LayerMask.NameToLayer("Tower");
+        public static readonly int Prop = LayerMask.NameToLayer("Prop");
 
         public static readonly int CharacterMask = 1 << Character;
+        public static readonly int PropMask = 1 << Prop;
     }
 }

@@ -2,8 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Battle;
-using Domivium.Client.Contents.ReadModels;
-using Domivium.Client.Contents.State;
+using Domivium.Client.Contents.System.Model;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
@@ -17,33 +16,23 @@ namespace Domivium.Client.Contents.Actors
 {
     public abstract class PawnPresenter<TPawn> : ActorPresenter<TPawn>, IPawnPresenter where TPawn : Pawn
     {
-        private const float Hysteresis = 0.25f;
-        private const float HysteresisSq = Hysteresis * Hysteresis;
+        protected readonly IStageSystemModel StageSystemModel;
 
-        protected readonly IBattleService BattleService;
-        protected IBattleSystem Target;
-        protected Vector3 ChasePosition;
-        protected ActorId TargetActionId;
-        protected BattleAbilityId BattleAbilityId;
-        protected bool LockOn;
-        
         public IBattleSystem BattleSystem { get; }
 
-        protected PawnPresenter(TPawn actor, ISystemFactory systemFactory, IBattleService battleService)
+        protected PawnPresenter(TPawn actor, ISystemFactory systemFactory, IStageSystemModel stageSystemModel)
             : base(actor, systemFactory)
         {
-            BattleSystem = systemFactory.CreateBattle(actor.transform, StateSystem.Tag);
+            BattleSystem = systemFactory.CreateBattle(actor, StateSystem.Tag);
             BattleSystem.AppliedEffect.Subscribe(OnAppliedEffectChanged).AddTo(ref DisposableBag);
-            BattleService = battleService;
+            BattleSystem.IsRight.Subscribe(Actor.SetFlip).AddTo(ref DisposableBag);
+            StageSystemModel = stageSystemModel;
         }
 
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             var p = param.As<UnitParams>();
             var row = p.PawnContext;
-
-            TargetActionId = row.TargetActionId;
-            BattleAbilityId = row.BattleAbilityId;
 
             BattleSystem.Initialize(Uid, row.ActorId, row.Id, row.PawnType, row.PawnRarityType);
 
@@ -85,57 +74,8 @@ namespace Domivium.Client.Contents.Actors
             base.Tick(deltaTime);
         }
 
-        protected bool IsEmptyTarget() => Target == null || Target.State == StateTags.Die || Target.State == StateTags.Despawn;
-
-        protected override bool OnBattleTick()
-        {
-            if(!base.OnBattleTick()) return false;
-            
-            if (IsEmptyTarget())
-            {
-                StateSystem.TryTransit(StateTags.Idle);
-                return false;
-            }
-
-            if (BattleCalculator.CanBattle(BattleSystem, Target))
-            {
-                var context = BattleAbilityContext.Create(BattleAbilityId, BattleSystem, Target);
-                BattleSystem.TryActivateAbility(ref context);
-                Actor.Battle(Target.UnitPosition);
-            }
-            else
-            {
-                StateSystem.TryTransit(StateTags.Chase);
-            }
-
-            return true;
-        }
-
-        protected override void OnIdle()
-        {
-            LockOn = false;
-            base.OnIdle();
-        }
-
-        protected override void OnBattle()
-        {
-            LockOn = true;
-            var offset = BattleService.GetPositionOffset(BattleSystem, Target);
-            Actor.StartBattle(offset, Target.UnitPosition);
-            base.OnBattle();
-        }
-
-        protected override void OnMove()
-        {
-            LockOn = false;
-            base.OnMove();
-        }
-
         protected override void OnDie()
         {
-            LockOn = false;
-            Target = null;
-            ChasePosition = Vector3.zero;
             this.Log();
             Actor.Die();
             base.OnDie();
@@ -143,40 +83,11 @@ namespace Domivium.Client.Contents.Actors
 
         protected override void OnTerminated()
         {
-            LockOn = false;
             Actor.Die();
             base.OnTerminated();
         }
 
         protected virtual void OnDamagedEffect(BattleEffectContext context) { }
-
-        protected virtual bool CheckForceSwapTarget() => false;
-
-        protected void CheckSwapTarget(BattleEffectContext context)
-        {
-            if (Target.Uid == context.Source.Uid) return;
-
-            if (!BattleService.TryGetChasePosition(BattleSystem, context.Source, out var chasePosition)) return;
-
-            if (CheckForceSwapTarget())
-            {
-                LockOnTarget(context.Source, chasePosition);
-                return;
-            }
-
-            if (StateSystem.Tag.CurrentValue == StateTags.Battle)
-            {
-                var newDistSq = (Actor.transform.position - chasePosition).sqrMagnitude;
-                var curDistSq = (Actor.transform.position - ChasePosition).sqrMagnitude;
-                if (newDistSq + HysteresisSq > curDistSq) return;
-            }
-            else
-            {
-                if (LockOn) return;
-            }
-
-            LockOnTarget(context.Source, chasePosition);
-        }
 
         protected virtual void OnLevelStatChanged()
         {
@@ -240,19 +151,14 @@ namespace Domivium.Client.Contents.Actors
                 OnDamagedEffect(context);
             }
         }
-  
+
         private void SetHealth()
         {
+            return;
+
             var cur = BattleSystem.Gauge.Current(StatId.Health);
             var max = BattleSystem.Stat.Value(StatId.Health);
             Actor.SetHealth(cur, max);
-        }
-
-        private void LockOnTarget(IBattleSystem battleSystem, Vector3 chasePosition)
-        {
-            Target = battleSystem;
-            LockOn = true;
-            ChasePosition = chasePosition;
         }
     }
 }

@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Core.Actors.Contract;
+using Domivium.Client.Core.Utility;
 using R3;
 using UnityEngine;
 
@@ -9,9 +10,10 @@ namespace Domivium.Client.Contents.Actors
 {
     public class Character : Unit
     {
-        private static readonly int RimColorId = Shader.PropertyToID("_RimColor");
-
         [SerializeField] private ParticleSystem _particleSystem;
+        [SerializeField] private LineRenderer _lineRenderer;
+        [SerializeField] private Transform _lootAt;
+        [SerializeField] private GameObject _aim;
 
         private DisposableBag _disposableBag;
         private readonly ReactiveProperty<bool> _isMove = new();
@@ -25,9 +27,7 @@ namespace Domivium.Client.Contents.Actors
         public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
         {
             var p = param.As<UnitParams>();
-            var color = p.PawnContext.PawnType.ToColor();
-            MaterialPropertyBlocks[0].SetColor(RimColorId, color);
-            _renderer[0].SetPropertyBlock(MaterialPropertyBlocks[0]);
+            // var color = p.PawnContext.PawnType.ToColor();
             return base.ActivateAsync(token, param);
         }
 
@@ -43,18 +43,24 @@ namespace Domivium.Client.Contents.Actors
             }
         }
 
-        public override void Tick(float deltaTime)
+        public void SetAim(Vector2 direction)
         {
-            _isMove.Value = _agent.velocity.sqrMagnitude > 0;
+            _aim.SetActive(!Mathf.Approximately(direction.sqrMagnitude, 0));
 
-            base.Tick(deltaTime);
-        }
+            var origin = _lootAt.transform.position;
+            var dir = new Vector3(direction.x, direction.y, 0);
+            var dist = 10f;
+            var hit = Physics2D.Raycast(origin, dir, dist, Layer.PropMask);
+            if (hit.collider != null)
+            {
+                dist = Vector2.Distance(_lootAt.position, hit.point);
+            }
 
-        public bool IsRemainingDistance()
-        {
-            if (_agent.pathPending) return false;
+            var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 180f;
+            _lootAt.rotation = Quaternion.Euler(0f, 0f, angle);
 
-            return _agent.remainingDistance > _agent.stoppingDistance;
+            _lineRenderer.SetPosition(0, Vector3.zero);
+            _lineRenderer.SetPosition(1, Vector3.left * dist);
         }
     }
 }

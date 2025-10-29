@@ -24,9 +24,9 @@ namespace Domivium.Client.Contents.UI.Static
         public LobbyStaticUIPresenter(
             LobbyStaticUIView view,
             IUINavigation navigation,
-            IAudioController audioController,
+            IAudioPlayer audioPlayer,
             NetworkService networkService,
-            SceneService sceneService) : base(view, navigation, audioController)
+            SceneService sceneService) : base(view, navigation, audioPlayer)
         {
             _networkService = networkService;
             _sceneService = sceneService;

@@ -1,5 +1,5 @@
 ﻿using System;
-using Domivium.Client.Contents.Commands;
+using Domivium.Client.Contents.System.Command;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 
@@ -7,12 +7,12 @@ namespace Domivium.Client.Contents.Input.Consumer
 {
     public class ApplicationInputConsumer : IInputConsumer
     {
-        private readonly IPointerCommand _pointerCommand;
+        private readonly IPointerSystemCommand _pointerSystemCommand;
         public InputPriority Priority => InputPriorities.Application;
 
-        public ApplicationInputConsumer(IPointerCommand pointerCommand)
+        public ApplicationInputConsumer(IPointerSystemCommand pointerSystemCommand)
         {
-            _pointerCommand = pointerCommand;
+            _pointerSystemCommand = pointerSystemCommand;
         }
 
         public bool TryHandle(InputMessage message)
@@ -21,11 +21,20 @@ namespace Domivium.Client.Contents.Input.Consumer
             {
                 case InputMessageType.Cancel:
                 case InputMessageType.Submit:
+                case InputMessageType.Move:
                     return false;
                 case InputMessageType.Point:
                 case InputMessageType.ClickEnter:
                 case InputMessageType.ClickExit:
-                    _pointerCommand.Update(message.Value);
+                    _pointerSystemCommand.Update(message.Value);
+                    return false;
+                case InputMessageType.Look:
+                case InputMessageType.LookCanceled:
+                case InputMessageType.Quick:
+                case InputMessageType.QuickCanceled:
+                case InputMessageType.Inventory:
+                case InputMessageType.Interact:
+                case InputMessageType.Avoid:
                     return false;
                 default:
                     throw new ArgumentOutOfRangeException();

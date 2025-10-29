@@ -3,20 +3,21 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - _collider
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Map
+  - Enviroment
   - Water
   - UI
-  - Effect
   - Character
-  - Tower
   - Monster
   - Prop
-  - 
+  - Background
+  - Foreground
+  - Effect
   - 
   - 
   - 
@@ -40,6 +41,15 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 450865473
+    locked: 0
+  - name: Actor
+    uniqueID: 3679672849
+    locked: 0
+  - name: Foreground
+    uniqueID: 99370801
     locked: 0
   m_RenderingLayers:
   - Default

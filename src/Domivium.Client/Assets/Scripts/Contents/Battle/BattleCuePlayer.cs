@@ -10,15 +10,15 @@ namespace Domivium.Client.Contents.Battle
 {
     public class BattleCuePlayer : Disposable, IBattleCuePlayer
     {
-        private readonly IAudioController _audioController;
+        private readonly IAudioPlayer _audioPlayer;
         private readonly VfxService _vfxService;
 
         public BattleCuePlayer(
-            IAudioController audioController,
+            IAudioPlayer audioPlayer,
             VfxService vfxService,
             ISubscriber<BattleCueMessage> subscriber)
         {
-            _audioController = audioController;
+            _audioPlayer = audioPlayer;
             _vfxService = vfxService;
             subscriber.Subscribe(OnCueMessage).AddTo(ref DisposableBag);
         }
@@ -27,11 +27,11 @@ namespace Domivium.Client.Contents.Battle
         {
             if (message.CueId == BattleCueIds.Attack)
             {
-                _audioController.PlaySFX(SFXAudioId.Attack);
+                _audioPlayer.PlaySFX(SFXAudioId.Attack);
             }
             else if (message.CueId == BattleCueIds.Damaged)
             {
-                _audioController.PlaySFX(SFXAudioId.Damaged);
+                _audioPlayer.PlaySFX(SFXAudioId.Damaged);
             }
 
             _vfxService.Spawn(message.CueId, message.Context);

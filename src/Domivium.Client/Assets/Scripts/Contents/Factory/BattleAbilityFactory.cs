@@ -17,9 +17,19 @@ namespace Domivium.Client.Contents.Factory
 
         public BattleAbility Create(BattleAbilityId id)
         {
+            if (id == BattleAbilityIds.Move)
+            {
+                return new MoveAbility(_effectPool);
+            }
+
             if (id == BattleAbilityIds.Attack)
             {
                 return new AttackAbility(_effectPool);
+            }
+
+            if (id == BattleAbilityIds.Avoid)
+            {
+                return new AvoidAbility(_effectPool);
             }
 
             if (id == BattleAbilityIds.Heal)

@@ -12,8 +12,8 @@ namespace Domivium.Client.Core.Battle
         protected virtual IReadOnlyCollection<BattleTag> BlockedBattleTags => TagGenerator.EmptyBattleTag;
         protected virtual IReadOnlyCollection<StateTag> BlockedStateTags => TagGenerator.DefaultBlockedStateTag;
         public abstract BattleAbilityId Id { get; }
-        public abstract BattleCueId CueId { get; }
-        public abstract float Cooldown { get; }
+        public virtual BattleCueId CueId => BattleCueId.None;
+        public virtual float Cooldown => 0;
         public virtual bool ApplyAttackSpeed => false;
 
         protected BattleAbility(IBattleEffectPool effectPool)
@@ -21,11 +21,9 @@ namespace Domivium.Client.Core.Battle
             EffectPool = effectPool;
         }
 
-        public bool TryActivate(ref BattleAbilityContext abilityContext) => PassesTagRequirements(abilityContext.Source) && OnActivate(ref abilityContext);
+        public bool TryActivate(ref BattleAbilityContext abilityContext) => OnActivate(ref abilityContext);
 
-        protected abstract bool OnActivate(ref BattleAbilityContext context);
-
-        private bool PassesTagRequirements(IBattleSystem source)
+        public bool PassesTagRequirements(IBattleSystem source)
         {
             if (BlockedStateTags.Contains(source.State))
             {
@@ -44,5 +42,7 @@ namespace Domivium.Client.Core.Battle
 
             return true;
         }
+
+        protected abstract bool OnActivate(ref BattleAbilityContext context);
     }
 }

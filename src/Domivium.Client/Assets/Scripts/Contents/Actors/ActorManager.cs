@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
@@ -28,7 +26,6 @@ namespace Domivium.Client.Contents.Actors
             ISubscriber<ActorStateMessage> actorStateSubscriber)
         {
             _stageContext = stageContext;
-            stageContext.Phase.Subscribe(OnChangedPhase).AddTo(ref DisposableBag);
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
             spawnActorSubscriber.Subscribe(OnSpawnActorMessage).AddTo(ref DisposableBag);
             actorStateSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
@@ -96,8 +93,6 @@ namespace Domivium.Client.Contents.Actors
 
         public void Tick(float deltaTime)
         {
-            if (_stageContext.Phase.CurrentValue != StagePhases.RunningWave) return;
-
             if (_pendingRemove.Count > 0)
             {
                 foreach (var id in _pendingRemove.Keys)
@@ -149,14 +144,6 @@ namespace Domivium.Client.Contents.Actors
             _index.Clear();
             _pendingRemove.Clear();
             _awaitDespawn.Clear();
-        }
-
-        private void OnChangedPhase(StagePhase phase)
-        {
-            if (phase == StagePhases.Failed || phase == StagePhases.Cleared)
-            {
-                TerminateAll();
-            }
         }
 
         private void OnSceneMessage(SceneMessage message)

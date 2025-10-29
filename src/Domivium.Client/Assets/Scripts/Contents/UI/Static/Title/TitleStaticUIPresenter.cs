@@ -11,8 +11,8 @@ namespace Domivium.Client.Contents.UI.Static
         protected override HashSet<UILayer> Layer => UILayer.Set(UILayers.Title);
         public override UIPriority Priority => UIPriorities.Title;
 
-        public TitleStaticUIPresenter(TitleStaticUIView view, IUINavigation navigation, IAudioController audioController)
-            : base(view, navigation, audioController) { }
+        public TitleStaticUIPresenter(TitleStaticUIView view, IUINavigation navigation, IAudioPlayer audioPlayer)
+            : base(view, navigation, audioPlayer) { }
 
         public void Login() { }
     }

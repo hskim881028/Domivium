@@ -45,7 +45,7 @@ namespace Domivium.Client.Contents.Actors
 
         public virtual void Tick(float deltaTime) // Die, Despawn 상태가 되면 Actor Manager에서 remove됨
         {
-            StateTick();
+            StateTick(deltaTime);
             Actor.Tick(deltaTime);
         }
 
@@ -63,43 +63,28 @@ namespace Domivium.Client.Contents.Actors
         }
 
         protected virtual void OnIdleTick() { }
-
-        protected virtual bool OnChaseTick()
-        {
-            return StateSystem.Tag.CurrentValue != StateTags.Move;
-        }
-
-        protected virtual bool OnBattleTick()
-        {
-            return StateSystem.Tag.CurrentValue != StateTags.Move;
-        }
-
-        protected virtual void OnMoveTick() { }
+        protected virtual void OnBattleTick() { }
+        protected virtual void OnMoveTick(float deltaTime) { }
 
         protected virtual void OnIdle() => this.Log(Uid);
-        protected virtual void OnChase() => this.Log(Uid);
-        protected virtual void OnBattle() => this.Log(Uid);
         protected virtual void OnMove() => this.Log(Uid);
+        protected virtual void OnBattle() => this.Log(Uid);
         protected virtual void OnDie() { }
         protected virtual void OnTerminated() => this.Log(Uid);
 
-        private void StateTick()
+        private void StateTick(float deltaTime)
         {
             if (StateSystem.Tag.CurrentValue == StateTags.Idle)
             {
                 OnIdleTick();
             }
-            else if (StateSystem.Tag.CurrentValue == StateTags.Chase)
+            else if (StateSystem.Tag.CurrentValue == StateTags.Move)
             {
-                OnChaseTick();
+                OnMoveTick(deltaTime);
             }
             else if (StateSystem.Tag.CurrentValue == StateTags.Battle)
             {
                 OnBattleTick();
-            }
-            else if (StateSystem.Tag.CurrentValue == StateTags.Move)
-            {
-                OnMoveTick();
             }
         }
 
@@ -109,17 +94,13 @@ namespace Domivium.Client.Contents.Actors
             {
                 OnIdle();
             }
-            else if (tag == StateTags.Chase)
+            else if (tag == StateTags.Move)
             {
-                OnChase();
+                OnMove();
             }
             else if (tag == StateTags.Battle)
             {
                 OnBattle();
-            }
-            else if (tag == StateTags.Move)
-            {
-                OnMove();
             }
             else if (tag == StateTags.Die)
             {

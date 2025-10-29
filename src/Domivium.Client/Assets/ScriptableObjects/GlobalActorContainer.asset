@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: GlobalActorContainer
   m_EditorClassIdentifier: 
   _inputEventSystem: {fileID: 1622887564007993358, guid: 9386ce8714672164a829dbe83bc12419, type: 3}
-  _cameraRig: {fileID: 9182275832961959613, guid: b7cbb1f031148924d8e30794de30e94d, type: 3}
-  _environmentRig: {fileID: 25565201943909701, guid: 94e6a1e7dfd96a046a52c50a26d2c532, type: 3}
+  _cameraRig: {fileID: 9182275832961959613, guid: 916773831afcc534c9e5fe373e783f19, type: 3}
+  _environmentRig: {fileID: 25565201943909701, guid: a2a3431c2d5f9f44b8c2aceb03b36059, type: 3}
   _audioRig: {fileID: 2640772526244607012, guid: 16c7a56185106834d9150f1271f55f1d, type: 3}
