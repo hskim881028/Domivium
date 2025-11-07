@@ -1,8 +1,8 @@
 ﻿using System;
-using Domivium.Client.Contents.System.Command;
 using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
+using Domivium.Client.Core.Systems;
 
 namespace Domivium.Client.Contents.Input.Consumer
 {
@@ -38,7 +38,7 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.Look:
                     return _characterSystemCommand.LookAt(message.Value);
                 case InputMessageType.LookCanceled:
-                    return _characterSystemCommand.Firing();
+                    return _characterSystemCommand.Reload();
                 case InputMessageType.Quick:
                 case InputMessageType.QuickCanceled:
                 case InputMessageType.Inventory:

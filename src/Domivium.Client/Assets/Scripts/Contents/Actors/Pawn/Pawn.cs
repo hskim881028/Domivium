@@ -15,14 +15,32 @@ namespace Domivium.Client.Contents.Actors
         [SerializeField] private DebugCircle _debugCircle;
         [SerializeField] private HealthDisplay _healthDisplay;
         [SerializeField] private SpriteRenderer _renderer;
+        [SerializeField] private Transform _muzzle;
+
+        private Collider2D _collider;
 
         private readonly Dictionary<StatId, DebugCircle> _ranges = new();
+        private bool _flipX;
 
-        public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
+        public Collider2D Collider => _collider;
+        public Transform Muzzle => _muzzle;
+
+
+        public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
-            var p = param.As<UnitParams>();
-            transform.localPosition = new Vector3(p.SpawnPoint.x + 0.5f, 0, p.SpawnPoint.y);
-            return base.ActivateAsync(token, param);
+            await base.SpawnAsync(token, param);
+            var p = param.As<PawnParams>();
+            transform.localPosition = p.SpawnPosition;
+        }
+
+        protected override void OnAwake()
+        {
+            base.OnAwake();
+            _collider = GetComponentInChildren<Collider2D>();
+            if (_muzzle == null)
+            {
+                _muzzle = transform;
+            }
         }
 
         public virtual void Die() { }
@@ -31,9 +49,15 @@ namespace Domivium.Client.Contents.Actors
 
         public virtual void Battle(Vector3 target) { }
 
-        public void SetFlip(bool isRight)
+        public void SetFlip(float x)
         {
-            _renderer.flipX = isRight;
+            if (Mathf.Approximately(x, 0f)) return;
+
+            var flipX = x > 0;
+            if (_flipX == flipX) return;
+
+            _flipX = flipX;
+            _renderer.flipX = _flipX;
         }
 
         public void SetHealth(int current, int max) => _healthDisplay.Set(current, max);

@@ -10,10 +10,9 @@ namespace Domivium.Client.Contents.Battle.Effect
 
         public DamageEffect(ref BattleEffectContext context) : base(ref context) { }
 
-        protected override bool OnActivate(BattleSystem owner)
+        protected override bool OnActivate()
         {
-            // Context.Source.Level.CurrentValue
-            var damage = BattleCalculator.GetDamage(Context.Source.Stat, owner.Stat);
+            var damage = BattleCalculator.GetDamage(Context.Source.Stat, Context.Owner.Stat);
             Context.Value = damage;
             AddGaugeModifier(StatId.Health, -damage, GaugeChannel.Add);
             return true;

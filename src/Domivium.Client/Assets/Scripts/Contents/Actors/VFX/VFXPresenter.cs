@@ -12,11 +12,11 @@ namespace Domivium.Client.Contents.Actors
         protected VFXPresenter(TVFX actor, ISystemFactory systemFactory)
             : base(actor, systemFactory) { }
 
-        public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
+        public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
+            await base.SpawnAsync(token, param);
             var p = param.As<VFXParams>();
             StateSystem.DespawnAsync(p.DespawnTime).Forget();
-            return base.ActivateAsync(token, param);
         }
     }
 }

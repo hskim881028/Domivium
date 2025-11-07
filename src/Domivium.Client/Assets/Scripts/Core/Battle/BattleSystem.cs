@@ -14,57 +14,67 @@ namespace Domivium.Client.Core.Battle
         private readonly IPublisher<BattleCueMessage> _cuePublisher;
         private readonly Dictionary<BattleAbilityId, BattleAbilitySpec> _abilitySpecs = new();
         private readonly List<BattleEffectSpec> _effectSpecs = new();
+        private readonly Queue<BattleEffectSpec> _deactivateEffectSpecs = new();
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
         private readonly ReadOnlyReactiveProperty<StateTag> _state;
         private readonly HashSet<BattleTag> _tags = new();
         private readonly ReactiveProperty<BattleEffectContext> _appliedEffect = new();
-        private readonly ReactiveProperty<bool> _isRight = new();
+        private readonly ReactiveProperty<Vector2> _direction = new();
+        private readonly ReactiveProperty<Vector2> _lookAt = new();
+        private readonly HashSet<ushort> _hitHistory = new();
 
+        private readonly Transform _pawn;
+        private readonly Transform _muzzle;
+        private readonly Collider2D _collider;
         private bool _isDisposed;
 
         public ushort Uid { get; private set; }
         public int Id { get; private set; }
         public ActorId ActorId { get; private set; }
-        public PawnType Type { get; private set; }
-        public PawnRarityType Rarity { get; private set; }
+        public RarityType Rarity { get; private set; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
-        public Vector3 UnitPosition => Unit.position;
-        public Vector2 Collider { get; }
-        public ReadOnlyReactiveProperty<bool> IsRight => _isRight;
-        public Transform Unit { get; }
+        public Vector2 PrePosition { get; private set; }
+        public Vector2 Position => _pawn.position;
+        public Vector2 MuzzlePosition => _muzzle.position;
+        public Vector2 ColliderSize => _collider.bounds.size;
+
         public StateTag State => _state.CurrentValue;
         public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect => _appliedEffect;
+        public ReadOnlyReactiveProperty<Vector2> Direction => _direction;
+        public ReadOnlyReactiveProperty<Vector2> LookAt => _lookAt;
 
         public BattleSystem(
-            Transform unit,
-            Vector2 collider,
+            Transform pawn,
+            Transform muzzle,
+            Collider2D collider,
             ReadOnlyReactiveProperty<StateTag> state,
             IPublisher<BattleCueMessage> cuePublisher)
         {
             Stat = new StatSet();
             Gauge = new GaugeSet(Stat);
-            Unit = unit;
-            Collider = collider;
+            _pawn = pawn;
+            _muzzle = muzzle;
+            _collider = collider;
             _state = state;
             _cuePublisher = cuePublisher;
         }
 
-        public bool Contains(BattleTag tag) => _tags.Contains(tag);
+        public bool ContainsTag(BattleTag tag) => _tags.Contains(tag);
 
-        public void Initialize(ushort uid, ActorId actorId, int id, PawnType type, PawnRarityType rarity)
+        public void Initialize(ushort uid, ActorId actorId, int id, RarityType rarity)
         {
             Uid = uid;
             ActorId = actorId;
             Id = id;
-            Type = type;
             Rarity = rarity;
             Reset();
         }
 
         public void Reset()
         {
+            _hitHistory.Clear();
             _abilitySpecs.Clear();
 
             foreach (var effect in _effectSpecs)
@@ -73,6 +83,7 @@ namespace Domivium.Client.Core.Battle
             }
 
             _tags.Clear();
+            _deactivateEffectSpecs.Clear();
             _effectSpecs.Clear();
             _statModifiers.Clear();
             _gaugeModifiers.Clear();
@@ -80,23 +91,32 @@ namespace Domivium.Client.Core.Battle
             Gauge.Clear();
         }
 
+        public void SetPosition(Vector2 position)
+        {
+            PrePosition = _pawn.position;
+            _pawn.position = position;
+        }
+
+        public void SetDirection(Vector2 direction)
+        {
+            _direction.Value = direction;
+        }
+
+        public void SetLookAt(Vector2 lookAt)
+        {
+            _lookAt.Value = lookAt;
+        }
+
         public void GrantAbility(BattleAbility ability)
         {
             _abilitySpecs.Add(ability.Id, new BattleAbilitySpec(ability, Stat, _cuePublisher));
         }
 
-        public void SetPosition(Vector3 position)
+        public void SetAbilityCooldown(BattleAbilityId abilityId, float cooldown)
         {
-            if (Unit.position.x < position.x)
-            {
-                _isRight.Value = true;
-            }
-            else if (Unit.position.x > position.x)
-            {
-                _isRight.Value = false;
-            }
+            if (!_abilitySpecs.TryGetValue(abilityId, out var spec)) return;
 
-            Unit.position = position;
+            spec.SetCooldown(cooldown);
         }
 
         public bool CanActivateAbility(BattleAbilityId abilityId, out float cooldown)
@@ -113,7 +133,7 @@ namespace Domivium.Client.Core.Battle
 
         public void ActivateEffect(BattleEffectSpec spec)
         {
-            if (!spec.TryActivate(this)) return;
+            if (!spec.TryActivate()) return;
 
             EnqueueModifiers(spec.StatModifiers, spec.GaugeModifiers);
             AddTags(spec.GrantedTags);
@@ -121,6 +141,20 @@ namespace Domivium.Client.Core.Battle
             _appliedEffect.Value = spec.Context;
             _appliedEffect.ForceNotify();
         }
+
+        public void DeactivateEffect(BattleEffectId effectId)
+        {
+            foreach (var spec in _effectSpecs)
+            {
+                if (spec.Id == effectId)
+                {
+                    _deactivateEffectSpecs.Enqueue(spec);
+                    return;
+                }
+            }
+        }
+
+        public bool TryAddHistory(ushort uid) => _hitHistory.Add(uid);
 
         public void Tick(float deltaTime)
         {
@@ -154,32 +188,22 @@ namespace Domivium.Client.Core.Battle
 
         private void UpdateEffects(float deltaTime)
         {
-            var originalCount = _effectSpecs.Count;
-            var write = 0;
-            for (var i = 0; i < originalCount; ++i)
-            {
-                var effect = _effectSpecs[i];
-                if (effect.Tick(deltaTime))
-                {
-                    if (effect.TryActivateForPeriodic(deltaTime))
-                    {
-                        EnqueueModifiers(effect.StatPeriodicModifiers, effect.GaugePeriodicModifiers);
-                    }
+            DeactivateEffects();
 
-                    _effectSpecs[write++] = effect;
-                }
-                else
+            foreach (var spec in _effectSpecs)
+            {
+                if (spec.TryActivateForPeriodic(deltaTime))
                 {
-                    RemoveTags(effect.GrantedTags);
-                    effect.Deactivate();
+                    EnqueueModifiers(spec.StatPeriodicModifiers, spec.GaugePeriodicModifiers);
+                }
+
+                if (!spec.Tick(deltaTime))
+                {
+                    _deactivateEffectSpecs.Enqueue(spec);
                 }
             }
 
-            var tail = _effectSpecs.Count - write;
-            if (tail > 0)
-            {
-                _effectSpecs.RemoveRange(write, tail);
-            }
+            DeactivateEffects();
         }
 
         private void EnqueueModifiers(IReadOnlyList<BattleStatModifier> stats, IReadOnlyList<BattleGaugeModifier> gauges)
@@ -216,6 +240,17 @@ namespace Domivium.Client.Core.Battle
             foreach (var tag in tags)
             {
                 _tags.Remove(tag);
+            }
+        }
+
+        private void DeactivateEffects()
+        {
+            while (_deactivateEffectSpecs.Count > 0)
+            {
+                var spec = _deactivateEffectSpecs.Dequeue();
+                RemoveTags(spec.GrantedTags);
+                spec.Deactivate();
+                _effectSpecs.Remove(spec);
             }
         }
     }

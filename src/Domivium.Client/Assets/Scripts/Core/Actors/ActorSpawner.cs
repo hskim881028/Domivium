@@ -76,7 +76,7 @@ namespace Domivium.Client.Core.Actors
 
             _uid++;
             var presenter = (IActorPresenter)actorScope.Container.Resolve(presenterType);
-            actorScope.Initialize(_uid, presenter);
+            actorScope.Initialize(_uid, actorId, presenter);
             return actorScope;
         }
 

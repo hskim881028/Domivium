@@ -1,7 +1,7 @@
 ﻿using System;
-using Domivium.Client.Contents.System.Command;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
+using Domivium.Client.Core.Systems;
 
 namespace Domivium.Client.Contents.Input.Consumer
 {

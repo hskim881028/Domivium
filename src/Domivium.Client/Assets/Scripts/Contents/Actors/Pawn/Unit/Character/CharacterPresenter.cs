@@ -1,14 +1,12 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.State;
-using Domivium.Client.Contents.System.Model;
-using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
-using Domivium.Client.Core.State;
+using Domivium.Client.Core.Systems;
 using Domivium.Client.Data.Stat;
 using R3;
 using UnityEngine;
@@ -17,88 +15,122 @@ namespace Domivium.Client.Contents.Actors
 {
     public class CharacterPresenter : UnitPresenter<Character>
     {
-        public override ActorId ActorId => ActorIds.Character;
-
-        private Vector2 _direction;
-        private Vector2 _lookAt;
-        private Vector2 _fire;
-        private Vector3 _prePosition;
+        private bool _firing;
+        public Transform Transform => Actor.transform;
 
         public CharacterPresenter(
             Character actor,
             ISystemFactory systemFactory,
-            IStageSystemModel stageSystemModel,
-            ICharacterSystemModel inputSystemModel)
-            : base(actor, systemFactory, stageSystemModel)
+            ICharacterSystem acharacterSystem)
+            : base(actor, systemFactory)
         {
-            inputSystemModel.OnMove.Subscribe(OnMove).AddTo(ref DisposableBag);
-            inputSystemModel.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
-            inputSystemModel.OnFire.Subscribe(OnFire).AddTo(ref DisposableBag);
-            inputSystemModel.OnAvoid.Subscribe(OnAvoid).AddTo(ref DisposableBag);
+            acharacterSystem.OnTurn.Subscribe(OnTurn).AddTo(ref DisposableBag);
+            acharacterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
+            acharacterSystem.OnAvoid.Subscribe(OnAvoid).AddTo(ref DisposableBag);
+            acharacterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
         }
 
-        public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
+        public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
-            base.ActivateAsync(token, param);
-            _prePosition = BattleSystem.UnitPosition;
-            return UniTask.CompletedTask;
+            await base.SpawnAsync(token, param);
+
+            var p = param.As<CharacterParams>();
+
+            var wp = p.WeaponContext;
+
+            BattleSystem.Stat.Apply(StatId.ProjectileCapacity, wp.ProjectileCapacity, StatChannel.Add);
+            BattleSystem.Stat.Apply(StatId.Attack, wp.Attack, StatChannel.Add);
+            BattleSystem.Stat.Apply(StatId.AttackRange, wp.AttackRange, StatChannel.Add);
+            BattleSystem.Stat.Apply(StatId.AttackSpeed, wp.AttackSpeed, StatChannel.Add);
+            BattleSystem.Stat.Apply(StatId.ReloadSpeed, wp.ReloadSpeed, StatChannel.Add);
+            BattleSystem.Stat.Apply(StatId.CriticalRate, wp.CriticalRate, StatChannel.Add);
+            BattleSystem.Stat.Apply(StatId.CriticalDamage, wp.CriticalDamage, StatChannel.Add);
+
+            var projectileCapacity = BattleSystem.Stat.Value(StatId.ProjectileCapacity);
+            BattleSystem.Gauge.Apply(StatId.ProjectileCapacity, projectileCapacity, GaugeChannel.Max);
+
+            var attackSpeed = BattleSystem.Stat.RateValue(StatId.AttackSpeed);
+            BattleSystem.SetAbilityCooldown(BattleAbilityIds.Attack, attackSpeed);
+            BattleSystem.SetAbilityCooldown(BattleAbilityIds.Avoid, Constant.AvoidCooldown);
+        }
+
+        public override void Tick(float deltaTime)
+        {
+            base.Tick(deltaTime);
+            if (!_firing) return;
+
+            var context = BattleAbilityContext.Create(BattleAbilityIds.Attack, BattleSystem);
+            BattleSystem.TryActivateAbility(ref context);
         }
 
         protected override void OnMoveTick(float deltaTime)
         {
             base.OnMoveTick(deltaTime);
+            var context = BattleAbilityContext.Create(BattleAbilityIds.Move, BattleSystem, deltaTime);
+            if (!BattleSystem.TryActivateAbility(ref context)) return;
 
-            _prePosition = BattleSystem.UnitPosition;
-            var collider = BattleSystem.Collider;
-            var speed = BattleSystem.Stat.RateValue(StatId.MoveSpeed);
-            var delta = new Vector3(_direction.x, _direction.y, 0f);
-            if (delta.sqrMagnitude > 1f)
-            {
-                delta.Normalize();
-            }
-            delta *= speed * deltaTime;
-            var nextPosition = StageSystemModel.NextPosition(_prePosition, delta, collider);
-            var context = BattleAbilityContext.Create(BattleAbilityIds.Move, BattleSystem, nextPosition);
-            BattleSystem.TryActivateAbility(ref context);
+            var lookAt = BattleSystem.LookAt.CurrentValue;
+            if (Mathf.Approximately(lookAt.sqrMagnitude, 0)) return;
+
+            var attackRange = BattleSystem.Stat.RateValue(StatId.AttackRange);
+            Actor.SetAim(lookAt, attackRange);
         }
 
-        private void OnMove(Vector2 value)
+        private void OnTurn(Vector2 value)
         {
-            var tag = StateTag.Idle;
-            if (value.sqrMagnitude > 0)
+            if (Mathf.Approximately(value.sqrMagnitude, 0))
             {
-                _direction = value;
-                tag = StateTags.Move;
+                StateSystem.Transit(StateTags.Idle);
+                return;
             }
 
-            StateSystem.TryTransit(tag);
+            var context = BattleAbilityContext.Create(BattleAbilityIds.Turn, BattleSystem, value);
+            if (!BattleSystem.TryActivateAbility(ref context)) return;
+
+            StateSystem.Transit(StateTags.Move);
         }
 
         private void OnLookAt(Vector2 value)
         {
-            _lookAt = value;
-            Actor.SetAim(_lookAt);
-        }
-
-        private void OnFire(Vector2 value)
-        {
-            _fire = value;
-            this.Log(_fire);
-        }
-
-        private void OnAvoid(float cooldown)
-        {
-            var position = BattleSystem.UnitPosition;
-            var lastDirection = position - _prePosition;
-            var collider = BattleSystem.Collider;
-            var delta = new Vector3(lastDirection.x, lastDirection.y, 0f);
-            delta.Normalize();
-
-            var speed = BattleSystem.Stat.RateValue(StatId.MoveSpeed);
-            delta *= speed;
-            var nextPosition = StageSystemModel.NextPosition(position, delta, collider);
-            var context = BattleAbilityContext.Create(BattleAbilityIds.Avoid, BattleSystem, nextPosition);
+            var context = BattleAbilityContext.Create(BattleAbilityIds.LookAt, BattleSystem, value);
             BattleSystem.TryActivateAbility(ref context);
+        }
+
+        protected override void OnLookAtChanged(Vector2 lookAt)
+        {
+            base.OnLookAtChanged(lookAt);
+            if (Mathf.Approximately(lookAt.sqrMagnitude, 0))
+            {
+                Actor.HideAim();
+            }
+            else
+            {
+                var attackRange = BattleSystem.Stat.RateValue(StatId.AttackRange);
+                Actor.SetAim(lookAt, attackRange);
+            }
+        }
+
+        private void OnAvoid(R3.Unit unit)
+        {
+            var context = BattleAbilityContext.Create(BattleAbilityIds.Avoid, BattleSystem);
+            BattleSystem.TryActivateAbility(ref context);
+        }
+
+        private void OnBattleTag(BattleTag tag)
+        {
+            _firing = tag == BattleTags.Firing;
+
+            if (tag == BattleTags.Idle)
+            {
+                var context = BattleAbilityContext.Create(BattleAbilityIds.Reload, BattleSystem);
+                BattleSystem.TryActivateAbility(ref context);
+            }
+
+            if (tag == BattleTags.Aiming || tag == BattleTags.Firing)
+            {
+                var context = BattleAbilityContext.Create(BattleAbilityIds.CancelReload, BattleSystem);
+                BattleSystem.TryActivateAbility(ref context);
+            }
         }
     }
 }

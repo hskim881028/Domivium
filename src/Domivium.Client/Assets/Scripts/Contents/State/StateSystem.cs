@@ -27,7 +27,7 @@ namespace Domivium.Client.Contents.State
             _publisher = publisher;
         }
 
-        public void TryTransit(StateTag next)
+        public void Transit(StateTag next)
         {
             var current = _tag.CurrentValue;
             if (IsTerminated()) return;

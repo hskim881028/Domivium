@@ -23,7 +23,11 @@ namespace Domivium.Client.Contents.Factory
 
         public IStateSystem CreateState(IActorPresenter presenter) => new StateSystem(presenter, _statePublisher);
 
-        public IBattleSystem CreateBattle(Actor actor, ReadOnlyReactiveProperty<StateTag> tag) 
-            => new BattleSystem(actor.transform, actor.Collder, tag, _cuePublisher);
+        public IBattleSystem CreateBattle(
+            Transform pawn,
+            Transform muzzle,
+            Collider2D collider,
+            ReadOnlyReactiveProperty<StateTag> tag)
+            => new BattleSystem(pawn, muzzle, collider, tag, _cuePublisher);
     }
 }

@@ -17,8 +17,7 @@ namespace Domivium.Client.Contents.Actors
 
         public ushort Uid { get; private set; }
 
-        public abstract ActorId ActorId { get; }
-        public int Id { get; protected set; }
+        public ActorId ActorId { get; private set; }
 
         protected ActorPresenter(TActor actor, ISystemFactory systemFactory)
         {
@@ -27,20 +26,23 @@ namespace Domivium.Client.Contents.Actors
             StateSystem.Tag.DistinctUntilChanged().Subscribe(OnStateChanged).AddTo(ref DisposableBag);
         }
 
-        public virtual void Initialize(ushort uid, Transform parent)
+        public virtual void Initialize(ushort uid, ActorId actorId, Transform parent)
         {
             Uid = uid;
-            Actor.Initialize(uid, parent);
+            ActorId = actorId;
+            Actor.Initialize(uid, actorId, parent);
         }
 
-        public virtual async UniTask ActivateAsync(CancellationToken token, ActorParam param)
+        public virtual async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
-            await Actor.ActivateAsync(token, param);
+            await Actor.SpawnAsync(token, param);
         }
 
-        public virtual void Deactivate()
+        public virtual void Activate() { }
+
+        public virtual void Despawn()
         {
-            Actor.Deactivate();
+            Actor.Despawn();
         }
 
         public virtual void Tick(float deltaTime) // Die, Despawn 상태가 되면 Actor Manager에서 remove됨
@@ -63,7 +65,6 @@ namespace Domivium.Client.Contents.Actors
         }
 
         protected virtual void OnIdleTick() { }
-        protected virtual void OnBattleTick() { }
         protected virtual void OnMoveTick(float deltaTime) { }
 
         protected virtual void OnIdle() => this.Log(Uid);
@@ -82,10 +83,6 @@ namespace Domivium.Client.Contents.Actors
             {
                 OnMoveTick(deltaTime);
             }
-            else if (StateSystem.Tag.CurrentValue == StateTags.Battle)
-            {
-                OnBattleTick();
-            }
         }
 
         private void OnStateChanged(StateTag tag)
@@ -97,10 +94,6 @@ namespace Domivium.Client.Contents.Actors
             else if (tag == StateTags.Move)
             {
                 OnMove();
-            }
-            else if (tag == StateTags.Battle)
-            {
-                OnBattle();
             }
             else if (tag == StateTags.Die)
             {

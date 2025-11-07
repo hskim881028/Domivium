@@ -15,15 +15,16 @@ namespace Domivium.Client.Contents.Actors
         [SerializeField] private Tilemap _debug;
         [SerializeField] private TileBase _backgroundBase;
         [SerializeField] private TileBase _treeTile;
-        [SerializeField] private GameObject _treePrefab;
         [SerializeField] private Transform _propContainer;
 
         private Vector3Int _cell;
 
         public Tilemap ColliderGrid => _colliderGrid;
 
-        public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
+        public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
+            await base.SpawnAsync(token, param);
+
             var tilemap = param.As<StageFieldParams>().Tilemap;
 
             foreach (var cell in tilemap.cellBounds.allPositionsWithin)
@@ -37,12 +38,8 @@ namespace Domivium.Client.Contents.Actors
                 else
                 {
                     _debug.SetTile(cell, _treeTile);
-                    var go = Instantiate(_treePrefab, _propContainer);
-                    go.transform.localPosition = new Vector3(cell.x + 0.427f, cell.y + 0.58f, 0);
                 }
             }
-
-            return base.ActivateAsync(token, param);
         }
     }
 }

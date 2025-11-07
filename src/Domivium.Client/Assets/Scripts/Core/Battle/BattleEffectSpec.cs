@@ -44,9 +44,9 @@ namespace Domivium.Client.Core.Battle
             return _duration >= 0;
         }
 
-        public bool TryActivate(BattleSystem target)
+        public bool TryActivate()
         {
-            if (!_effect.TryActivate(target))
+            if (!_effect.TryActivate())
             {
                 _onDeactivate.Invoke(this);
                 return false;

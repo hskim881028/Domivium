@@ -12,23 +12,29 @@ namespace Domivium.Client.Core.Battle
         public ushort Uid { get; }
         public ActorId ActorId { get; }
         public int Id { get; }
-        public PawnType Type { get; }
-        public PawnRarityType Rarity { get; }
+        public RarityType Rarity { get; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
-        public Transform Unit { get; }
-        public Vector3 UnitPosition { get; }
-        public Vector2 Collider { get; }
-        public ReadOnlyReactiveProperty<bool> IsRight { get; }
+        public Vector2 PrePosition { get; }
+        public Vector2 Position { get; }
+        public Vector2 MuzzlePosition { get; }
+        public Vector2 ColliderSize { get; }
         public StateTag State { get; }
         public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect { get; }
-        public bool Contains(BattleTag tag);
-        public void Initialize(ushort uid, ActorId actorId, int id, PawnType type, PawnRarityType rarity);
+        public ReadOnlyReactiveProperty<Vector2> Direction { get; }
+        public ReadOnlyReactiveProperty<Vector2> LookAt { get; }
+        public bool ContainsTag(BattleTag tag);
+        public void Initialize(ushort uid, ActorId actorId, int id, RarityType rarity);
         public void Reset();
+        public void SetPosition(Vector2 position);
+        public void SetDirection(Vector2 direction);
+        public void SetLookAt(Vector2 lookAt);
         public void GrantAbility(BattleAbility ability);
-        public void SetPosition(Vector3 position);
-        public bool CanActivateAbility(BattleAbilityId abilityId, out float  cooldown);
+        public void SetAbilityCooldown(BattleAbilityId abilityId, float cooldown);
+        public bool CanActivateAbility(BattleAbilityId abilityId, out float cooldown);
         public bool TryActivateAbility(ref BattleAbilityContext context);
         public void ActivateEffect(BattleEffectSpec spec);
+        public void DeactivateEffect(BattleEffectId effectId);
+        public bool TryAddHistory(ushort uid);
     }
 }

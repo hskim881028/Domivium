@@ -10,9 +10,9 @@ namespace Domivium.Client.Contents.Battle.Effect
 
         public HealEffect(ref BattleEffectContext context) : base(ref context) { }
 
-        protected override bool OnActivate(BattleSystem owner)
+        protected override bool OnActivate()
         {
-            var heal = owner.Stat.Value(StatId.Attack);
+            var heal = Context.Owner.Stat.Value(StatId.Attack);
             Context.Value = heal;
             AddGaugeModifier(StatId.Health, heal, GaugeChannel.Add);
             return true;

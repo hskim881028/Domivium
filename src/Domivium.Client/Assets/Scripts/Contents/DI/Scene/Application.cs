@@ -10,7 +10,7 @@ using Domivium.Client.Contents.Factory;
 using Domivium.Client.Contents.Input.Composition;
 using Domivium.Client.Contents.Input.Consumer;
 using Domivium.Client.Contents.Services;
-using Domivium.Client.Contents.System;
+using Domivium.Client.Contents.Systems;
 using Domivium.Client.Contents.UI.Generated;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
@@ -132,7 +132,6 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<NetworkService>(lifetime);
             builder.Register<SceneService>(lifetime);
             builder.Register<EnvironmentService>(lifetime);
-            builder.Register<VfxService>(lifetime);
         }
 
         private void System(IContainerBuilder builder, Lifetime lifetime)
@@ -197,7 +196,7 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<IBattleEffectFactory, BattleEffectFactory>(lifetime);
             builder.Register<IBattleAbilityFactory, BattleAbilityFactory>(lifetime);
             builder.Register<ISystemFactory, SystemFactory>(lifetime);
-            builder.Register<IActorFactory, ActorFactory>(lifetime);
+            builder.Register<IActorParamFactory, ActorParamFactory>(lifetime);
         }
     }
 }

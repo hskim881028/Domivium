@@ -1,5 +1,8 @@
-﻿using Domivium.Client.Contents.Audio.Generated;
-using Domivium.Client.Contents.Services;
+﻿using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Actors.Contract;
+using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.Audio.Generated;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Message;
@@ -11,15 +14,15 @@ namespace Domivium.Client.Contents.Battle
     public class BattleCuePlayer : Disposable, IBattleCuePlayer
     {
         private readonly IAudioPlayer _audioPlayer;
-        private readonly VfxService _vfxService;
+        private readonly IActorSpawner _actorSpawner;
 
         public BattleCuePlayer(
             IAudioPlayer audioPlayer,
-            VfxService vfxService,
+            IActorSpawner actorSpawner,
             ISubscriber<BattleCueMessage> subscriber)
         {
             _audioPlayer = audioPlayer;
-            _vfxService = vfxService;
+            _actorSpawner = actorSpawner;
             subscriber.Subscribe(OnCueMessage).AddTo(ref DisposableBag);
         }
 
@@ -29,12 +32,19 @@ namespace Domivium.Client.Contents.Battle
             {
                 _audioPlayer.PlaySFX(SFXAudioId.Attack);
             }
-            else if (message.CueId == BattleCueIds.Damaged)
+
+            if (message.CueId == BattleCueIds.Damaged)
             {
                 _audioPlayer.PlaySFX(SFXAudioId.Damaged);
+                var param = new DamageTextParams(message.Context.Position, message.Context.Value, 1.6f);
+                _actorSpawner.SpawnAsync(ActorIds.DamageText, param).Forget();
             }
 
-            _vfxService.Spawn(message.CueId, message.Context);
+            if (message.CueId == BattleCueIds.Healed)
+            {
+                var param = new HealTextParams(message.Context.Position, message.Context.Value, 1.6f);
+                _actorSpawner.SpawnAsync(ActorIds.HealText, param).Forget();
+            }
         }
     }
 }

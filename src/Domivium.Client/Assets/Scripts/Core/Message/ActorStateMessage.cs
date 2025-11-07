@@ -8,21 +8,15 @@ namespace Domivium.Client.Core.Message
         public StateTag Tag { get; }
         public ushort Uid { get; }
         public ActorId ActorId { get; }
-        public int Id { get; }
 
-        private ActorStateMessage(
-            StateTag tag,
-            ushort uid,
-            ActorId actorId,
-            int id)
+        private ActorStateMessage(StateTag tag, ushort uid, ActorId actorId)
         {
             Tag = tag;
             Uid = uid;
             ActorId = actorId;
-            Id = id;
         }
 
         public static ActorStateMessage Create(StateTag tag, IActorPresenter presenter)
-            => new(tag, presenter.Uid, presenter.ActorId, presenter.Id);
+            => new(tag, presenter.Uid, presenter.ActorId);
     }
 }

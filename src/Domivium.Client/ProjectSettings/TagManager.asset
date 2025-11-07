@@ -9,14 +9,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Enviroment
+  - Environment
   - Water
   - UI
+  - Background
   - Character
   - Monster
+  - Projectile
   - Prop
-  - Background
-  - Foreground
   - Effect
   - 
   - 
@@ -42,21 +42,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Environment
+    uniqueID: 696774947
+    locked: 0
   - name: Background
     uniqueID: 450865473
     locked: 0
   - name: Actor
     uniqueID: 3679672849
     locked: 0
+  - name: Effect
+    uniqueID: 382924341
+    locked: 0
   - name: Foreground
     uniqueID: 99370801
     locked: 0
   m_RenderingLayers:
   - Default
-  - Light Layer 1
-  - Light Layer 2
-  - Light Layer 3
-  - Light Layer 4
-  - Light Layer 5
-  - Light Layer 6
-  - Light Layer 7
+  - Test

@@ -8,17 +8,27 @@ namespace Domivium.Client.Data.Row
 	public class CharacterRow
 	{
 		[PrimaryKey] public int Id { get; set; }
-		public string Job { get; set; } = string.Empty;
+		public string Type { get; set; } = string.Empty;
 		public string Rarity { get; set; } = string.Empty;
-		public string Target { get; set; } = string.Empty;
 		public int Health { get; set; }
+		public int Hunger { get; set; }
+		public int Stamina { get; set; }
+		public int Sanity { get; set; }
+		public int Durability { get; set; }
+		public int Weight { get; set; }
+		public int MaxWeight { get; set; }
+		public int InventoryCapacity { get; set; }
+		public int ProjectileCapacity { get; set; }
 		public int Attack { get; set; }
 		public int Defense { get; set; }
+		public int AttackRange { get; set; } // percent
+		public int HitRange { get; set; } // percent
+		public int DetectionRange { get; set; } // percent
+		public int FieldOfView { get; set; } // percent
+		public int AngleOfView { get; set; } // percent
 		public int MoveSpeed { get; set; } // percent
 		public int AttackSpeed { get; set; } // percent
-		public int HitRange { get; set; } // percent
-		public int AttackRange { get; set; } // percent
-		public int DetectionRange { get; set; } // percent
+		public int ReloadSpeed { get; set; } // percent
 		public int CriticalRate { get; set; } // percent
 		public int CriticalDamage { get; set; } // percent
 	}
