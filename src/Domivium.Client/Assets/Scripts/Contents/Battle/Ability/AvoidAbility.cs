@@ -7,14 +7,14 @@ namespace Domivium.Client.Contents.Battle.Ability
     {
         private const float Multiply = 1f;
 
-        private readonly IStageSystem _stageSystem;
+        private readonly IStageFieldSystem _stageFieldSystem;
 
         public override BattleAbilityId Id => BattleAbilityIds.Avoid;
         public override BattleCueId CueId => BattleCueIds.Avoid;
 
-        public AvoidAbility(IBattleEffectPool effectPool, IStageSystem stageSystem) : base(effectPool)
+        public AvoidAbility(IBattleEffectPool effectPool, IStageFieldSystem stageFieldSystem) : base(effectPool)
         {
-            _stageSystem = stageSystem;
+            _stageFieldSystem = stageFieldSystem;
         }
 
         protected override bool OnActivate(ref BattleAbilityContext context)
@@ -24,7 +24,7 @@ namespace Domivium.Client.Contents.Battle.Ability
             var collider = source.ColliderSize;
             var direction = source.Direction.CurrentValue;
             direction *= Multiply;
-            var nextPosition = _stageSystem.GetNextPosition(position, direction, collider);
+            var nextPosition = _stageFieldSystem.GetNextPosition(position, direction, collider);
             context.Source.SetPosition(nextPosition);
             return true;
         }

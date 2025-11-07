@@ -63,12 +63,19 @@ namespace Domivium.Client.Core.Battle
 
         public bool ContainsTag(BattleTag tag) => _tags.Contains(tag);
 
-        public void Initialize(ushort uid, ActorId actorId, int id, RarityType rarity)
+        public void Initialize(
+            ushort uid,
+            ActorId actorId,
+            int id,
+            RarityType rarity,
+            Vector2 position)
         {
             Uid = uid;
             ActorId = actorId;
             Id = id;
             Rarity = rarity;
+            PrePosition = position;
+            _pawn.position = position;
             Reset();
         }
 

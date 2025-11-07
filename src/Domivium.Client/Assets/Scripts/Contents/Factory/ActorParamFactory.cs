@@ -37,11 +37,12 @@ namespace Domivium.Client.Contents.Factory
         public ActorParam CreateMonster(
             int id,
             Vector2 spawnPosition,
-            IReadOnlyList<BattleAbility> abilities)
+            IReadOnlyList<BattleAbility> abilities,
+            IBattleSystem target)
         {
             var row = _masterDbService.DB.MonsterRowTable.FindById(id);
             var context = new UnitContext(row);
-            return new UnitParams(spawnPosition, context, abilities);
+            return new MonsterParams(spawnPosition, context, abilities, target);
         }
 
         public ActorParam CreateProjectile(

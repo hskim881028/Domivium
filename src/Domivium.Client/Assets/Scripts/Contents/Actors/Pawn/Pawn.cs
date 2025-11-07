@@ -26,12 +26,12 @@ namespace Domivium.Client.Contents.Actors
         public Transform Muzzle => _muzzle;
 
 
-        public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
-        {
-            await base.SpawnAsync(token, param);
-            var p = param.As<PawnParams>();
-            transform.localPosition = p.SpawnPosition;
-        }
+        // public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
+        // {
+        //     await base.SpawnAsync(token, param);
+        //     var p = param.As<PawnParams>();
+        //     transform.localPosition = p.SpawnPosition;
+        // }
 
         protected override void OnAwake()
         {

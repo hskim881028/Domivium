@@ -40,16 +40,6 @@ namespace Domivium.Client.Contents.UI.Static
             characterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
         }
 
-        protected override void OnDispose()
-        {
-            _character.Gauge.RemoveListener(StatId.Health, OnHealthChanged);
-            _character.Gauge.RemoveListener(StatId.Hunger, OnHungerChanged);
-            _character.Gauge.RemoveListener(StatId.Stamina, OnStaminaChanged);
-            _character.Gauge.RemoveListener(StatId.Sanity, OnSanityChanged);
-            _character.Gauge.RemoveListener(StatId.ProjectileCapacity, OnSanityChanged);
-            base.OnDispose();
-        }
-
         public void EnterLobby()
         {
             _sceneService.Load(SceneScopeIds.Lobby);

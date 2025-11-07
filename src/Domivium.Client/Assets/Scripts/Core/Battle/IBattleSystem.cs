@@ -24,7 +24,7 @@ namespace Domivium.Client.Core.Battle
         public ReadOnlyReactiveProperty<Vector2> Direction { get; }
         public ReadOnlyReactiveProperty<Vector2> LookAt { get; }
         public bool ContainsTag(BattleTag tag);
-        public void Initialize(ushort uid, ActorId actorId, int id, RarityType rarity);
+        public void Initialize(ushort uid, ActorId actorId, int id, RarityType rarity, Vector2 position);
         public void Reset();
         public void SetPosition(Vector2 position);
         public void SetDirection(Vector2 direction);

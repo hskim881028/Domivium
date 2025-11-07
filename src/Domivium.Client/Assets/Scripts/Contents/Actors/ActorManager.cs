@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
-using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Message;
 using MessagePipe;
 using R3;
@@ -12,7 +12,6 @@ namespace Domivium.Client.Contents.Actors
 {
     public sealed class ActorManager : Disposable, IActorManager
     {
-        private readonly StageContext _stageContext;
         private readonly Dictionary<ushort, (ActorId actorId, Action<ushort> onDespawn)> _index = new();
         private readonly Dictionary<ActorId, ActorBucket> _buckets = new();
         private readonly Dictionary<ushort, ActorId> _pendingRemove = new();
@@ -20,12 +19,10 @@ namespace Domivium.Client.Contents.Actors
         private readonly List<ActorBucket> _bucketSnapshot = new(32);
 
         public ActorManager(
-            StageContext stageContext,
             ISubscriber<SceneMessage> sceneSubscriber,
             ISubscriber<SpawnActorMessage> spawnActorSubscriber,
             ISubscriber<ActorStateMessage> actorStateSubscriber)
         {
-            _stageContext = stageContext;
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
             spawnActorSubscriber.Subscribe(OnSpawnActorMessage).AddTo(ref DisposableBag);
             actorStateSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
@@ -70,10 +67,10 @@ namespace Domivium.Client.Contents.Actors
             return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetPawn(uid, out pawn);
         }
 
-        public bool TryGetFirstPawn(ActorId actorId, out IBattleSystem pawn)
+        public bool GetCharacter(out IBattleSystem pawn)
         {
             pawn = null;
-            return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetFirstPawn(out pawn);
+            return _buckets.TryGetValue(ActorIds.Character, out var bucket) && bucket.TryGetFirstPawn(out pawn);
         }
 
         public int GetPawns(ActorId actorId, List<IBattleSystem> buffer) => !_buckets.TryGetValue(actorId, out var bucket) ? 0 : bucket.CollectPawns(buffer);

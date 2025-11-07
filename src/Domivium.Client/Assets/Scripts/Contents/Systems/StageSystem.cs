@@ -1,111 +1,123 @@
-﻿using Domivium.Client.Core.Systems;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Actors;
+using Domivium.Client.Contents.Actors.Contract;
+using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.Audio.Generated;
+using Domivium.Client.Contents.State;
+using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Audio;
+using Domivium.Client.Core.Factory;
+using Domivium.Client.Core.Message;
+using Domivium.Client.Core.Provider;
+using Domivium.Client.Core.Systems;
+using MessagePipe;
+using R3;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace Domivium.Client.Contents.Systems
 {
     public sealed class StageSystem : Disposable, IStageSystem, IStageSystemCommand
     {
-        private const float Skin = 0.01f;
-        private const float BiasInX = 0.002f;
-        private const float BiasInY = 0.002f;
-        private const float LeadOut = 0.003f;
-        private const int IterationCount = 10;
+        private readonly StageFieldProvider _stageFieldProvider;
+        private readonly IAudioPlayer _audioPlayer;
+        private readonly IActorSpawner _actorSpawner;
+        private readonly IActorManager _actorManager;
+        private readonly IBattleAbilityFactory _abilityFactory;
+        private readonly IActorParamFactory _actorParamFactory;
+        private readonly IStageFieldSystemCommand _stageFieldSystemCommand;
+        private readonly ICharacterSystemCommand _characterSystemCommand;
+        private readonly ICameraSystemCommand _cameraSystemCommand;
+        private readonly ReactiveProperty<StageMode> _mode = new();
 
-        private Tilemap _grid;
+        public ReadOnlyReactiveProperty<StageMode> Mode => _mode;
 
-        public void InitializeAsync(Tilemap grid)
+        public StageSystem(
+            StageFieldProvider stageFieldProvider,
+            IAudioPlayer audioPlayer,
+            IActorSpawner actorSpawner,
+            IActorManager actorManager,
+            IBattleAbilityFactory abilityFactory,
+            IActorParamFactory actorParamFactory,
+            IStageFieldSystemCommand stageFieldSystemCommand,
+            ICharacterSystemCommand characterSystemCommand,
+            ICameraSystemCommand cameraSystemCommand,
+            ISubscriber<SceneMessage> sceneSubscriber,
+            ISubscriber<ActorStateMessage> actorStateSubscriber)
         {
-            _grid = grid;
+            _stageFieldProvider = stageFieldProvider;
+            _audioPlayer = audioPlayer;
+            _actorSpawner = actorSpawner;
+            _actorManager = actorManager;
+            _abilityFactory = abilityFactory;
+            _actorParamFactory = actorParamFactory;
+            _stageFieldSystemCommand = stageFieldSystemCommand;
+            _characterSystemCommand = characterSystemCommand;
+            _cameraSystemCommand = cameraSystemCommand;
+            sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
+            actorStateSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
         }
 
-        public Vector3 GetNextPosition(Vector3 position, Vector3 delta, Vector2 collider)
+        public async UniTaskVoid RunAsync(int stageId)
         {
-            var target = position + delta;
-            if (IsValid(target, delta, collider)) return target;
-
-            var first = Mathf.Abs(delta.x) >= Mathf.Abs(delta.y);
-            var nextPosition = position;
-
-            if (first)
+            _audioPlayer.PlayBGM(BGMAudioId.Stage);
+            var tilemap = _stageFieldProvider.Get(stageId);
+            var stageField = await _actorSpawner.SpawnAsync(ActorIds.StageField, new StageFieldParams(tilemap));
+            if (stageField is StageFieldPresenter stageFieldPresenter)
             {
-                Vector3 dx = new(delta.x, 0f, 0f);
-                nextPosition += dx * Sweep(nextPosition, dx, collider);
-
-                Vector3 dy = new(0f, delta.y, 0f);
-                nextPosition += dy * Sweep(nextPosition, dy, collider);
-            }
-            else
-            {
-                Vector3 dy = new(0f, delta.y, 0f);
-                nextPosition += dy * Sweep(nextPosition, dy, collider);
-
-                Vector3 dx = new(delta.x, 0f, 0f);
-                nextPosition += dx * Sweep(nextPosition, dx, collider);
+                _stageFieldSystemCommand.InitializeAsync(stageFieldPresenter.Grid);
             }
 
-            return nextPosition;
+            foreach (var cell in tilemap.cellBounds.allPositionsWithin)
+            {
+                if (tilemap.HasTile(cell)) continue;
+
+                var position = new Vector2(cell.x + 0.427f, cell.y + 0.58f);
+                await _actorSpawner.SpawnAsync(ActorIds.Prop, new PropParams(position));
+            }
+
+            var abilities = _abilityFactory.GetAbilities(ActorIds.Character);
+            var actorParam = _actorParamFactory.CreateCharacter(1, Vector2.zero, abilities);
+            var character = await _actorSpawner.SpawnAsync(ActorIds.Character, actorParam);
+            if (character is CharacterPresenter characterPresenter)
+            {
+                _characterSystemCommand.Initialize(characterPresenter.BattleSystem);
+                _cameraSystemCommand.Initialize(characterPresenter.Transform);
+
+                var monsterAbilities = _abilityFactory.GetAbilities(ActorIds.Monster);
+                var monsterParam = _actorParamFactory.CreateMonster(1, new Vector2(2, -2), monsterAbilities, characterPresenter.BattleSystem);
+                await _actorSpawner.SpawnAsync(ActorIds.Monster, monsterParam);
+            }
+
+            _mode.Value = StageMode.Run;
         }
 
-        private bool HasTile(Vector3 p)
+        private void OnSceneMessage(SceneMessage message)
         {
-            var cell = _grid.WorldToCell(p);
-            return _grid.cellBounds.Contains(cell) && _grid.HasTile(cell);
+            switch (message.Type)
+            {
+                case SceneMessageType.Unload:
+                case SceneMessageType.Load:
+                    _mode.Value = StageMode.Prepare;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
-        private bool IsValid(Vector3 position, Vector3 delta, Vector2 collider)
+        private void OnActorStateMessage(ActorStateMessage message)
         {
-            var hx = Mathf.Max(0f, collider.x - Skin);
-            var hy = Mathf.Max(0f, collider.y - Skin);
-            var leftX = position.x - hx + BiasInX;
-            var rightX = position.x + hx - BiasInX;
-            var botY = position.y + BiasInY;
-            var topY = position.y + hy - BiasInY;
-
-            switch (delta.y)
+            if (message.Tag == StateTags.Despawn && message.ActorId == ActorIds.Character)
             {
-                case > 0f:
-                    topY = position.y + hy + LeadOut;
-                    break;
-                case < 0f:
-                    botY = position.y - LeadOut;
-                    break;
+                _mode.Value = StageMode.Terminated;
             }
-
-            switch (delta.x)
-            {
-                case < 0f:
-                    leftX = position.x - hx - LeadOut;
-                    break;
-                case > 0f:
-                    rightX = position.x + hx + LeadOut;
-                    break;
-            }
-
-            var bl = new Vector3(leftX, botY);
-            var br = new Vector3(rightX, botY);
-            var tl = new Vector3(leftX, topY);
-            var tr = new Vector3(rightX, topY);
-            return HasTile(bl) && HasTile(br) && HasTile(tl) && HasTile(tr);
         }
 
-        private float Sweep(Vector3 start, Vector3 delta, Vector2 collider)
+        public void Tick(float deltaTime)
         {
-            float lo = 0f, hi = 1f;
-            for (var i = 0; i < IterationCount; i++)
-            {
-                var mid = (lo + hi) * 0.5f;
-                var position = start + delta * mid;
-                if (IsValid(position, delta, collider))
-                {
-                    lo = mid;
-                }
-                else
-                {
-                    hi = mid;
-                }
-            }
-            return Mathf.Max(0f, lo - Skin * 0.5f);
+            if (Mode.CurrentValue != StageMode.Run) return;
+
+            _actorManager.Tick(deltaTime);
         }
     }
 }

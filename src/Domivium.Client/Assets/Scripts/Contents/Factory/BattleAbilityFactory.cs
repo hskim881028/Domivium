@@ -16,7 +16,7 @@ namespace Domivium.Client.Contents.Factory
         private readonly IActorParamFactory _actorParamFactory;
         private readonly IActorManager _actorManager;
         private readonly IActorSpawner _actorSpawner;
-        private readonly IStageSystem _stageSystem;
+        private readonly IStageFieldSystem _stageFieldSystem;
 
         private readonly Dictionary<ActorId, IReadOnlyList<BattleAbility>> _abilities = new();
 
@@ -26,13 +26,13 @@ namespace Domivium.Client.Contents.Factory
             IActorParamFactory actorParamFactory,
             IActorManager actorManager,
             IActorSpawner actorSpawner,
-            IStageSystem stageSystem)
+            IStageFieldSystem stageFieldSystem)
         {
             _effectPool = effectPool;
             _actorParamFactory = actorParamFactory;
             _actorManager = actorManager;
             _actorSpawner = actorSpawner;
-            _stageSystem = stageSystem;
+            _stageFieldSystem = stageFieldSystem;
 
             _abilities.Add(ActorIds.Character,
                 new List<BattleAbility>
@@ -54,7 +54,8 @@ namespace Domivium.Client.Contents.Factory
                     Create(BattleAbilityIds.LookAt),
                     Create(BattleAbilityIds.Attack),
                     Create(BattleAbilityIds.Avoid),
-                    Create(BattleAbilityIds.Reload)
+                    Create(BattleAbilityIds.Reload),
+                    Create(BattleAbilityIds.Chase)
                 });
 
             _abilities.Add(ActorIds.Projectile,
@@ -77,12 +78,12 @@ namespace Domivium.Client.Contents.Factory
 
             if (id == BattleAbilityIds.Move)
             {
-                return new MoveAbility(_effectPool, _stageSystem);
+                return new MoveAbility(_effectPool, _stageFieldSystem);
             }
 
             if (id == BattleAbilityIds.Avoid)
             {
-                return new AvoidAbility(_effectPool, _stageSystem);
+                return new AvoidAbility(_effectPool, _stageFieldSystem);
             }
 
             if (id == BattleAbilityIds.LookAt)
@@ -113,6 +114,10 @@ namespace Domivium.Client.Contents.Factory
             if (id == BattleAbilityIds.CancelReload)
             {
                 return new CancelReloadAbility(_effectPool);
+            }
+            if (id == BattleAbilityIds.Chase)
+            {
+                return new ChaseAbility(_effectPool, _stageFieldSystem);
             }
 
             throw new Exception($"Invalid battle ability: {id}");

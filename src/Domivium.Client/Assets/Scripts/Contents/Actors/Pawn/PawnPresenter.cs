@@ -1,8 +1,5 @@
-﻿using System.Threading;
-using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Battle;
+﻿using Domivium.Client.Contents.Battle;
 using Domivium.Client.Core.Actors;
-using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using R3;

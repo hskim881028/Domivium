@@ -21,13 +21,13 @@ namespace Domivium.Client.Contents.Actors
         public CharacterPresenter(
             Character actor,
             ISystemFactory systemFactory,
-            ICharacterSystem acharacterSystem)
+            ICharacterSystem characterSystem)
             : base(actor, systemFactory)
         {
-            acharacterSystem.OnTurn.Subscribe(OnTurn).AddTo(ref DisposableBag);
-            acharacterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
-            acharacterSystem.OnAvoid.Subscribe(OnAvoid).AddTo(ref DisposableBag);
-            acharacterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
+            characterSystem.OnTurn.Subscribe(OnTurn).AddTo(ref DisposableBag);
+            characterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
+            characterSystem.OnAvoid.Subscribe(OnAvoid).AddTo(ref DisposableBag);
+            characterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
         }
 
         public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
@@ -54,9 +54,10 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.SetAbilityCooldown(BattleAbilityIds.Avoid, Constant.AvoidCooldown);
         }
 
-        public override void Tick(float deltaTime)
+        protected override void OnPostStateTick(float deltaTime)
         {
-            base.Tick(deltaTime);
+            base.OnPostStateTick(deltaTime);
+            
             if (!_firing) return;
 
             var context = BattleAbilityContext.Create(BattleAbilityIds.Attack, BattleSystem);

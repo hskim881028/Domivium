@@ -22,7 +22,7 @@ namespace Domivium.Client.Contents.Actors
             var p = param.As<UnitParams>();
             var row = p.UnitContext;
 
-            BattleSystem.Initialize(Uid, row.ActorId, row.Id, row.RarityType);
+            BattleSystem.Initialize(Uid, row.ActorId, row.Id, row.RarityType, p.SpawnPosition);
 
             BattleSystem.Stat.Register(StatId.Health, row.Health, OnHealthStatChanged);
             BattleSystem.Stat.Register(StatId.Hunger, row.Hunger, OnHungerStatChanged);
@@ -62,16 +62,6 @@ namespace Domivium.Client.Contents.Actors
             {
                 BattleSystem.GrantAbility(ability);
             }
-        }
-
-        public override void Despawn()
-        {
-            BattleSystem.Gauge.RemoveListener(StatId.Health, OnHealthGaugeChanged);
-            BattleSystem.Gauge.RemoveListener(StatId.Hunger, OnHungerGaugeChanged);
-            BattleSystem.Gauge.RemoveListener(StatId.Stamina, OnStaminaGaugeChanged);
-            BattleSystem.Gauge.RemoveListener(StatId.Sanity, OnSanityGaugeChanged);
-            BattleSystem.Gauge.RemoveListener(StatId.ProjectileCapacity, OnProjectileCapacityGaugeChanged);
-            base.Despawn();
         }
 
         #region Stat

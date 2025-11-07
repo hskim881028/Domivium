@@ -13,6 +13,10 @@ namespace Domivium.Client.Contents.Actors
         {
             base.OnAwake();
             _spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+            // foreach (var spriteRenderer in _spriteRenderers)
+            // {
+            //     spriteRenderer.maskInteraction = SpriteMaskInteraction.None;
+            // }
         }
 
         public async UniTaskVoid ShowAsync(float duration = 1)

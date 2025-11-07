@@ -66,10 +66,10 @@ namespace Domivium.Client.Contents.Actors
 
         protected virtual void OnIdleTick() { }
         protected virtual void OnMoveTick(float deltaTime) { }
+        protected virtual void OnPostStateTick(float deltaTime) { }
 
         protected virtual void OnIdle() => this.Log(Uid);
         protected virtual void OnMove() => this.Log(Uid);
-        protected virtual void OnBattle() => this.Log(Uid);
         protected virtual void OnDie() { }
         protected virtual void OnTerminated() => this.Log(Uid);
 
@@ -83,6 +83,8 @@ namespace Domivium.Client.Contents.Actors
             {
                 OnMoveTick(deltaTime);
             }
+
+            OnPostStateTick(deltaTime);
         }
 
         private void OnStateChanged(StateTag tag)

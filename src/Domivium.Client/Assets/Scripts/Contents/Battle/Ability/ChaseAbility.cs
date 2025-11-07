@@ -4,14 +4,13 @@ using Domivium.Client.Data.Stat;
 
 namespace Domivium.Client.Contents.Battle.Ability
 {
-    public class MoveAbility : BattleAbility
+    public class ChaseAbility : BattleAbility
     {
         private readonly IStageFieldSystem _stageFieldSystem;
 
-        public override BattleAbilityId Id => BattleAbilityIds.Move;
-        public override BattleCueId CueId => BattleCueIds.Move;
+        public override BattleAbilityId Id => BattleAbilityIds.Chase;
 
-        public MoveAbility(IBattleEffectPool effectPool, IStageFieldSystem stageFieldSystem) : base(effectPool)
+        public ChaseAbility(IBattleEffectPool effectPool, IStageFieldSystem stageFieldSystem) : base(effectPool)
         {
             _stageFieldSystem = stageFieldSystem;
         }
@@ -19,6 +18,11 @@ namespace Domivium.Client.Contents.Battle.Ability
         protected override bool OnActivate(ref BattleAbilityContext context)
         {
             var source = context.Source;
+
+            var dir = context.Delta - source.Position;
+            dir.Normalize();
+            source.SetDirection(dir);
+
             var speed = source.Stat.RateValue(StatId.MoveSpeed);
             var position = source.Position;
             var collider = source.ColliderSize;

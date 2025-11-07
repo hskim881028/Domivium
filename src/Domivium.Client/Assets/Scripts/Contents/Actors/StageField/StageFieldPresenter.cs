@@ -1,6 +1,4 @@
-﻿using Domivium.Client.Core.Context;
-using Domivium.Client.Core.Factory;
-using R3;
+﻿using Domivium.Client.Core.Factory;
 using UnityEngine.Tilemaps;
 
 namespace Domivium.Client.Contents.Actors
@@ -9,15 +7,6 @@ namespace Domivium.Client.Contents.Actors
     {
         public Tilemap Grid => Actor.ColliderGrid;
 
-        public StageFieldPresenter(
-            StageField actor,
-            ISystemFactory systemFactory,
-            StageContext stageContext)
-            : base(actor, systemFactory)
-        {
-            stageContext.Mode.Subscribe(OnChangeMode).AddTo(ref DisposableBag);
-        }
-
-        private void OnChangeMode(StageMode mode) { }
+        public StageFieldPresenter(StageField actor, ISystemFactory systemFactory) : base(actor, systemFactory) { }
     }
 }

@@ -9,15 +9,23 @@ namespace Domivium.Client.Contents.Actors
     {
         [SerializeField] private TrailRenderer _trailRenderer;
 
+        protected override void OnAwake()
+        {
+            base.OnAwake();
+            _trailRenderer.enabled = true;
+        }
+
         public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
             await base.SpawnAsync(token, param);
             _trailRenderer.Clear();
+            _trailRenderer.enabled = true;
         }
 
         public override void Despawn()
         {
             _trailRenderer.Clear();
+            _trailRenderer.enabled = false;
             base.Despawn();
         }
     }

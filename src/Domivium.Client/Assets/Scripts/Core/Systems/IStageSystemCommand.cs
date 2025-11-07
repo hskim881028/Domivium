@@ -1,9 +1,9 @@
-﻿using UnityEngine.Tilemaps;
+﻿using Cysharp.Threading.Tasks;
 
 namespace Domivium.Client.Core.Systems
 {
-    public interface IStageSystemCommand
+    public interface IStageSystemCommand : ITicker
     {
-        public void InitializeAsync(Tilemap grid);
+        public UniTaskVoid RunAsync(int stageId);
     }
 }

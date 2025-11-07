@@ -1,6 +1,6 @@
 ﻿using UnitGenerator;
 
-namespace Domivium.Client.Core.Context
+namespace Domivium.Client.Core.Systems
 {
     [UnitOf(typeof(int), UnitGenerateOptions.ImplicitOperator | UnitGenerateOptions.Comparable | UnitGenerateOptions.ArithmeticOperator)]
     public readonly partial struct StageMode

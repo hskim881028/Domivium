@@ -1,5 +1,4 @@
 ﻿using System;
-using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Systems;
@@ -8,22 +7,20 @@ namespace Domivium.Client.Contents.Input.Consumer
 {
     public sealed class BattleInputConsumer : IInputConsumer
     {
-        private readonly StageContext _stageContext;
+        private readonly IStageSystem _stageSystem;
         private readonly ICharacterSystemCommand _characterSystemCommand;
 
-        public BattleInputConsumer(StageContext stageContext, ICharacterSystemCommand characterSystemCommand)
+        public BattleInputConsumer(IStageSystem stageSystem, ICharacterSystemCommand characterSystemCommand)
         {
-            _stageContext = stageContext;
+            _stageSystem = stageSystem;
             _characterSystemCommand = characterSystemCommand;
         }
 
         public InputPriority Priority => InputPriorities.Battle;
 
-        private bool IsStageRunning => _stageContext.Mode.CurrentValue == StageMode.Run;
-
         public bool TryHandle(InputMessage message)
         {
-            if (!IsStageRunning) return false;
+            if (_stageSystem.Mode.CurrentValue != StageMode.Run) return false;
 
             switch (message.Type)
             {

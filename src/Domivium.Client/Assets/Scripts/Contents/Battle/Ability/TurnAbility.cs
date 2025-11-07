@@ -10,6 +10,7 @@ namespace Domivium.Client.Contents.Battle.Ability
 
         protected override bool OnActivate(ref BattleAbilityContext context)
         {
+            context.Delta.Normalize();
             context.Source.SetDirection(context.Delta);
             return true;
         }

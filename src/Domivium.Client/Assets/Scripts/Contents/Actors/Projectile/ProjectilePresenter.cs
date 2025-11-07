@@ -17,7 +17,7 @@ namespace Domivium.Client.Contents.Actors
     {
         private ActorId _target;
         private Vector2 _direction;
-        private Vector2 _startPosition;
+        private Vector2 _spawnPosition;
 
         protected ProjectilePresenter(Projectile actor, ISystemFactory systemFactory)
             : base(actor, systemFactory) { }
@@ -28,7 +28,7 @@ namespace Domivium.Client.Contents.Actors
 
             var p = param.As<ProjectileParams>();
             var projectile = p.ProjectileContext;
-            BattleSystem.Initialize(Uid, projectile.ActorId, projectile.Id, projectile.RarityType);
+            BattleSystem.Initialize(Uid, projectile.ActorId, projectile.Id, projectile.RarityType, p.SpawnPosition);
 
             BattleSystem.Stat.Register(StatId.Durability, projectile.Durability, OnDurabilityStatChanged);
             BattleSystem.Stat.Register(StatId.Attack, projectile.Attack, OnAttackStatChanged);
@@ -54,19 +54,13 @@ namespace Domivium.Client.Contents.Actors
 
             _target = p.Target;
             _direction = p.Direction;
-            _startPosition = p.SpawnPosition;
-        }
-
-        public override void Despawn()
-        {
-            BattleSystem.Gauge.RemoveListener(StatId.Health, OnDurabilityGaugeChanged);
-            base.Despawn();
+            _spawnPosition = p.SpawnPosition;
         }
 
         protected override void OnMoveTick(float deltaTime)
         {
             base.OnMoveTick(deltaTime);
-            var dist = Vector2.Distance(_startPosition, BattleSystem.Position);
+            var dist = Vector2.Distance(_spawnPosition, BattleSystem.Position);
             var range = BattleSystem.Stat.RateValue(StatId.AttackRange);
             if (dist > range)
             {
@@ -77,6 +71,8 @@ namespace Domivium.Client.Contents.Actors
             var context = BattleAbilityContext.Create(BattleAbilityIds.Tracking, BattleSystem, _target, deltaTime);
             BattleSystem.TryActivateAbility(ref context);
         }
+        
+        
 
         protected override void OnIdle()
         {

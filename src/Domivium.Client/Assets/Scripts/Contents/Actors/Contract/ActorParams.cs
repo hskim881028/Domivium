@@ -16,6 +16,12 @@ namespace Domivium.Client.Contents.Actors.Contract
         UnitContext UnitContext,
         ItemContext WeaponContext,
         IReadOnlyList<BattleAbility> Abilities) : UnitParams(SpawnPosition, UnitContext, Abilities);
+    
+    public record MonsterParams(
+        Vector2 SpawnPosition,
+        UnitContext UnitContext,
+        IReadOnlyList<BattleAbility> Abilities,
+        IBattleSystem Target) : UnitParams(SpawnPosition, UnitContext, Abilities);
 
     public record UnitParams(
         Vector2 SpawnPosition,

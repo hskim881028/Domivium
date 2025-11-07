@@ -32,11 +32,6 @@ namespace Domivium.Client.Data.Stat
             onChanged?.Invoke();
         }
 
-        public void RemoveListener(StatId id, Action onChanged)
-        {
-            _onChanged[id].Remove(onChanged);
-        }
-
         public void Apply(StatId id, int value, GaugeChannel channel)
         {
             if (channel == GaugeChannel.Set)
