@@ -24,9 +24,9 @@ namespace Domivium.Client.Contents.Battle
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
-        public BattleEffectSpec Get(BattleEffectId id, BattleAbilityContext abilityContext)
+        public BattleEffectSpec Get(BattleEffectId id, IBattleSystem source, IBattleSystem owner)
         {
-            var context = BattleEffectContext.Create(id, abilityContext);
+            var context = BattleEffectContext.Create(id, source, owner);
             if (!_specs.ContainsKey(id))
             {
                 _specs[id] = new Queue<BattleEffectSpec>();

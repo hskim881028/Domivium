@@ -2,9 +2,9 @@
 
 namespace Domivium.Client.Core.Actors
 {
-    [UnitOf(typeof(int), UnitGenerateOptions.ImplicitOperator | UnitGenerateOptions.Comparable | UnitGenerateOptions.ArithmeticOperator)]
+    [UnitOf(typeof(int))]
     public readonly partial struct ActorId
     {
-        public static ActorId None = 0;
+        public static ActorId None = new(0);
     }
 }

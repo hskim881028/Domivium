@@ -1,11 +1,11 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Domivium.Client.Contents.Actors.Contract;
+using Domivium.Client.Contents.Components;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
-using Domivium.Client.Core.Utility;
-using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -13,55 +13,57 @@ namespace Domivium.Client.Contents.Actors
 {
     public class DamageText : VFX
     {
-        private static readonly Vector3 Punch1 = new(0f, 0.8f, 0f);
-        private static readonly Vector3 Punch2 = new(0f, 0.4f, 0f);
-        private static readonly Vector3 Punch3 = new(0f, 0.2f, 0f);
+        private const float StartX = -1.17f;
+        private const float SizeX = 0.13f;
+        private const float MoveY = 0.8f;
+
+        private static readonly Vector3 Punch1 = new(0f, -0.2f, 0f);
+        private static readonly Vector3 Punch2 = new(0f, -0.1f, 0f);
         private static readonly Vector3 Shake = new(0.05f, 0f, 0f);
 
         [SerializeField] private Transform _driver;
         [SerializeField] private Transform _axis;
-        [SerializeField] private TextMeshPro _text;
+        [SerializeField] private SpriteNumber[] _numbers;
+        [SerializeField] private Sprite[] _sprites;
 
-        private readonly char[] _buf = new char[16];
+        private readonly Queue<int> _cached = new();
 
         private Sequence _punch;
         private Sequence _shake;
 
-        private Color _baseColor;
         private Vector3 _basePos;
         private Vector3 _currentPosition;
 
-
-        public override void Initialize(ushort id, Transform parent)
+        public override void Initialize(ushort uid, ActorId actorId, Transform parent)
         {
-            SetText(int.MinValue);
-            _text.ForceMeshUpdate();
-            _text.SetCharArray(Array.Empty<char>(), 0, 0);
+            base.Initialize(uid, actorId, parent);
 
-            _baseColor = _text.color;
+            Reset();
+
             _punch = DOTween.Sequence()
                 .SetAutoKill(false)
                 .Pause()
-                .Append(_driver.DOPunchPosition(Punch1, 0.3f, 1, 0.8f).SetRecyclable(true))
-                .Append(_driver.DOPunchPosition(Punch2, 0.3f, 2, 0.8f).SetRecyclable(true))
-                .Append(_driver.DOPunchPosition(Punch3, 0.4f, 3, 0.5f).SetRecyclable(true))
-                .Join(_text.DOFade(0f, 0.5f).SetDelay(0.4f).SetRecyclable(true))
+                .Append(_driver.DOLocalMoveY(MoveY, 0.3f).SetEase(Ease.OutCirc).SetRecyclable(true))
+                .Append(_driver.DOPunchPosition(Punch1, 0.3f, 2, 0.8f).SetRecyclable(true))
+                .Append(_driver.DOPunchPosition(Punch2, 0.4f, 3, 0.5f).SetRecyclable(true))
                 .OnUpdate(() =>
                 {
                     _currentPosition = _basePos + _driver.localPosition;
                     transform.localPosition = _currentPosition;
-                });
+                })
+                .SetLink(gameObject);
 
             _shake = DOTween.Sequence()
                 .SetAutoKill(false)
                 .Pause()
-                .Append(_axis.DOShakePosition(0.8f, Shake).SetRecyclable(true));
-
-            base.Initialize(id, parent);
+                .Append(_axis.DOShakePosition(0.8f, Shake).SetDelay(0.3f).SetRecyclable(true))
+                .SetLink(gameObject);
         }
 
-        public override UniTask ActivateAsync(CancellationToken token, ActorParam param)
+        public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
+            await base.SpawnAsync(token, param);
+
             var p = param.As<DamageTextParams>();
             var position = p.Position;
             var circle = Random.insideUnitCircle;
@@ -73,7 +75,6 @@ namespace Domivium.Client.Contents.Actors
             _axis.localPosition = Vector3.zero;
             _driver.localPosition = Vector3.zero;
 
-            _text.color = _baseColor;
             SetText(p.Damage);
 
             _punch.Rewind();
@@ -81,30 +82,56 @@ namespace Domivium.Client.Contents.Actors
 
             _shake.Rewind();
             _shake.Play();
-            return base.ActivateAsync(token, param);
         }
 
-        public override void Deactivate()
+        public override void Despawn()
         {
             _punch?.Pause();
             _shake?.Pause();
-
-            _text.color = Color.clear;
-            _text.SetCharArray(Array.Empty<char>(), 0, 0);
-            base.Deactivate();
+            base.Despawn();
         }
 
         protected override void OnDestroyInternal()
         {
+            base.OnDestroyInternal();
             _punch?.Kill();
             _shake?.Kill();
-            base.OnDestroyInternal();
         }
 
         private void SetText(int damage)
         {
-            var length = TextWriteUtils.WriteIntToBuffer(damage, _buf);
-            _text.SetCharArray(_buf, 0, length);
+            if (damage <= 0) return;
+
+            _cached.Clear();
+            var cur = damage;
+            while (cur >= 10)
+            {
+                var d = cur % 10;
+                _cached.Enqueue(d);
+                cur /= 10;
+            }
+
+            _cached.Enqueue(cur);
+
+            Reset();
+
+            var index = 0;
+            while (_cached.Count > 0)
+            {
+                var num = _cached.Dequeue();
+                _numbers[index].Show(_sprites[num], Color.red);
+                index++;
+            }
+
+            _axis.localPosition = new Vector3(StartX + (index - 1) * SizeX, 0, 0);
+        }
+
+        private void Reset()
+        {
+            foreach (var number in _numbers)
+            {
+                number.Hide();
+            }
         }
     }
 }

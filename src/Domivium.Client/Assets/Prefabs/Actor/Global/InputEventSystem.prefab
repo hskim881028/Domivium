@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6040503875020347560}
   - component: {fileID: 1622887564007993358}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: InputEventSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 5684623721850164986}
   - component: {fileID: 1871565207573019253}
   - component: {fileID: 4311187983958867879}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: EventSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}

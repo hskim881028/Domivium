@@ -10,9 +10,24 @@ namespace Domivium.Client.Contents.Factory
     {
         public BattleEffect Create(BattleEffectId id, ref BattleEffectContext context)
         {
+            if (id == BattleEffectIds.Attack)
+            {
+                return new AttackEffect(ref context);
+            }
+            
             if (id == BattleEffectIds.Damage)
             {
                 return new DamageEffect(ref context);
+            }
+
+            if (id == BattleEffectIds.Durability)
+            {
+                return new DurabilityEffect(ref context);
+            }
+
+            if (id == BattleEffectIds.Reload)
+            {
+                return new ReloadEffect(ref context);
             }
 
             if (id == BattleEffectIds.Heal)

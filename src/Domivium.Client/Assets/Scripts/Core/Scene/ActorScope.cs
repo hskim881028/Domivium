@@ -10,21 +10,22 @@ namespace Domivium.Client.Core.Scene
     {
         private bool _isDespawn;
 
-        public ushort Id { get; private set; }
+        public ushort Uid { get; private set; }
         public IActorPresenter Presenter { get; private set; }
 
-        public void Initialize(ushort id, IActorPresenter presenter)
+        public void Initialize(ushort uid, ActorId actorId, IActorPresenter presenter)
         {
-            Id = id;
+            Uid = uid;
             Presenter = presenter;
-            Presenter.Initialize(id, transform);
+            Presenter.Initialize(uid, actorId, transform);
         }
 
         public async UniTask SpawnAsync(ActorParam param, CancellationToken token)
         {
             _isDespawn = false;
             gameObject.SetActive(true);
-            await Presenter.ActivateAsync(token, param);
+            await Presenter.SpawnAsync(token, param);
+            Presenter.Activate();
         }
 
         public void Despawn()
@@ -32,7 +33,7 @@ namespace Domivium.Client.Core.Scene
             if (_isDespawn) return;
 
             _isDespawn = true;
-            Presenter.Deactivate();
+            Presenter.Despawn();
             gameObject.SetActive(false);
         }
     }

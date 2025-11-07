@@ -1,11 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Domivium.Client.Contents.ReadModels;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
+using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI.Navigation;
 using MessagePipe;
 using R3;
@@ -23,7 +23,7 @@ namespace Domivium.Client.Contents.DI.Entry
             SceneService sceneService,
             EnvironmentService environmentService,
             InputDispatcher inputDispatcher,
-            ICameraReadModel cameraRead,
+            ICameraSystem cameraSystem,
             IUINavigation uiNavigation,
             IInputComposition inputComposition,
             ISubscriber<SceneUIReadyMessage> sceneUIReadySubscriber)

@@ -9,8 +9,8 @@ namespace Domivium.Client.Core.UI.Presenter
         where TView : StackUIView<TMessage>
         where TMessage : IUIMessage
     {
-        protected StackUIPresenter(TView view, IUINavigation navigation, IAudioController audioController)
-            : base(view, navigation, audioController) { }
+        protected StackUIPresenter(TView view, IUINavigation navigation, IAudioPlayer audioPlayer)
+            : base(view, navigation, audioPlayer) { }
 
         protected void Close(UIResult result) { }
     }

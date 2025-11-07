@@ -5,20 +5,20 @@ namespace Domivium.Client.Core.Message
 {
     public readonly struct SpawnActorMessage
     {
-        public ushort Id { get; }
+        public ushort Uid { get; }
         public ActorId ActorId { get; }
         public IActorPresenter Presenter { get; }
         public Action<ushort> OnDespawn { get; }
 
-        private SpawnActorMessage(ushort id, ActorId actorId, IActorPresenter presenter, Action<ushort> onDespawn)
+        private SpawnActorMessage(ushort uid, ActorId actorId, IActorPresenter presenter, Action<ushort> onDespawn)
         {
-            Id = id;
+            Uid = uid;
             ActorId = actorId;
             Presenter = presenter;
             OnDespawn = onDespawn;
         }
 
-        public static SpawnActorMessage Create(ushort id, ActorId actorId, IActorPresenter presenter, Action<ushort> onDespawn)
-            => new(id, actorId, presenter, onDespawn);
+        public static SpawnActorMessage Create(ushort uid, ActorId actorId, IActorPresenter presenter, Action<ushort> onDespawn)
+            => new(uid, actorId, presenter, onDespawn);
     }
 }

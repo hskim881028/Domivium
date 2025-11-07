@@ -14,21 +14,21 @@ namespace Domivium.Client.Core.Battle
         private readonly List<BattleGaugeModifier> _gaugePeriodicModifiers = new();
         private BattleEffectContext _context;
 
+        public abstract BattleEffectId Id { get; }
         protected virtual IReadOnlyCollection<BattleTag> RequiredBattleTags => TagGenerator.EmptyBattleTag;
         protected virtual IReadOnlyCollection<BattleTag> BlockedBattleTags => TagGenerator.EmptyBattleTag;
         protected virtual IReadOnlyCollection<StateTag> BlockedStateTags => TagGenerator.DefaultBlockedStateTag;
         public virtual IReadOnlyCollection<BattleTag> GrantedBattleTags => TagGenerator.EmptyBattleTag;
-        public virtual float Duration => 0;
-        public virtual float PeriodicInterval => 0;
+        public virtual BattleCueId CueId => BattleCueId.None;
         public virtual BattleCueId PeriodicCueId => BattleCueId.None;
         public virtual BattleCueId DeactivateCueId => BattleCueId.None;
-        public abstract BattleCueId CueId { get; }
-        public abstract BattleEffectId Id { get; }
         public ref BattleEffectContext Context => ref _context;
         public IReadOnlyList<BattleStatModifier> StatModifiers => _statModifiers;
         public IReadOnlyList<BattleStatModifier> StatPeriodicModifiers => _statPeriodicModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugeModifiers => _gaugeModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugePeriodicModifiers => _gaugePeriodicModifiers;
+        public float Duration { get; protected set; }
+        public float PeriodicInterval { get; protected set; }
 
         protected BattleEffect(ref BattleEffectContext context)
         {
@@ -44,9 +44,9 @@ namespace Domivium.Client.Core.Battle
             _gaugePeriodicModifiers.Clear();
         }
 
-        public bool TryActivate(BattleSystem owner) => PassesTagRequirements(owner) && OnActivate(owner);
+        public bool TryActivate() => PassesTagRequirements() && OnActivate();
 
-        protected abstract bool OnActivate(BattleSystem owner);
+        protected abstract bool OnActivate();
 
         protected void AddStatModifier(StatId id, int value, StatChannel channel)
         {
@@ -68,21 +68,21 @@ namespace Domivium.Client.Core.Battle
             _gaugePeriodicModifiers.Add(new BattleGaugeModifier(id, value, channel));
         }
 
-        private bool PassesTagRequirements(BattleSystem source)
+        private bool PassesTagRequirements()
         {
-            if (BlockedStateTags.Contains(source.State))
+            if (BlockedStateTags.Contains(Context.Owner.State))
             {
                 return false;
             }
 
             foreach (var tag in BlockedBattleTags)
             {
-                if (source.Contains(tag)) return false;
+                if (Context.Owner.ContainsTag(tag)) return false;
             }
 
             foreach (var tag in RequiredBattleTags)
             {
-                if (!source.Contains(tag)) return false;
+                if (!Context.Owner.ContainsTag(tag)) return false;
             }
 
             return true;

@@ -15,9 +15,9 @@ namespace Domivium.Client.Contents.Actors
         protected TActor Actor { get; }
         protected IStateSystem StateSystem { get; }
 
-        public ushort Id { get; private set; }
+        public ushort Uid { get; private set; }
 
-        public abstract ActorId ActorId { get; }
+        public ActorId ActorId { get; private set; }
 
         protected ActorPresenter(TActor actor, ISystemFactory systemFactory)
         {
@@ -26,25 +26,28 @@ namespace Domivium.Client.Contents.Actors
             StateSystem.Tag.DistinctUntilChanged().Subscribe(OnStateChanged).AddTo(ref DisposableBag);
         }
 
-        public virtual void Initialize(ushort id, Transform parent)
+        public virtual void Initialize(ushort uid, ActorId actorId, Transform parent)
         {
-            Id = id;
-            Actor.Initialize(id, parent);
+            Uid = uid;
+            ActorId = actorId;
+            Actor.Initialize(uid, actorId, parent);
         }
 
-        public virtual async UniTask ActivateAsync(CancellationToken token, ActorParam param)
+        public virtual async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
-            await Actor.ActivateAsync(token, param);
+            await Actor.SpawnAsync(token, param);
         }
 
-        public virtual void Deactivate()
+        public virtual void Activate() { }
+
+        public virtual void Despawn()
         {
-            Actor.Deactivate();
+            Actor.Despawn();
         }
 
         public virtual void Tick(float deltaTime) // Die, Despawn 상태가 되면 Actor Manager에서 remove됨
         {
-            StateTick();
+            StateTick(deltaTime);
             Actor.Tick(deltaTime);
         }
 
@@ -62,35 +65,26 @@ namespace Domivium.Client.Contents.Actors
         }
 
         protected virtual void OnIdleTick() { }
-        protected virtual void OnChaseTick() { }
-        protected virtual void OnBattleTick() { }
-        protected virtual void OnMoveTick() { }
+        protected virtual void OnMoveTick(float deltaTime) { }
+        protected virtual void OnPostStateTick(float deltaTime) { }
 
-        protected virtual void OnIdle() => this.Log(Id);
-        protected virtual void OnChase() => this.Log(Id);
-        protected virtual void OnBattle() => this.Log(Id);
-        protected virtual void OnMove() => this.Log(Id);
+        protected virtual void OnIdle() => this.Log(Uid);
+        protected virtual void OnMove() => this.Log(Uid);
         protected virtual void OnDie() { }
-        protected virtual void OnTerminated() => this.Log(Id);
+        protected virtual void OnTerminated() => this.Log(Uid);
 
-        private void StateTick()
+        private void StateTick(float deltaTime)
         {
             if (StateSystem.Tag.CurrentValue == StateTags.Idle)
             {
                 OnIdleTick();
             }
-            else if (StateSystem.Tag.CurrentValue == StateTags.Chase)
-            {
-                OnChaseTick();
-            }
-            else if (StateSystem.Tag.CurrentValue == StateTags.Battle)
-            {
-                OnBattleTick();
-            }
             else if (StateSystem.Tag.CurrentValue == StateTags.Move)
             {
-                OnMoveTick();
+                OnMoveTick(deltaTime);
             }
+
+            OnPostStateTick(deltaTime);
         }
 
         private void OnStateChanged(StateTag tag)
@@ -98,14 +92,6 @@ namespace Domivium.Client.Contents.Actors
             if (tag == StateTags.Idle)
             {
                 OnIdle();
-            }
-            else if (tag == StateTags.Chase)
-            {
-                OnChase();
-            }
-            else if (tag == StateTags.Battle)
-            {
-                OnBattle();
             }
             else if (tag == StateTags.Move)
             {

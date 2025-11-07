@@ -5,6 +5,6 @@ namespace Domivium.Client.Core.Actors
 {
     public interface IActorSpawner
     {
-        public UniTask SpawnAsync(ActorId actorId, ActorParam param);
+        public UniTask<IActorPresenter> SpawnAsync(ActorId actorId, ActorParam param);
     }
 }

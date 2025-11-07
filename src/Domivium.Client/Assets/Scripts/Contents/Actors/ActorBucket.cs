@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 
@@ -13,44 +14,55 @@ namespace Domivium.Client.Contents.Actors
         public int Count => _map.Count;
         public IReadOnlyDictionary<ushort, IActorPresenter> Map => _map;
 
-        public bool TryGet(ushort id, out IActorPresenter p) => _map.TryGetValue(id, out p);
+        public bool TryGet(ushort uid, out IActorPresenter p) => _map.TryGetValue(uid, out p);
 
-        public bool TryGetUnit(ushort id, out IBattleSystem unit)
+        public bool TryGetPawn(ushort uid, out IBattleSystem pawn)
         {
-            unit = null;
-            if (!TryGet(id, out var presenter)) return false;
+            pawn = null;
+            if (!TryGet(uid, out var presenter)) return false;
 
-            if (presenter is not IUnitPresenter unitPresenter) return false;
+            if (presenter is not IPawnPresenter pawnPresenter) return false;
 
-            unit = unitPresenter.BattleSystem;
+            pawn = pawnPresenter.BattleSystem;
             return true;
         }
 
-        public int CollectUnits(List<IBattleSystem> buffer)
+        public bool TryGetFirstPawn(out IBattleSystem pawn)
+        {
+            pawn = null;
+            if (_map.Count <= 0) return false;
+
+            if (_map.First().Value is not IPawnPresenter pawnPresenter) return false;
+
+            pawn = pawnPresenter.BattleSystem;
+            return true;
+        }
+
+        public int CollectPawns(List<IBattleSystem> buffer)
         {
             buffer.Clear();
             foreach (var (_, presenter) in _map)
             {
-                if (presenter is not IUnitPresenter unit) continue;
+                if (presenter is not IPawnPresenter pawn) continue;
 
-                buffer.Add(unit.BattleSystem);
+                buffer.Add(pawn.BattleSystem);
             }
             return buffer.Count;
         }
 
-        public void Remove(ushort id)
+        public void Remove(ushort uid)
         {
-            if (_map.Remove(id, out var presenter))
+            if (_map.Remove(uid, out var presenter))
             {
                 presenter.Terminate();
             }
         }
 
-        public void Add(ushort id, IActorPresenter presenter)
+        public void Add(ushort uid, IActorPresenter presenter)
         {
-            if (!_map.TryAdd(id, presenter))
+            if (!_map.TryAdd(uid, presenter))
             {
-                throw new InvalidOperationException($"Presenter already exists: {id}");
+                throw new InvalidOperationException($"Presenter already exists: {uid}");
             }
         }
 

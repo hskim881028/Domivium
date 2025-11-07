@@ -9,7 +9,7 @@ namespace Domivium.Client.Contents.UI.Stack
         public LoginStackUIPresenter(
             LoginStackUIView view,
             IUINavigation navigation,
-            IAudioController audioController)
-            : base(view, navigation, audioController) { }
+            IAudioPlayer audioPlayer)
+            : base(view, navigation, audioPlayer) { }
     }
 }

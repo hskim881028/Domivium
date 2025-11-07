@@ -7,8 +7,9 @@ namespace Domivium.Client.Core.Actors
 {
     public interface IActorActivatable
     {
-        public void Initialize(ushort id, Transform parent);
-        public UniTask ActivateAsync(CancellationToken token, ActorParam param);
-        public void Deactivate();
+        public void Initialize(ushort uid, ActorId actorId, Transform parent);
+        public UniTask SpawnAsync(CancellationToken token, ActorParam param);
+        public void Activate();
+        public void Despawn();
     }
 }

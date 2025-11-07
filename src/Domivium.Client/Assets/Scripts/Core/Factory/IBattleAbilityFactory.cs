@@ -1,9 +1,11 @@
-﻿using Domivium.Client.Core.Battle;
+﻿using System.Collections.Generic;
+using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Battle;
 
 namespace Domivium.Client.Core.Factory
 {
     public interface IBattleAbilityFactory
     {
-        public BattleAbility Create(BattleAbilityId id);
+        public IReadOnlyList<BattleAbility> GetAbilities(ActorId actorId);
     }
 }

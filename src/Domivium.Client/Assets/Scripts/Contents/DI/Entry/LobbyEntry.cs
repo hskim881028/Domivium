@@ -5,9 +5,9 @@ namespace Domivium.Client.Contents.DI.Entry
 {
     public class LobbyEntry : Entry
     {
-        public LobbyEntry(IAudioController audioController)
+        public LobbyEntry(IAudioPlayer audioPlayer)
         {
-            audioController.PlayBGM(BGMAudioId.Lobby);
+            audioPlayer.PlayBGM(BGMAudioId.Lobby);
         }
 
         protected override void OnStart() { }

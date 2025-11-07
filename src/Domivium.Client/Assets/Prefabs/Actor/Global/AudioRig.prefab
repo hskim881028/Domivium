@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 146054022030179821}
   - component: {fileID: 2640772526244607012}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: AudioRig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,7 +60,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5554035760921030923}
   - component: {fileID: 3565223117640398264}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: AudioListener
   m_TagString: Untagged
   m_Icon: {fileID: 0}

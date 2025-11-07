@@ -20,15 +20,24 @@ namespace Domivium.Client.Contents.Input.Consumer
         {
             switch (message.Type)
             {
+                case InputMessageType.Submit:
+                    return false;
                 case InputMessageType.Cancel:
                     _inputEventSystem.ReleaseSelectedGameObject();
                     return false;
-                case InputMessageType.Submit:
-                case InputMessageType.Point:
-                    return false;
                 case InputMessageType.ClickEnter:
                 case InputMessageType.ClickExit:
-                    return _inputEventSystem.IsPointerOverUI(message.Value);
+                    return !_inputEventSystem.BlockUI && _inputEventSystem.IsPointerOverUI(message.Value);
+                case InputMessageType.Point:
+                case InputMessageType.Move:
+                case InputMessageType.Look:
+                case InputMessageType.LookCanceled:
+                case InputMessageType.Quick:
+                case InputMessageType.QuickCanceled:
+                case InputMessageType.Inventory:
+                case InputMessageType.Interact:
+                case InputMessageType.Avoid:
+                    return false;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -7,8 +7,8 @@ namespace Domivium.Client.Core.State
     public interface IStateSystem : IDisposable
     {
         public ReadOnlyReactiveProperty<StateTag> Tag { get; }
-        public void TryTransit(StateTag next);
-        public void Spawn();
+        public void Transit(StateTag next);
+        public void Activate();
         public UniTaskVoid DespawnAsync(float despawnSeconds = 0);
         public void Terminate();
     }

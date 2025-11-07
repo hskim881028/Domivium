@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Domivium.Client.Data.Stat
 {
@@ -6,7 +7,7 @@ namespace Domivium.Client.Data.Stat
     {
         private readonly StatSet _stats;
         private readonly int[] _current = new int[StatId.StatCount];
-        private readonly Action[] _onChanged = new Action[StatId.StatCount];
+        private readonly HashSet<Action>[] _onChanged = new HashSet<Action>[StatId.StatCount];
 
         public GaugeSet(StatSet stats)
         {
@@ -17,11 +18,18 @@ namespace Domivium.Client.Data.Stat
 
         public int Max(StatId id) => _stats.Value(id);
 
-        public void Register(StatId id, int value, Action onChanged = null)
+        public void Register(StatId id, int value)
         {
             Set(id, value);
-            _onChanged[id] = onChanged;
-            _onChanged[id]?.Invoke();
+        }
+
+        public void AddListener(StatId id, Action onChanged)
+        {
+            if (onChanged == null) return;
+
+            _onChanged[id] ??= new HashSet<Action>();
+            _onChanged[id].Add(onChanged);
+            onChanged?.Invoke();
         }
 
         public void Apply(StatId id, int value, GaugeChannel channel)
@@ -43,7 +51,12 @@ namespace Domivium.Client.Data.Stat
                 Set(id, 0);
             }
 
-            _onChanged[id]?.Invoke();
+            if (_onChanged[id] == null) return;
+
+            foreach (var action in _onChanged[id])
+            {
+                action?.Invoke();
+            }
         }
 
         public void Clear()

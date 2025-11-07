@@ -10,7 +10,7 @@ namespace Domivium.Client.Core.UI.Presenter
     {
         public abstract UIPriority Priority { get; }
 
-        protected SystemUIPresenter(TView view, IUINavigation navigation, IAudioController audioController)
-            : base(view, navigation, audioController) { }
+        protected SystemUIPresenter(TView view, IUINavigation navigation, IAudioPlayer audioPlayer)
+            : base(view, navigation, audioPlayer) { }
     }
 }

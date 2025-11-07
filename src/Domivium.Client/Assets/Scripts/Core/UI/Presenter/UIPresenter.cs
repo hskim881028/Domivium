@@ -18,11 +18,11 @@ namespace Domivium.Client.Core.UI.Presenter
 
         protected readonly TView View;
         protected readonly IUINavigation Navigation;
-        protected readonly IAudioController AudioController;
+        protected readonly IAudioPlayer AudioPlayer;
 
         public virtual bool DeactivateBehindView { get; }
 
-        protected UIPresenter(TView view, IUINavigation navigation, IAudioController audioController)
+        protected UIPresenter(TView view, IUINavigation navigation, IAudioPlayer audioPlayer)
         {
             if (this is not TMessage message)
             {
@@ -32,7 +32,7 @@ namespace Domivium.Client.Core.UI.Presenter
             View = view;
             View.AttachMessage(message);
             Navigation = navigation;
-            AudioController = audioController;
+            AudioPlayer = audioPlayer;
         }
 
         public void SetParent(Transform parent)

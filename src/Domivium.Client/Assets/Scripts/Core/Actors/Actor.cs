@@ -7,7 +7,8 @@ namespace Domivium.Client.Core.Actors
 {
     public class Actor : MonoBehaviour, IActorActivatable, ITicker
     {
-        public ushort Id { get; private set; }
+        public ushort Uid { get; private set; }
+        public ActorId ActorId { get; private set; }
 
         private void Awake()
         {
@@ -19,19 +20,26 @@ namespace Domivium.Client.Core.Actors
             OnDestroyInternal();
         }
 
-        public virtual void Initialize(ushort id, Transform parent)
+        public virtual void Initialize(ushort uid, ActorId actorId, Transform parent)
         {
-            Id = id;
+            Uid = uid;
+            ActorId = actorId;
             transform.SetParent(parent);
         }
 
-        public virtual UniTask ActivateAsync(CancellationToken token, ActorParam param) => UniTask.CompletedTask;
+        public virtual async UniTask SpawnAsync(CancellationToken token, ActorParam param)
+        {
+            await UniTask.CompletedTask;
+        }
 
-        public virtual void Deactivate() { }
+        public virtual void Activate() { }
+
+        public virtual void Despawn() { }
 
         public virtual void Tick(float deltaTime) { }
 
         protected virtual void OnAwake() { }
+
         protected virtual void OnDestroyInternal() { }
     }
 }

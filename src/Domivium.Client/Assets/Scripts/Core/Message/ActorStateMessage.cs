@@ -6,16 +6,17 @@ namespace Domivium.Client.Core.Message
     public readonly struct ActorStateMessage
     {
         public StateTag Tag { get; }
-        public ushort Id { get; }
+        public ushort Uid { get; }
         public ActorId ActorId { get; }
 
-        private ActorStateMessage(StateTag tag, ushort id, ActorId actorId)
+        private ActorStateMessage(StateTag tag, ushort uid, ActorId actorId)
         {
             Tag = tag;
-            Id = id;
+            Uid = uid;
             ActorId = actorId;
         }
 
-        public static ActorStateMessage Create(StateTag tag, ushort id, ActorId actorId) => new(tag, id, actorId);
+        public static ActorStateMessage Create(StateTag tag, IActorPresenter presenter)
+            => new(tag, presenter.Uid, presenter.ActorId);
     }
 }

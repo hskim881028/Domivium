@@ -45,6 +45,12 @@ namespace Domivium.Client.Data.Stat
 #endif
         }
 
+        public int RawValue(StatId id)
+        {
+            ref var s = ref Ref(id);
+            return s.Value();
+        }
+
         public void Apply(StatId id, int value, StatChannel channel)
         {
             if (channel == StatChannel.Add)
@@ -83,6 +89,14 @@ namespace Domivium.Client.Data.Stat
         private static StatDomain GetDomain(StatId id)
         {
             if (id == StatId.Health ||
+                id == StatId.Hunger ||
+                id == StatId.Stamina ||
+                id == StatId.Sanity ||
+                id == StatId.Durability ||
+                id == StatId.Weight ||
+                id == StatId.MaxWeight ||
+                id == StatId.InventoryCapacity ||
+                id == StatId.ProjectileCapacity ||
                 id == StatId.Attack ||
                 id == StatId.Defense)
             {

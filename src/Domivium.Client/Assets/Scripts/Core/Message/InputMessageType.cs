@@ -6,6 +6,15 @@
         Cancel,
         ClickEnter,
         ClickExit,
-        Point
+        Point,
+        
+        Move,
+        Look,
+        LookCanceled,
+        Quick,
+        QuickCanceled,
+        Inventory,
+        Interact,
+        Avoid,
     }
 }

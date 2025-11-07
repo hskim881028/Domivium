@@ -1,5 +1,8 @@
-﻿using Domivium.Client.Contents.Audio.Generated;
-using Domivium.Client.Contents.Services;
+﻿using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Actors.Contract;
+using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Contents.Audio.Generated;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Message;
@@ -10,16 +13,16 @@ namespace Domivium.Client.Contents.Battle
 {
     public class BattleCuePlayer : Disposable, IBattleCuePlayer
     {
-        private readonly IAudioController _audioController;
-        private readonly VfxService _vfxService;
+        private readonly IAudioPlayer _audioPlayer;
+        private readonly IActorSpawner _actorSpawner;
 
         public BattleCuePlayer(
-            IAudioController audioController,
-            VfxService vfxService,
+            IAudioPlayer audioPlayer,
+            IActorSpawner actorSpawner,
             ISubscriber<BattleCueMessage> subscriber)
         {
-            _audioController = audioController;
-            _vfxService = vfxService;
+            _audioPlayer = audioPlayer;
+            _actorSpawner = actorSpawner;
             subscriber.Subscribe(OnCueMessage).AddTo(ref DisposableBag);
         }
 
@@ -27,14 +30,21 @@ namespace Domivium.Client.Contents.Battle
         {
             if (message.CueId == BattleCueIds.Attack)
             {
-                _audioController.PlaySFX(SFXAudioId.Attack);
-            }
-            else if (message.CueId == BattleCueIds.Damaged)
-            {
-                _audioController.PlaySFX(SFXAudioId.Damaged);
+                _audioPlayer.PlaySFX(SFXAudioId.Attack);
             }
 
-            _vfxService.Spawn(message.CueId, message.Context);
+            if (message.CueId == BattleCueIds.Damaged)
+            {
+                _audioPlayer.PlaySFX(SFXAudioId.Damaged);
+                var param = new DamageTextParams(message.Context.Position, message.Context.Value, 1.6f);
+                _actorSpawner.SpawnAsync(ActorIds.DamageText, param).Forget();
+            }
+
+            if (message.CueId == BattleCueIds.Healed)
+            {
+                var param = new HealTextParams(message.Context.Position, message.Context.Value, 1.6f);
+                _actorSpawner.SpawnAsync(ActorIds.HealText, param).Forget();
+            }
         }
     }
 }
