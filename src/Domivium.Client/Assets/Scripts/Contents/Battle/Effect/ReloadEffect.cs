@@ -8,7 +8,7 @@ namespace Domivium.Client.Contents.Battle.Effect
     public class ReloadEffect : BattleEffect
     {
         public override BattleEffectId Id => BattleEffectIds.Reload;
-        public override IReadOnlyCollection<BattleTag> GrantedBattleTags => TagGenerator.SetBattleTag(BattleTags.Reloading);
+        public override IReadOnlyCollection<BattleEffectTag> GrantedEffectTags => TagGenerator.SetBattleTag(BattleEffectTags.Reloading);
 
         public ReloadEffect(ref BattleEffectContext context) : base(ref context)
         {

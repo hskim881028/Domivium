@@ -54,7 +54,7 @@ namespace Domivium.Client.Core.Battle
                 Source = source,
                 Delta = delta
             };
-        
+
         public static BattleAbilityContext Create(
             BattleAbilityId abilityId,
             IBattleSystem source,

@@ -26,7 +26,6 @@ namespace Domivium.Client.Contents.Actors
         {
             characterSystem.OnTurn.Subscribe(OnTurn).AddTo(ref DisposableBag);
             characterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
-            characterSystem.OnAvoid.Subscribe(OnAvoid).AddTo(ref DisposableBag);
             characterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
         }
 
@@ -48,17 +47,14 @@ namespace Domivium.Client.Contents.Actors
 
             var projectileCapacity = BattleSystem.Stat.Value(StatId.ProjectileCapacity);
             BattleSystem.Gauge.Apply(StatId.ProjectileCapacity, projectileCapacity, GaugeChannel.Max);
-
-            var attackSpeed = BattleSystem.Stat.RateValue(StatId.AttackSpeed);
-            BattleSystem.SetAbilityCooldown(BattleAbilityIds.Attack, attackSpeed);
-            BattleSystem.SetAbilityCooldown(BattleAbilityIds.Avoid, Constant.AvoidCooldown);
         }
 
         protected override void OnPostStateTick(float deltaTime)
         {
             base.OnPostStateTick(deltaTime);
-            
+
             if (!_firing) return;
+
 
             var context = BattleAbilityContext.Create(BattleAbilityIds.Attack, BattleSystem);
             BattleSystem.TryActivateAbility(ref context);
@@ -100,21 +96,10 @@ namespace Domivium.Client.Contents.Actors
         protected override void OnLookAtChanged(Vector2 lookAt)
         {
             base.OnLookAtChanged(lookAt);
-            if (Mathf.Approximately(lookAt.sqrMagnitude, 0))
-            {
-                Actor.HideAim();
-            }
-            else
-            {
-                var attackRange = BattleSystem.Stat.RateValue(StatId.AttackRange);
-                Actor.SetAim(lookAt, attackRange);
-            }
-        }
+            if (Mathf.Approximately(lookAt.sqrMagnitude, 0)) return;
 
-        private void OnAvoid(R3.Unit unit)
-        {
-            var context = BattleAbilityContext.Create(BattleAbilityIds.Avoid, BattleSystem);
-            BattleSystem.TryActivateAbility(ref context);
+            var attackRange = BattleSystem.Stat.RateValue(StatId.AttackRange);
+            Actor.SetAim(lookAt, attackRange);
         }
 
         private void OnBattleTag(BattleTag tag)
@@ -130,6 +115,12 @@ namespace Domivium.Client.Contents.Actors
             if (tag == BattleTags.Aiming || tag == BattleTags.Firing)
             {
                 var context = BattleAbilityContext.Create(BattleAbilityIds.CancelReload, BattleSystem);
+                BattleSystem.TryActivateAbility(ref context);
+            }
+
+            if (tag == BattleTags.Avoid)
+            {
+                var context = BattleAbilityContext.Create(BattleAbilityIds.Avoid, BattleSystem);
                 BattleSystem.TryActivateAbility(ref context);
             }
         }

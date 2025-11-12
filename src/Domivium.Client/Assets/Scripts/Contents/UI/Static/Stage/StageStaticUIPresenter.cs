@@ -36,7 +36,6 @@ namespace Domivium.Client.Contents.UI.Static
             _sceneService = sceneService;
             characterSystem.OnInitialize.Subscribe(OnInitialize).AddTo(ref DisposableBag);
             characterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
-            characterSystem.OnAvoid.Subscribe(OnAvoid).AddTo(ref DisposableBag);
             characterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
         }
 
@@ -59,13 +58,6 @@ namespace Domivium.Client.Contents.UI.Static
         private void OnLookAt(Vector2 value)
         {
             View.SetAttackButton(value.sqrMagnitude > Constant.CanAttackRange);
-        }
-
-        private void OnAvoid(Unit unit)
-        {
-            if (!_character.CanActivateAbility(BattleAbilityIds.Avoid, out var cooldown)) return;
-
-            View.SetAvoidButton(cooldown);
         }
 
         private void OnHealthChanged()
@@ -107,7 +99,7 @@ namespace Domivium.Client.Contents.UI.Static
         {
             if (tag == BattleTags.Idle)
             {
-                if (!_character.CanActivateAbility(BattleAbilityIds.Reload, out var _)) return;
+                if (!_character.CanActivateAbility(BattleAbilityIds.Reload)) return;
 
                 var reloadSpeed = _character.Stat.RateValue(StatId.ReloadSpeed);
                 View.Reload(reloadSpeed);
@@ -116,6 +108,13 @@ namespace Domivium.Client.Contents.UI.Static
             if (tag == BattleTags.Aiming || tag == BattleTags.Firing)
             {
                 View.CancelReload();
+            }
+
+            if (tag == BattleTags.Avoid)
+            {
+                if (!_character.CanActivateAbility(BattleAbilityIds.Avoid)) return;
+                
+                View.SetAvoidButton(Constant.AvoidCooldown);
             }
         }
     }

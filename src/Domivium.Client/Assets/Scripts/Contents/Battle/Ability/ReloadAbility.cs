@@ -7,8 +7,8 @@ namespace Domivium.Client.Contents.Battle.Ability
 {
     public class ReloadAbility : BattleAbility
     {
-        protected override IReadOnlyCollection<BattleTag> BlockedBattleTags => TagGenerator.SetBattleTag(BattleTags.Reloading);
         public override BattleAbilityId Id => BattleAbilityIds.Reload;
+        protected override IReadOnlyCollection<BattleEffectTag> BlockedEffectTags => TagGenerator.SetBattleTag(BattleEffectTags.Reloading);
 
         public ReloadAbility(IBattleEffectPool effectPool) : base(effectPool) { }
 
@@ -21,11 +21,11 @@ namespace Domivium.Client.Contents.Battle.Ability
             return cur < max;
         }
 
-        protected override bool OnActivate(ref BattleAbilityContext context)
+        public override float Activate(ref BattleAbilityContext context)
         {
             var effect = EffectPool.Get(BattleEffectIds.Reload, context.Source, context.Source);
             context.Source.ActivateEffect(effect);
-            return true;
+            return 0;
         }
     }
 }

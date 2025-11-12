@@ -279,7 +279,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -70}
   m_SizeDelta: {x: 128, y: 84}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1487624170496276067
@@ -371,7 +371,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 100}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -360, y: 250}
+  m_AnchoredPosition: {x: -434, y: 278}
   m_SizeDelta: {x: 128, y: 84}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &5377318344976974865
@@ -425,6 +425,81 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.OnScreen.OnScreenButton
   m_ControlPath: <Keyboard>/f
+--- !u!1 &835040526726218567
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3538086740729259670}
+  - component: {fileID: 1963819150573441864}
+  - component: {fileID: 2744257516796139177}
+  m_Layer: 5
+  m_Name: AttackableRangeImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &3538086740729259670
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 835040526726218567}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6928475395309390041}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 300, y: 300}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1963819150573441864
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 835040526726218567}
+  m_CullTransparentMesh: 1
+--- !u!114 &2744257516796139177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 835040526726218567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 0
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: b001615939d59ab439128b6a2337d633, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &2424807326347731476
 GameObject:
   m_ObjectHideFlags: 0
@@ -974,7 +1049,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5335100691106294396}
-  m_CullTransparentMesh: 0
+  m_CullTransparentMesh: 1
 --- !u!114 &8633801099863867281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1086,7 +1161,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5443033325666612052}
-  m_CullTransparentMesh: 0
+  m_CullTransparentMesh: 1
 --- !u!114 &5515103353541039947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1401,13 +1476,14 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1655947474515392502}
+  - {fileID: 3538086740729259670}
   - {fileID: 1283756181856817773}
   - {fileID: 6452743671193367969}
   m_Father: {fileID: 3465918597656528284}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -100, y: 100}
+  m_AnchoredPosition: {x: -100, y: 150}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &497067341835336718
@@ -1568,7 +1644,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7184521964896225613}
-  m_CullTransparentMesh: 0
+  m_CullTransparentMesh: 1
 --- !u!114 &3430221705188031763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1925,10 +2001,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _enterLobbyButton: {fileID: 5301206066462688538}
   _rightStickImages:
-  - {fileID: 8423535040106714040}
   - {fileID: 3430221705188031763}
-  - {fileID: 8296293562706463967}
-  - {fileID: 0}
+  - {fileID: 2744257516796139177}
   _avoidButton: {fileID: 6014391054943155325}
   _healthGauge: {fileID: 2842882702718475971}
   _hungerGauge: {fileID: 840791637740689141}
@@ -2114,6 +2188,22 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.20392157
       objectReference: {fileID: 0}
+    - target: {fileID: 1342352622907920341, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2976324364611392095, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4142195435880338056, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5164028074842077641, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5738049983376830803, guid: 240551adbf129d041986198a99da1d28, type: 3}
       propertyPath: m_Name
       value: SanityStatGauge
@@ -2159,6 +2249,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3465918597656528284}
     m_Modifications:
+    - target: {fileID: 2770514934595252234, guid: a21a947ce9e00e741b8c20e9c9567191, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3569130851093630710, guid: a21a947ce9e00e741b8c20e9c9567191, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -2242,6 +2336,10 @@ PrefabInstance:
     - target: {fileID: 6273435782045281565, guid: a21a947ce9e00e741b8c20e9c9567191, type: 3}
       propertyPath: m_Name
       value: EnterLobbyButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 8229041923585234201, guid: a21a947ce9e00e741b8c20e9c9567191, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2368,6 +2466,10 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.94509804
       objectReference: {fileID: 0}
+    - target: {fileID: 1342352622907920341, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1445537567337677125, guid: 240551adbf129d041986198a99da1d28, type: 3}
       propertyPath: m_SizeDelta.x
       value: 30
@@ -2375,6 +2477,18 @@ PrefabInstance:
     - target: {fileID: 1445537567337677125, guid: 240551adbf129d041986198a99da1d28, type: 3}
       propertyPath: m_SizeDelta.y
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2976324364611392095, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4142195435880338056, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5164028074842077641, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5738049983376830803, guid: 240551adbf129d041986198a99da1d28, type: 3}
       propertyPath: m_Name
@@ -2424,6 +2538,18 @@ PrefabInstance:
     - target: {fileID: 1059200502040880380, guid: ad7ca4e13ce47c84facdc7bdf249c3bb, type: 3}
       propertyPath: m_Name
       value: AvoidFilledOnScreenButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 3102845469525991686, guid: ad7ca4e13ce47c84facdc7bdf249c3bb, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131438191136448950, guid: ad7ca4e13ce47c84facdc7bdf249c3bb, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7552680915675605579, guid: ad7ca4e13ce47c84facdc7bdf249c3bb, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7610489301662637283, guid: ad7ca4e13ce47c84facdc7bdf249c3bb, type: 3}
       propertyPath: m_FillAmount
@@ -2507,7 +2633,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8096759616956398637, guid: ad7ca4e13ce47c84facdc7bdf249c3bb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 350
+      value: 450
       objectReference: {fileID: 0}
     - target: {fileID: 8096759616956398637, guid: ad7ca4e13ce47c84facdc7bdf249c3bb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2646,6 +2772,22 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.94509804
       objectReference: {fileID: 0}
+    - target: {fileID: 1342352622907920341, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2976324364611392095, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4142195435880338056, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5164028074842077641, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5738049983376830803, guid: 240551adbf129d041986198a99da1d28, type: 3}
       propertyPath: m_Name
       value: HungerStatGauge
@@ -2783,6 +2925,10 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.90588236
       objectReference: {fileID: 0}
+    - target: {fileID: 1342352622907920341, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1445537567337677125, guid: 240551adbf129d041986198a99da1d28, type: 3}
       propertyPath: m_SizeDelta.x
       value: 30
@@ -2790,6 +2936,18 @@ PrefabInstance:
     - target: {fileID: 1445537567337677125, guid: 240551adbf129d041986198a99da1d28, type: 3}
       propertyPath: m_SizeDelta.y
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2976324364611392095, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4142195435880338056, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5164028074842077641, guid: 240551adbf129d041986198a99da1d28, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5738049983376830803, guid: 240551adbf129d041986198a99da1d28, type: 3}
       propertyPath: m_Name

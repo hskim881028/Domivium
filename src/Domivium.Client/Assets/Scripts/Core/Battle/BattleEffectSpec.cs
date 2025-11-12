@@ -15,7 +15,7 @@ namespace Domivium.Client.Core.Battle
 
         public BattleEffectId Id => _effect.Id;
         public BattleEffectContext Context => _effect.Context;
-        public IReadOnlyCollection<BattleTag> GrantedTags => _effect.GrantedBattleTags;
+        public IReadOnlyCollection<BattleEffectTag> GrantedTags => _effect.GrantedEffectTags;
         public IReadOnlyList<BattleStatModifier> StatModifiers => _effect.StatModifiers;
         public IReadOnlyList<BattleStatModifier> StatPeriodicModifiers => _effect.StatPeriodicModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugeModifiers => _effect.GaugeModifiers;

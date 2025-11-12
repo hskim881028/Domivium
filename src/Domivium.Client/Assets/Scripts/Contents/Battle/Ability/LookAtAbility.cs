@@ -8,10 +8,10 @@ namespace Domivium.Client.Contents.Battle.Ability
         
         public LookAtAbility(IBattleEffectPool effectPool) : base(effectPool) { }
 
-        protected override bool OnActivate(ref BattleAbilityContext context)
+        public override float Activate(ref BattleAbilityContext context)
         {
             context.Source.SetLookAt(context.Delta);
-            return true;
+            return 0;
         }
     }
 }

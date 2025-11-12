@@ -6,6 +6,7 @@ using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Message;
@@ -19,7 +20,6 @@ namespace Domivium.Client.Contents.Systems
 {
     public sealed class StageSystem : Disposable, IStageSystem, IStageSystemCommand
     {
-        private readonly StageFieldProvider _stageFieldProvider;
         private readonly IAudioPlayer _audioPlayer;
         private readonly IActorSpawner _actorSpawner;
         private readonly IActorManager _actorManager;
@@ -33,7 +33,6 @@ namespace Domivium.Client.Contents.Systems
         public ReadOnlyReactiveProperty<StageMode> Mode => _mode;
 
         public StageSystem(
-            StageFieldProvider stageFieldProvider,
             IAudioPlayer audioPlayer,
             IActorSpawner actorSpawner,
             IActorManager actorManager,
@@ -45,7 +44,6 @@ namespace Domivium.Client.Contents.Systems
             ISubscriber<SceneMessage> sceneSubscriber,
             ISubscriber<ActorStateMessage> actorStateSubscriber)
         {
-            _stageFieldProvider = stageFieldProvider;
             _audioPlayer = audioPlayer;
             _actorSpawner = actorSpawner;
             _actorManager = actorManager;
@@ -61,23 +59,22 @@ namespace Domivium.Client.Contents.Systems
         public async UniTaskVoid RunAsync(int stageId)
         {
             _audioPlayer.PlayBGM(BGMAudioId.Stage);
-            var tilemap = _stageFieldProvider.Get(stageId);
-            var stageField = await _actorSpawner.SpawnAsync(ActorIds.StageField, new StageFieldParams(tilemap));
+            var stageField = await _actorSpawner.SpawnAsync(ActorIds.StageField, new ActorParam());
             if (stageField is StageFieldPresenter stageFieldPresenter)
             {
                 _stageFieldSystemCommand.InitializeAsync(stageFieldPresenter.Grid);
             }
 
-            foreach (var cell in tilemap.cellBounds.allPositionsWithin)
-            {
-                if (tilemap.HasTile(cell)) continue;
-
-                var position = new Vector2(cell.x + 0.427f, cell.y + 0.58f);
-                await _actorSpawner.SpawnAsync(ActorIds.Prop, new PropParams(position));
-            }
+            // foreach (var cell in tilemap.cellBounds.allPositionsWithin)
+            // {
+            //     if (tilemap.HasTile(cell)) continue;
+            //
+            //     var position = new Vector2(cell.x + 0.427f, cell.y + 0.58f);
+            //     await _actorSpawner.SpawnAsync(ActorIds.Prop, new PropParams(position));
+            // }
 
             var abilities = _abilityFactory.GetAbilities(ActorIds.Character);
-            var actorParam = _actorParamFactory.CreateCharacter(1, Vector2.zero, abilities);
+            var actorParam = _actorParamFactory.CreateCharacter(1, new Vector2(7, 5), abilities);
             var character = await _actorSpawner.SpawnAsync(ActorIds.Character, actorParam);
             if (character is CharacterPresenter characterPresenter)
             {
@@ -85,7 +82,7 @@ namespace Domivium.Client.Contents.Systems
                 _cameraSystemCommand.Initialize(characterPresenter.Transform);
 
                 var monsterAbilities = _abilityFactory.GetAbilities(ActorIds.Monster);
-                var monsterParam = _actorParamFactory.CreateMonster(1, new Vector2(2, -2), monsterAbilities, characterPresenter.BattleSystem);
+                var monsterParam = _actorParamFactory.CreateMonster(1, new Vector2(14, 9), monsterAbilities, characterPresenter.BattleSystem);
                 await _actorSpawner.SpawnAsync(ActorIds.Monster, monsterParam);
             }
 

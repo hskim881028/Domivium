@@ -6,15 +6,15 @@ namespace Domivium.Client.Contents.Battle.Ability
 {
     public class CancelReloadAbility : BattleAbility
     {
-        protected override IReadOnlyCollection<BattleTag> RequiredBattleTags => TagGenerator.SetBattleTag(BattleTags.Reloading);
+        protected override IReadOnlyCollection<BattleEffectTag> RequiredEffectTags => TagGenerator.SetBattleTag(BattleEffectTags.Reloading);
         public override BattleAbilityId Id => BattleAbilityIds.CancelReload;
 
         public CancelReloadAbility(IBattleEffectPool effectPool) : base(effectPool) { }
 
-        protected override bool OnActivate(ref BattleAbilityContext context)
+        public override float Activate(ref BattleAbilityContext context)
         {
             context.Source.DeactivateEffect(BattleEffectIds.Reload);
-            return true;
+            return 0;
         }
     }
 }

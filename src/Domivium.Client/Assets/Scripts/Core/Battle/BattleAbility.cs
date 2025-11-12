@@ -8,21 +8,16 @@ namespace Domivium.Client.Core.Battle
     public abstract class BattleAbility
     {
         protected readonly IBattleEffectPool EffectPool;
-        protected virtual IReadOnlyCollection<BattleTag> RequiredBattleTags => TagGenerator.EmptyBattleTag;
-        protected virtual IReadOnlyCollection<BattleTag> BlockedBattleTags => TagGenerator.EmptyBattleTag;
-        protected virtual IReadOnlyCollection<StateTag> BlockedStateTags => TagGenerator.DefaultBlockedStateTag;
+
         public abstract BattleAbilityId Id { get; }
+        protected virtual IReadOnlyCollection<BattleEffectTag> RequiredEffectTags => TagGenerator.EmptyBattleEffectTag;
+        protected virtual IReadOnlyCollection<BattleEffectTag> BlockedEffectTags => TagGenerator.EmptyBattleEffectTag;
+        protected virtual IReadOnlyCollection<StateTag> BlockedStateTags => TagGenerator.DefaultBlockedStateTag;
         public virtual BattleCueId CueId => BattleCueId.None;
-        public float Cooldown { get; private set; }
 
         protected BattleAbility(IBattleEffectPool effectPool)
         {
             EffectPool = effectPool;
-        }
-
-        public void SetCooldown(float cooldown)
-        {
-            Cooldown = cooldown;
         }
 
         public virtual bool CanActivate(IBattleSystem source)
@@ -32,21 +27,19 @@ namespace Domivium.Client.Core.Battle
                 return false;
             }
 
-            foreach (var tag in BlockedBattleTags)
+            foreach (var tag in BlockedEffectTags)
             {
-                if (source.ContainsTag(tag)) return false;
+                if (source.ContainsEffectTag(tag)) return false;
             }
 
-            foreach (var tag in RequiredBattleTags)
+            foreach (var tag in RequiredEffectTags)
             {
-                if (!source.ContainsTag(tag)) return false;
+                if (!source.ContainsEffectTag(tag)) return false;
             }
 
             return true;
         }
 
-        public bool TryActivate(ref BattleAbilityContext abilityContext) => OnActivate(ref abilityContext);
-
-        protected abstract bool OnActivate(ref BattleAbilityContext context);
+        public abstract float Activate(ref BattleAbilityContext context);
     }
 }

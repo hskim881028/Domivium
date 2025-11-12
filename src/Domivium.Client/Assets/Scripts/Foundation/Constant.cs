@@ -5,7 +5,7 @@ using UnityEngine;
 public static class Constant
 {
     public const float Percent = 0.01f;
-    public const float CanAttackRange = 0.8f;
+    public const float CanAttackRange = 0.95f;
     public const float AvoidCooldown = 1;
     
     public static Color MeleeColor = new(0.8980392f, 0.2235294f, 0.2078431f);

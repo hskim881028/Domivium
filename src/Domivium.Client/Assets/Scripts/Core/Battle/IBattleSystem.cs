@@ -23,15 +23,14 @@ namespace Domivium.Client.Core.Battle
         public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect { get; }
         public ReadOnlyReactiveProperty<Vector2> Direction { get; }
         public ReadOnlyReactiveProperty<Vector2> LookAt { get; }
-        public bool ContainsTag(BattleTag tag);
+        public bool ContainsEffectTag(BattleEffectTag tag);
         public void Initialize(ushort uid, ActorId actorId, int id, RarityType rarity, Vector2 position);
         public void Reset();
         public void SetPosition(Vector2 position);
         public void SetDirection(Vector2 direction);
         public void SetLookAt(Vector2 lookAt);
         public void GrantAbility(BattleAbility ability);
-        public void SetAbilityCooldown(BattleAbilityId abilityId, float cooldown);
-        public bool CanActivateAbility(BattleAbilityId abilityId, out float cooldown);
+        public bool CanActivateAbility(BattleAbilityId abilityId);
         public bool TryActivateAbility(ref BattleAbilityContext context);
         public void ActivateEffect(BattleEffectSpec spec);
         public void DeactivateEffect(BattleEffectId effectId);

@@ -12,20 +12,13 @@ namespace Domivium.Client.Core.Battle
         private float _remainCooldown;
 
         public BattleAbilityId Id => _ability.Id;
-        public float Cooldown => _ability.Cooldown;
+        public float Cooldown { get; private set; }
 
         public BattleAbilitySpec(BattleAbility ability, StatSet stat, IPublisher<BattleCueMessage> cuePublisher)
         {
             _ability = ability;
             _stat = stat;
             _cuePublisher = cuePublisher;
-            _remainCooldown = _ability.Cooldown;
-        }
-
-        public void SetCooldown(float cooldown)
-        {
-            _ability.SetCooldown(cooldown);
-            _remainCooldown = _ability.Cooldown;
         }
 
         public bool CanActivateAbility(IBattleSystem battleSystem)
@@ -40,9 +33,9 @@ namespace Domivium.Client.Core.Battle
             var source = context.Source;
             if (!CanActivateAbility(source)) return false;
 
-            if (!_ability.TryActivate(ref context)) return false;
-
-            _remainCooldown = _ability.Cooldown;
+            var cooldown = _ability.Activate(ref context);
+            Cooldown = cooldown;
+            _remainCooldown = cooldown;
             var cueContext = BattleCueContext.Create(source.ActorId, source.Position, source.Direction.CurrentValue);
             _cuePublisher.Publish(BattleCueMessage.Emit(_ability.CueId, cueContext));
             return true;

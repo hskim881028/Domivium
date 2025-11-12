@@ -12,7 +12,6 @@ namespace Domivium.Client.Contents.Systems
         private readonly ReactiveProperty<Vector2> _lookAt = new();
 
         public ReactiveCommand<IBattleSystem> OnInitialize { get; } = new();
-        public ReactiveCommand OnAvoid { get; } = new();
         public ReactiveCommand<BattleTag> OnBattleTag { get; } = new();
         public ReadOnlyReactiveProperty<Vector2> OnTurn => _direction;
         public ReadOnlyReactiveProperty<Vector2> OnLookAt => _lookAt;
@@ -50,7 +49,7 @@ namespace Domivium.Client.Contents.Systems
 
         public bool Avoid()
         {
-            OnAvoid.Execute(Unit.Default);
+            OnBattleTag.Execute(BattleTags.Avoid);
             return true;
         }
 

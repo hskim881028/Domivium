@@ -35,7 +35,7 @@ namespace Domivium.Client.Contents.Battle.Ability
             return cur > 0;
         }
 
-        protected override bool OnActivate(ref BattleAbilityContext context)
+        public override float Activate(ref BattleAbilityContext context)
         {
             var effect = EffectPool.Get(BattleEffectIds.Attack, context.Source, context.Source);
             context.Source.ActivateEffect(effect);
@@ -46,7 +46,9 @@ namespace Domivium.Client.Contents.Battle.Ability
             var abilities = _abilityFactory.GetAbilities(ActorIds.Projectile);
             var param = _actorParamFactory.CreateProjectile(1, target, stat, position, direction, abilities);
             _actorSpawner.SpawnAsync(ActorIds.Projectile, param).Forget();
-            return true;
+            
+            var attackSpeed = stat.RateValue(StatId.AttackSpeed);
+            return attackSpeed;
         }
     }
 }

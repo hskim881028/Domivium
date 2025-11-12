@@ -18,7 +18,7 @@ namespace Domivium.Client.Core.Battle
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
         private readonly ReadOnlyReactiveProperty<StateTag> _state;
-        private readonly HashSet<BattleTag> _tags = new();
+        private readonly HashSet<BattleEffectTag> _effectTags = new();
         private readonly ReactiveProperty<BattleEffectContext> _appliedEffect = new();
         private readonly ReactiveProperty<Vector2> _direction = new();
         private readonly ReactiveProperty<Vector2> _lookAt = new();
@@ -61,7 +61,7 @@ namespace Domivium.Client.Core.Battle
             _cuePublisher = cuePublisher;
         }
 
-        public bool ContainsTag(BattleTag tag) => _tags.Contains(tag);
+        public bool ContainsEffectTag(BattleEffectTag tag) => _effectTags.Contains(tag);
 
         public void Initialize(
             ushort uid,
@@ -89,7 +89,7 @@ namespace Domivium.Client.Core.Battle
                 effect.Deactivate(true);
             }
 
-            _tags.Clear();
+            _effectTags.Clear();
             _deactivateEffectSpecs.Clear();
             _effectSpecs.Clear();
             _statModifiers.Clear();
@@ -119,21 +119,9 @@ namespace Domivium.Client.Core.Battle
             _abilitySpecs.Add(ability.Id, new BattleAbilitySpec(ability, Stat, _cuePublisher));
         }
 
-        public void SetAbilityCooldown(BattleAbilityId abilityId, float cooldown)
+        public bool CanActivateAbility(BattleAbilityId abilityId)
         {
-            if (!_abilitySpecs.TryGetValue(abilityId, out var spec)) return;
-
-            spec.SetCooldown(cooldown);
-        }
-
-        public bool CanActivateAbility(BattleAbilityId abilityId, out float cooldown)
-        {
-            cooldown = 0;
-
-            if (!_abilitySpecs.TryGetValue(abilityId, out var spec)) return false;
-
-            cooldown = spec.Cooldown;
-            return spec.CanActivateAbility(this);
+            return _abilitySpecs.TryGetValue(abilityId, out var spec) && spec.CanActivateAbility(this);
         }
 
         public bool TryActivateAbility(ref BattleAbilityContext context) => _abilitySpecs.TryGetValue(context.AbilityId, out var spec) && spec.TryActivate(ref context);
@@ -234,19 +222,19 @@ namespace Domivium.Client.Core.Battle
             }
         }
 
-        private void AddTags(IReadOnlyCollection<BattleTag> tags)
+        private void AddTags(IReadOnlyCollection<BattleEffectTag> tags)
         {
             foreach (var tag in tags)
             {
-                _tags.Add(tag);
+                _effectTags.Add(tag);
             }
         }
 
-        private void RemoveTags(IReadOnlyCollection<BattleTag> tags)
+        private void RemoveTags(IReadOnlyCollection<BattleEffectTag> tags)
         {
             foreach (var tag in tags)
             {
-                _tags.Remove(tag);
+                _effectTags.Remove(tag);
             }
         }
 

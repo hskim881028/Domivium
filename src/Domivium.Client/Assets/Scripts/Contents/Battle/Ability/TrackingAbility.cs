@@ -20,7 +20,7 @@ namespace Domivium.Client.Contents.Battle.Ability
             _actorManager = actorManager;
         }
 
-        protected override bool OnActivate(ref BattleAbilityContext context)
+        public override float Activate(ref BattleAbilityContext context)
         {
             var source = context.Source;
             var pre = source.PrePosition;
@@ -70,14 +70,14 @@ namespace Domivium.Client.Contents.Battle.Ability
             return Move(source, context.DeltaTime);
         }
 
-        private bool Move(IBattleSystem source, float deltaTime)
+        private float Move(IBattleSystem source, float deltaTime)
         {
             var speed = source.Stat.RateValue(StatId.MoveSpeed);
             var position = source.Position;
             var direction = source.Direction.CurrentValue;
             direction *= speed * deltaTime;
             source.SetPosition(position + direction);
-            return true;
+            return 0;
         }
     }
 }

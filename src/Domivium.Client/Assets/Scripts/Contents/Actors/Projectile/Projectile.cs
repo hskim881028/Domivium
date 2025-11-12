@@ -12,7 +12,7 @@ namespace Domivium.Client.Contents.Actors
         protected override void OnAwake()
         {
             base.OnAwake();
-            _trailRenderer.enabled = true;
+            _trailRenderer.enabled = false;
         }
 
         public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
