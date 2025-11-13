@@ -19,6 +19,7 @@ namespace Domivium.Client.Contents.Systems
         public void Initialize(IBattleSystem character)
         {
             OnInitialize.Execute(character);
+            _lookAt.Value = Vector2.one * 0.1f;
         }
 
         public bool SetDirection(Vector2 value)
