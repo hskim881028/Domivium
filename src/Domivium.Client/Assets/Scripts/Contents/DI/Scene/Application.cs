@@ -89,6 +89,8 @@ namespace Domivium.Client.Contents.DI.Scene
         {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
             builder.Register<ISecureStore, WindowsDpapiSecureStore>(lifetime);
+#elif UNITY_ANDROID
+            builder.Register<ISecureStore, AndroidSecureStore>(lifetime);
 #endif
         }
 
