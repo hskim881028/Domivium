@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using Domivium.Client.Contents.Battle;
-using Domivium.Client.Contents.DI;
-using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Systems;
@@ -16,7 +14,6 @@ namespace Domivium.Client.Contents.UI.Static
 {
     public class StageStaticUIPresenter : StaticUIPresenter<StageStaticUIView, IStageStaticUIMessage>, IStageStaticUIMessage
     {
-        private readonly SceneService _sceneService;
         private readonly ICharacterSystem _characterSystem;
         private readonly ICameraSystem _cameraSystem;
         private IBattleSystem _character;
@@ -29,19 +26,14 @@ namespace Domivium.Client.Contents.UI.Static
             StageStaticUIView view,
             IUINavigation navigation,
             IAudioPlayer audioPlayer,
-            SceneService sceneService,
-            ICharacterSystem characterSystem)
+            ICharacterSystem characterSystem,
+            ILootSystem lootSystem)
             : base(view, navigation, audioPlayer)
         {
-            _sceneService = sceneService;
             characterSystem.OnInitialize.Subscribe(OnInitialize).AddTo(ref DisposableBag);
             characterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
             characterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
-        }
-
-        public void EnterLobby()
-        {
-            _sceneService.Load(SceneScopeIds.Lobby);
+            lootSystem.OnFind.Subscribe(OnFindProp).AddTo(ref DisposableBag);
         }
 
         private void OnInitialize(IBattleSystem character)
@@ -53,6 +45,7 @@ namespace Domivium.Client.Contents.UI.Static
             _character.Gauge.AddListener(StatId.Sanity, OnSanityChanged);
             _character.Gauge.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityChanged);
             View.SetAvoidButton(Constant.AvoidCooldown);
+            View.SetInteractButton(false);
         }
 
         private void OnLookAt(Vector2 value)
@@ -113,9 +106,15 @@ namespace Domivium.Client.Contents.UI.Static
             if (tag == BattleTags.Avoid)
             {
                 if (!_character.CanActivateAbility(BattleAbilityIds.Avoid)) return;
-                
+
                 View.SetAvoidButton(Constant.AvoidCooldown);
             }
+        }
+
+        private void OnFindProp(ushort lootId)
+        {
+            this.Log($"[uid] : {lootId}");
+            View.SetInteractButton(lootId > 0);
         }
     }
 }

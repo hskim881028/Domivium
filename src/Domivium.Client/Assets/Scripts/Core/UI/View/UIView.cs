@@ -42,9 +42,7 @@ namespace Domivium.Client.Core.UI.View
             Self.pivot = Vector2.one * 0.5f;
         }
 
-        public virtual UniTask InitializeAsync(CancellationToken token) =>
-            // TODO: Need to implement
-            UniTask.CompletedTask;
+        public virtual UniTask<bool> InitializeAsync(CancellationToken token) => UniTask.FromResult(true);
 
         public virtual UniTask ShowAsync(CancellationToken token, UIParam param, bool immediately = false)
         {

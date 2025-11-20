@@ -70,7 +70,7 @@ namespace Domivium.Client.Contents.Actors
         public bool GetCharacter(out IBattleSystem pawn)
         {
             pawn = null;
-            return _buckets.TryGetValue(ActorIds.Character, out var bucket) && bucket.TryGetFirstPawn(out pawn);
+            return _buckets.TryGetValue(ActorId.Character, out var bucket) && bucket.TryGetFirstPawn(out pawn);
         }
 
         public int GetPawns(ActorId actorId, List<IBattleSystem> buffer) => !_buckets.TryGetValue(actorId, out var bucket) ? 0 : bucket.CollectPawns(buffer);

@@ -22,6 +22,13 @@ namespace Domivium.Client.Contents.Systems
             _lookAt.Value = Vector2.one * 0.1f;
         }
 
+        public void Stop()
+        {
+            _direction.Value = Vector2.zero;
+            _lookAt.Value = Vector2.zero;
+            OnBattleTag.Execute(BattleTags.Idle);
+        }
+
         public bool SetDirection(Vector2 value)
         {
             if (value.sqrMagnitude > 1f)
@@ -36,41 +43,25 @@ namespace Domivium.Client.Contents.Systems
         public bool LookAt(Vector2 value)
         {
             _lookAt.Value = value;
-            var tag = _lookAt.Value.sqrMagnitude > Constant.CanAttackRange ? BattleTags.Firing : BattleTags.Aiming;
-            OnBattleTag.Execute(tag);
-            return true;
-        }
+            switch (_lookAt.Value.sqrMagnitude)
+            {
+                case > 0 when value.sqrMagnitude <= Constant.CanAttackRange:
+                    OnBattleTag.Execute(BattleTags.Aiming);
+                    break;
+                case > Constant.CanAttackRange:
+                    OnBattleTag.Execute(BattleTags.Firing);
+                    break;
+                default:
+                    OnBattleTag.Execute(BattleTags.Idle);
+                    break;
+            }
 
-        public bool Reload()
-        {
-            _lookAt.Value = Vector2.zero;
-            OnBattleTag.Execute(BattleTags.Idle);
             return true;
         }
 
         public bool Avoid()
         {
             OnBattleTag.Execute(BattleTags.Avoid);
-            return true;
-        }
-
-        public bool SelectItem(Vector2 value)
-        {
-            return true;
-        }
-
-        public bool UseItem()
-        {
-            return true;
-        }
-
-        public bool OpenInventory()
-        {
-            return true;
-        }
-
-        public bool Interact()
-        {
             return true;
         }
     }

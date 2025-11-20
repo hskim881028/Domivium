@@ -1,32 +1,16 @@
 ﻿using System.Collections.Generic;
-using Domivium.Client.Contents.Item;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Data.Context;
+using Domivium.Client.Data.Item;
 using Domivium.Client.Data.Stat;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace Domivium.Client.Contents.Actors.Contract
 {
-    public record StageFieldParams(Tilemap Tilemap) : ActorParam;
-
-    public record CharacterParams(
-        Vector2 SpawnPosition,
-        UnitContext UnitContext,
-        ItemContext WeaponContext,
-        IReadOnlyList<BattleAbility> Abilities) : UnitParams(SpawnPosition, UnitContext, Abilities);
-    
-    public record MonsterParams(
-        Vector2 SpawnPosition,
-        UnitContext UnitContext,
-        IReadOnlyList<BattleAbility> Abilities,
-        IBattleSystem Target) : UnitParams(SpawnPosition, UnitContext, Abilities);
-
-    public record UnitParams(
-        Vector2 SpawnPosition,
-        UnitContext UnitContext,
-        IReadOnlyList<BattleAbility> Abilities) : PawnParams(SpawnPosition);
+    public record PawnParams(Vector2 SpawnPosition) : ActorParam;
 
     public record ProjectileParams(
         ActorId Target,
@@ -36,7 +20,23 @@ namespace Domivium.Client.Contents.Actors.Contract
         ProjectileContext ProjectileContext,
         IReadOnlyList<BattleAbility> Abilities) : PawnParams(SpawnPosition);
 
-    public record PawnParams(Vector2 SpawnPosition) : ActorParam;
+    public record UnitParams(
+        Vector2 SpawnPosition,
+        UnitContext UnitContext,
+        IReadOnlyList<BattleAbility> Abilities) : PawnParams(SpawnPosition);
+
+    public record CharacterParams(
+        Vector2 SpawnPosition,
+        UnitContext UnitContext,
+        ItemContext WeaponContext,
+        IReadOnlyList<BattleAbility> Abilities) : UnitParams(SpawnPosition, UnitContext, Abilities);
+
+    public record MonsterParams(
+        Vector2 SpawnPosition,
+        UnitContext UnitContext,
+        IReadOnlyList<BattleAbility> Abilities,
+        IBattleSystem Target) : UnitParams(SpawnPosition, UnitContext, Abilities);
+
 
     public record PropParams(Vector2 SpawnPosition) : ActorParam;
 

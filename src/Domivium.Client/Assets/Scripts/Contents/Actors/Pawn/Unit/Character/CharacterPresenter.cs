@@ -16,7 +16,6 @@ namespace Domivium.Client.Contents.Actors
     public class CharacterPresenter : UnitPresenter<Character>
     {
         private bool _firing;
-        public Transform Transform => Actor.transform;
 
         public CharacterPresenter(
             Character actor,
@@ -53,11 +52,8 @@ namespace Domivium.Client.Contents.Actors
         {
             base.OnPostStateTick(deltaTime);
 
-            if (!_firing) return;
-
-
-            var context = BattleAbilityContext.Create(BattleAbilityIds.Attack, BattleSystem);
-            BattleSystem.TryActivateAbility(ref context);
+            OnFindLoot();
+            OnFiringTick();
         }
 
         protected override void OnMoveTick(float deltaTime)
@@ -67,6 +63,15 @@ namespace Domivium.Client.Contents.Actors
             if (!BattleSystem.TryActivateAbility(ref context)) return;
 
             var lookAt = BattleSystem.LookAt.CurrentValue;
+            if (Mathf.Approximately(lookAt.sqrMagnitude, 0)) return;
+
+            var attackRange = BattleSystem.Stat.RateValue(StatId.AttackRange);
+            Actor.SetAim(lookAt, attackRange);
+        }
+
+        protected override void OnLookAtChanged(Vector2 lookAt)
+        {
+            base.OnLookAtChanged(lookAt);
             if (Mathf.Approximately(lookAt.sqrMagnitude, 0)) return;
 
             var attackRange = BattleSystem.Stat.RateValue(StatId.AttackRange);
@@ -93,15 +98,6 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.TryActivateAbility(ref context);
         }
 
-        protected override void OnLookAtChanged(Vector2 lookAt)
-        {
-            base.OnLookAtChanged(lookAt);
-            if (Mathf.Approximately(lookAt.sqrMagnitude, 0)) return;
-
-            var attackRange = BattleSystem.Stat.RateValue(StatId.AttackRange);
-            Actor.SetAim(lookAt, attackRange);
-        }
-
         private void OnBattleTag(BattleTag tag)
         {
             _firing = tag == BattleTags.Firing;
@@ -123,6 +119,19 @@ namespace Domivium.Client.Contents.Actors
                 var context = BattleAbilityContext.Create(BattleAbilityIds.Avoid, BattleSystem);
                 BattleSystem.TryActivateAbility(ref context);
             }
+        }
+
+        private void OnFindLoot()
+        {
+            
+        }
+        
+        private void OnFiringTick()
+        {
+            if (!_firing) return;
+
+            var context = BattleAbilityContext.Create(BattleAbilityIds.Attack, BattleSystem);
+            BattleSystem.TryActivateAbility(ref context);
         }
     }
 }

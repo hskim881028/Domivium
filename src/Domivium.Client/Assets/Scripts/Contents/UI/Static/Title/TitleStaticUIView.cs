@@ -10,10 +10,12 @@ namespace Domivium.Client.Contents.UI.Static
     {
         [SerializeField] private DvmButton _loginButton;
 
-        public override async UniTask InitializeAsync(CancellationToken token)
+        public override async UniTask<bool> InitializeAsync(CancellationToken token)
         {
+            if (!await base.InitializeAsync(token)) return false;
+
             _loginButton.onClick.AddListener(Message.Login);
-            await base.InitializeAsync(token);
+            return true;
         }
     }
 }

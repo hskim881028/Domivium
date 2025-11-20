@@ -22,6 +22,7 @@ namespace Domivium.Client.Contents.UIComponents
 
         public async UniTaskVoid Reload(float duration)
         {
+            this.Log();
             Reset();
 
             _cts = new CancellationTokenSource();

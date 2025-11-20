@@ -16,8 +16,8 @@ namespace Domivium.Client.Contents.Actors
         protected IStateSystem StateSystem { get; }
 
         public ushort Uid { get; private set; }
-
         public ActorId ActorId { get; private set; }
+        public Transform Transform => Actor.transform;
 
         protected ActorPresenter(TActor actor, ISystemFactory systemFactory)
         {

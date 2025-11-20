@@ -39,13 +39,13 @@ namespace Domivium.Client.Contents.Battle.Ability
         {
             var effect = EffectPool.Get(BattleEffectIds.Attack, context.Source, context.Source);
             context.Source.ActivateEffect(effect);
-            var target = context.Source.ActorId == ActorIds.Character ? ActorIds.Monster : ActorIds.Character;
+            var target = context.Source.ActorId == ActorId.Character ? ActorId.Monster : ActorId.Character;
             var stat = context.Source.Stat;
             var position = context.Source.MuzzlePosition;
             var direction = context.Source.LookAt.CurrentValue;
-            var abilities = _abilityFactory.GetAbilities(ActorIds.Projectile);
+            var abilities = _abilityFactory.GetAbilities(ActorId.Projectile);
             var param = _actorParamFactory.CreateProjectile(1, target, stat, position, direction, abilities);
-            _actorSpawner.SpawnAsync(ActorIds.Projectile, param).Forget();
+            _actorSpawner.SpawnAsync(ActorId.Projectile, param).Forget();
             
             var attackSpeed = stat.RateValue(StatId.AttackSpeed);
             return attackSpeed;

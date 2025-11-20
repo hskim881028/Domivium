@@ -36,7 +36,7 @@ namespace Domivium.Client.Contents.Battle.Ability
             // todo: 범위 공격 생기면 구현 필요.
 
             var dir = source.Direction.CurrentValue;
-            var mask = context.Target == ActorIds.Character ? Layer.CharacterOrPropMask : Layer.MonsterOrPropMask;
+            var mask = context.Target == ActorId.Character ? Layer.CharacterOrPropMask : Layer.MonsterOrPropMask;
             var count = Physics2D.RaycastNonAlloc(pre, dir, _hits, dist, mask);
             if (count <= 0)
             {
@@ -55,9 +55,9 @@ namespace Domivium.Client.Contents.Battle.Ability
                 var durabilityEffect = EffectPool.Get(BattleEffectIds.Durability, context.Source, context.Source);
                 context.Source.ActivateEffect(durabilityEffect);
 
-                if (actor.ActorId == context.Target)
+                if (actor.Id == context.Target)
                 {
-                    if (_actorManager.TryGetPawn(actor.ActorId, actor.Uid, out var pawn))
+                    if (_actorManager.TryGetPawn(actor.Id, actor.Uid, out var pawn))
                     {
                         var effect = EffectPool.Get(BattleEffectIds.Damage, context.Source, pawn);
                         pawn.ActivateEffect(effect);

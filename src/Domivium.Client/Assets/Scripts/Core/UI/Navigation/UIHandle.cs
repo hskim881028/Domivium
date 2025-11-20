@@ -15,6 +15,7 @@ namespace Domivium.Client.Core.UI.Navigation
 
         public static IUIHandle Create => new UIHandle();
         public static IUIHandle Error => Create.Closed(UIResult.Failure);
+        public static IUIHandle Running => Create.Closed(UIResult.Running);
 
         public bool IsOpened => _state == UIHandleState.Opened;
         public bool IsClosed => _state == UIHandleState.Closed;

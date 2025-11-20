@@ -187,7 +187,15 @@ namespace Domivium.Client.Editor
 
                 var (csharpType, comment) = MapCsvTypeToCSharp(typeToken);
 
-                var attr = propName.Equals("Id", StringComparison.OrdinalIgnoreCase) ? "[PrimaryKey] " : "";
+                var attr = string.Empty;
+                if (propName.Equals("Id", StringComparison.OrdinalIgnoreCase))
+                {
+                    attr = "[PrimaryKey] ";
+                }
+                else if (propName.Equals("GroupId", StringComparison.OrdinalIgnoreCase))
+                {
+                    attr = "[SecondaryKey(0), NonUnique] ";
+                }
                 var cmt = string.IsNullOrEmpty(comment) ? string.Empty : $" // {comment}";
                 var init = csharpType == "string" ? " = string.Empty;" : string.Empty;
                 sb.AppendLine($"\t\t{attr}public {csharpType} {propName} {{ get; set; }}{init}{cmt}");

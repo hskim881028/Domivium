@@ -2,18 +2,18 @@
 {
     public class CostButton : DvmButton
     {
-        private CostText _cost;
+        private IntText _int;
 
         public int Cost
         {
-            get => _cost.Cost;
-            set => _cost.Cost = value;
+            get => _int.Value;
+            set => _int.Value = value;
         }
 
         protected override void Awake()
         {
             base.Awake();
-            _cost = GetComponentInChildren<CostText>();
+            _int = GetComponentInChildren<IntText>();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.State;
+using Domivium.Client.Data.Rarity;
 using Domivium.Client.Data.Stat;
 using R3;
 using UnityEngine;

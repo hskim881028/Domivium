@@ -14,6 +14,7 @@ namespace Domivium.Client.Contents.UI.Generated
 			{ StaticUIId.Stage, (typeof(Domivium.Client.Contents.UI.Static.StageStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.StageStaticUIView)) },
 			{ StaticUIId.Title, (typeof(Domivium.Client.Contents.UI.Static.TitleStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.TitleStaticUIView)) },
 			// Stack
+			{ StackUIId.ItemContainer, (typeof(Domivium.Client.Contents.UI.Stack.ItemContainerStackUIPresenter), typeof(Domivium.Client.Contents.UI.Stack.ItemContainerStackUIView)) },
 			{ StackUIId.Login, (typeof(Domivium.Client.Contents.UI.Stack.LoginStackUIPresenter), typeof(Domivium.Client.Contents.UI.Stack.LoginStackUIView)) },
 		};
 

@@ -40,14 +40,15 @@ namespace Domivium.Client.Core.UI.Presenter
             View.SetParent(parent);
         }
 
-        public virtual async UniTask InitializeAsync(CancellationToken token)
+        public virtual async UniTask<bool> InitializeAsync(CancellationToken token)
         {
-            if (_initialized) return;
+            if (_initialized) return false;
 
             try
             {
                 await View.InitializeAsync(token);
                 _initialized = true;
+                return true;
             }
             catch (Exception e)
             {

@@ -16,6 +16,7 @@ namespace Domivium.Client.Contents.UI.Generated
 
 	public static class StackUIId
 	{
+		public static UIId ItemContainer = 148036831;
 		public static UIId Login = 367913938;
 	}
 }

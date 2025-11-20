@@ -15,10 +15,12 @@ namespace Domivium.Client.Contents.DI.Entry
 {
     public sealed class ApplicationEntry : Entry
     {
+        private readonly IAppContext _appContext;
         private readonly SceneService _sceneService;
         private readonly IUINavigation _uiNavigation;
 
         public ApplicationEntry(
+            IAppContext appContext,
             NetworkService networkService,
             SceneService sceneService,
             EnvironmentService environmentService,
@@ -33,6 +35,7 @@ namespace Domivium.Client.Contents.DI.Entry
                 networkService.Connect();
             }
 
+            _appContext = appContext;
             _sceneService = sceneService;
             _uiNavigation = uiNavigation;
             sceneUIReadySubscriber.Subscribe(OnSceneUIReady).AddTo(ref DisposableBag);
@@ -48,6 +51,7 @@ namespace Domivium.Client.Contents.DI.Entry
         private void OnSceneUIReady(SceneUIReadyMessage message)
         {
             var id = message.SceneScopeId;
+            _appContext.SetScene(id);
             if (id == SceneScopeIds.Title)
             {
                 _uiNavigation.ApplyUILayer(UILayers.Title).Forget();

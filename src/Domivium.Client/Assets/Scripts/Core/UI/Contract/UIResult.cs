@@ -6,5 +6,6 @@
         public static UIResult Cancel => new(UIResultState.Cancel);
         public static UIResult Close => new(UIResultState.Close);
         public static UIResult Failure => new(UIResultState.Failure);
+        public static UIResult Running => new(UIResultState.Running);
     }
 }

@@ -29,8 +29,15 @@ namespace Domivium.Client.Core.UI.Navigation
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
+        public bool IsRunning { get; private set; }
         public bool HasOpenSystemUI => _systemNodes.Count > 0;
         public bool HasOpenStackUI => _stackNodes.Count > 0;
+        public bool IsTopOfStack(UIId id)
+        {
+            if (!_stackNodes.TryPeek(out var node)) return false;
+
+            return node.Id == id;
+        }
 
         public async UniTask ApplyUILayer(UILayer layer, bool immediately = false)
         {
@@ -67,6 +74,8 @@ namespace Domivium.Client.Core.UI.Navigation
 
         public async UniTask<IUIHandle> ShowStackUIAsync(UIId id, UIParam payload = null, bool immediately = false)
         {
+            if (IsRunning) return UIHandle.Running;
+
             try
             {
                 if (_stackNodes.Any(x => x.Id == id))
@@ -74,11 +83,13 @@ namespace Domivium.Client.Core.UI.Navigation
                     throw new AlreadyOpenedException();
                 }
 
+                IsRunning = true;
                 var node = _navigationNodePool.Get(id);
                 var presenter = _uiManager.Get<IStackUIPresenter>(id);
-                var uiHandle = await ShowPresenterAsync(presenter, node, payload, immediately);
+                var handle = await ShowPresenterAsync(presenter, node, payload, immediately);
                 _stackNodes.Push(node);
-                return uiHandle;
+                IsRunning = false;
+                return handle;
             }
             catch (InitializationFailedException)
             {
@@ -94,8 +105,11 @@ namespace Domivium.Client.Core.UI.Navigation
 
         public async UniTask<IUIHandle> ShowSystemUIAsync(UIId id, UIParam payload = null, bool immediately = false)
         {
+            if (IsRunning) return UIHandle.Running;
+
             try
             {
+                IsRunning = true;
                 var node = _systemNodes.FirstOrDefault(x => x.Id == id);
                 if (node == null)
                 {
@@ -104,7 +118,9 @@ namespace Domivium.Client.Core.UI.Navigation
                 }
 
                 var presenter = _uiManager.Get<ISystemUIPresenter>(id);
-                return await ShowPresenterAsync(presenter, node, payload ?? UIParam.Empty, immediately);
+                var handle = await ShowPresenterAsync(presenter, node, payload ?? UIParam.Empty, immediately);
+                IsRunning = false;
+                return handle;
             }
             catch (InitializationFailedException)
             {
@@ -118,6 +134,8 @@ namespace Domivium.Client.Core.UI.Navigation
 
         public async UniTask<bool> HideSystemUIAsync(UIId id, UIResult result, bool immediately = false)
         {
+            if (IsRunning) return false;
+
             var node = _systemNodes.FirstOrDefault(x => x.Id == id);
             if (node == null)
             {
@@ -134,6 +152,8 @@ namespace Domivium.Client.Core.UI.Navigation
 
         public async UniTask<bool> HideStackUIAsync(UIResult result, bool immediately = false)
         {
+            if (IsRunning) return false;
+
             if (!_stackNodes.TryPop(out var node))
             {
                 return false;

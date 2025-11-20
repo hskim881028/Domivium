@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.State;
+using Domivium.Client.Data.Item;
+using Domivium.Client.Data.Rarity;
 using Domivium.Client.Data.Stat;
 using MessagePipe;
 using R3;

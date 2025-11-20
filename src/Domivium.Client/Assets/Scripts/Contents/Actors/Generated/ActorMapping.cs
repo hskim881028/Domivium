@@ -8,17 +8,17 @@ namespace Domivium.Client.Contents.Actors.Generated
     {
         public static readonly Dictionary<ActorId, (Type presenter, Type view)> Actor = new()
         {
-            { ActorIds.StageField, (typeof(StageFieldPresenter), typeof(StageField)) },
-            { ActorIds.Character, (typeof(CharacterPresenter), typeof(Character)) },
-            { ActorIds.Monster, (typeof(MonsterPresenter), typeof(Monster)) },
-            { ActorIds.Projectile, (typeof(ProjectilePresenter), typeof(Projectile)) },
+            { ActorId.StageField, (typeof(StageFieldPresenter), typeof(StageField)) },
+            { ActorId.Character, (typeof(CharacterPresenter), typeof(Character)) },
+            { ActorId.Monster, (typeof(MonsterPresenter), typeof(Monster)) },
+            { ActorId.Projectile, (typeof(ProjectilePresenter), typeof(Projectile)) },
             
             // VFX
-            { ActorIds.DamageText, (typeof(DamageTextPresenter), typeof(DamageText)) },
-            { ActorIds.HealText, (typeof(HealTextPresenter), typeof(HealText)) },
+            { ActorId.DamageText, (typeof(DamageTextPresenter), typeof(DamageText)) },
+            { ActorId.HealText, (typeof(HealTextPresenter), typeof(HealText)) },
 
             // Prop
-            { ActorIds.Prop, (typeof(PropPresenter), typeof(Prop)) },
+            { ActorId.Prop, (typeof(PropPresenter), typeof(Prop)) },
         };
     }
 }

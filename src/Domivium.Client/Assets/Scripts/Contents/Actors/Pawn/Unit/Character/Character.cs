@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
-using Domivium.Client.Contents.Actors.Generated;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Utility;
 using R3;
@@ -30,7 +30,7 @@ namespace Domivium.Client.Contents.Actors
             await base.SpawnAsync(token, param);
             var p = param.As<CharacterParams>();
             // var color = p.PawnContext.PawnType.ToColor();
-            _layerMask = ActorId == ActorIds.Character ? Layer.MonsterOrPropMask : Layer.CharacterOrPropMask;
+            _layerMask = Id == ActorId.Character ? Layer.MonsterOrPropMask : Layer.CharacterOrPropMask;
         }
 
         public void SetAim(Vector2 direction, float range)

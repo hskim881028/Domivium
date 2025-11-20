@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6899217807413941226}
   - component: {fileID: 7768189556102517028}
   - component: {fileID: 4030447758893814899}
-  - component: {fileID: 5061707181622055934}
   m_Layer: 11
   m_Name: FadeNumber
   m_TagString: Untagged
@@ -79,7 +78,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 99370801
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 83cc862b679a2d94d90b39edfbebcec1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -93,18 +92,6 @@ SpriteRenderer:
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &4030447758893814899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5946522370232495747}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30676d8871e34f009ee3266988662bf9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.Components.FadeNumber
---- !u!114 &5061707181622055934
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
