@@ -17,19 +17,16 @@ namespace Domivium.Client.Data.Context
         public int Sanity { get; }
         public int Durability { get; }
         public int Weight { get; }
-        public int MaxWeight { get; }
         public int InventoryCapacity { get; }
         public int ProjectileCapacity { get; }
         public int Attack { get; }
         public int Defense { get; }
         public int AttackRange { get; }
-        public int HitRange { get; }
         public int DetectionRange { get; }
-        public int FieldOfView { get; }
-        public int AngleOfView { get; }
         public int MoveSpeed { get; }
         public int AttackSpeed { get; }
         public int ReloadSpeed { get; }
+        public int ProjectileSpeed { get; }
         public int CriticalRate { get; }
         public int CriticalDamage { get; }
 
@@ -46,19 +43,16 @@ namespace Domivium.Client.Data.Context
             Sanity = row.Sanity;
             Durability = row.Durability;
             Weight = row.Weight;
-            MaxWeight = row.MaxWeight;
             InventoryCapacity = row.InventoryCapacity;
             ProjectileCapacity = row.ProjectileCapacity;
             Attack = row.Attack;
             Defense = row.Defense;
             AttackRange = row.AttackRange;
-            HitRange = row.HitRange;
             DetectionRange = row.DetectionRange;
-            FieldOfView = row.FieldOfView;
-            AngleOfView = row.AngleOfView;
             MoveSpeed = row.MoveSpeed;
             AttackSpeed = row.AttackSpeed;
             ReloadSpeed = row.ReloadSpeed;
+            ProjectileSpeed = row.ProjectileSpeed;
             CriticalRate = row.CriticalRate;
             CriticalDamage = row.CriticalDamage;
         }
@@ -76,19 +70,16 @@ namespace Domivium.Client.Data.Context
             Sanity = row.Sanity;
             Durability = row.Durability;
             Weight = row.Weight;
-            MaxWeight = row.MaxWeight;
             InventoryCapacity = row.InventoryCapacity;
             ProjectileCapacity = row.ProjectileCapacity;
             Attack = row.Attack;
             Defense = row.Defense;
             AttackRange = row.AttackRange;
-            HitRange = row.HitRange;
             DetectionRange = row.DetectionRange;
-            FieldOfView = row.FieldOfView;
-            AngleOfView = row.AngleOfView;
             MoveSpeed = row.MoveSpeed;
             AttackSpeed = row.AttackSpeed;
             ReloadSpeed = row.ReloadSpeed;
+            ProjectileSpeed = row.ProjectileSpeed;
             CriticalRate = row.CriticalRate;
             CriticalDamage = row.CriticalDamage;
         }

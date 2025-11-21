@@ -30,19 +30,16 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Stat.Register(StatId.Sanity, row.Sanity, OnSanityStatChanged);
             BattleSystem.Stat.Register(StatId.Durability, row.Durability, OnDurabilityStatChanged);
             BattleSystem.Stat.Register(StatId.Weight, row.Weight, OnWeightStatChanged);
-            BattleSystem.Stat.Register(StatId.MaxWeight, row.MaxWeight, OnMaxWeightStatChanged);
             BattleSystem.Stat.Register(StatId.InventoryCapacity, row.InventoryCapacity, OnInventoryCapacityStatChanged);
             BattleSystem.Stat.Register(StatId.ProjectileCapacity, row.ProjectileCapacity, OnProjectileCapacityStatChanged);
             BattleSystem.Stat.Register(StatId.Attack, row.Attack, OnAttackStatChanged);
             BattleSystem.Stat.Register(StatId.Defense, row.Defense, OnDefenseStatChanged);
             BattleSystem.Stat.Register(StatId.AttackRange, row.AttackRange, OnAttackRangeStatChanged);
-            BattleSystem.Stat.Register(StatId.HitRange, row.HitRange, OnHitRangeStatChanged);
             BattleSystem.Stat.Register(StatId.DetectionRange, row.DetectionRange, OnDetectionRangeStatChanged);
-            BattleSystem.Stat.Register(StatId.FieldOfView, row.FieldOfView, OnFieldOfViewStatChanged);
-            BattleSystem.Stat.Register(StatId.AngleOfView, row.AngleOfView, OnAngleOfViewStatChanged);
             BattleSystem.Stat.Register(StatId.MoveSpeed, row.MoveSpeed, OnMoveSpeedStatChanged);
             BattleSystem.Stat.Register(StatId.AttackSpeed, row.AttackSpeed, OnAttackSpeedStatChanged);
             BattleSystem.Stat.Register(StatId.ReloadSpeed, row.ReloadSpeed, OnReloadSpeedStatChanged);
+            BattleSystem.Stat.Register(StatId.ProjectileSpeed, row.ProjectileSpeed, OnProjectileSpeedStatChanged);
             BattleSystem.Stat.Register(StatId.CriticalRate, row.CriticalRate, OnCriticalRateStatChanged);
             BattleSystem.Stat.Register(StatId.CriticalDamage, row.CriticalDamage, OnCriticalDamageStatChanged);
 
@@ -50,12 +47,16 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Gauge.Register(StatId.Hunger, row.Hunger);
             BattleSystem.Gauge.Register(StatId.Stamina, row.Stamina);
             BattleSystem.Gauge.Register(StatId.Sanity, row.Sanity);
+            BattleSystem.Gauge.Register(StatId.Weight, row.Weight);
+            BattleSystem.Gauge.Register(StatId.InventoryCapacity, row.InventoryCapacity);
             BattleSystem.Gauge.Register(StatId.ProjectileCapacity, row.ProjectileCapacity);
 
             BattleSystem.Gauge.AddListener(StatId.Health, OnHealthGaugeChanged);
             BattleSystem.Gauge.AddListener(StatId.Hunger, OnHungerGaugeChanged);
             BattleSystem.Gauge.AddListener(StatId.Stamina, OnStaminaGaugeChanged);
             BattleSystem.Gauge.AddListener(StatId.Sanity, OnSanityGaugeChanged);
+            BattleSystem.Gauge.AddListener(StatId.Weight, OnWeightGaugeChanged);
+            BattleSystem.Gauge.AddListener(StatId.InventoryCapacity, OnInventoryCapacityGaugeChanged);
             BattleSystem.Gauge.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityGaugeChanged);
 
             foreach (var ability in p.Abilities)
@@ -99,14 +100,6 @@ namespace Domivium.Client.Contents.Actors
             Actor.SetRange(StatId.AttackRange, range, Color.crimson);
         }
 
-        protected virtual void OnHitRangeStatChanged()
-        {
-            if (!AppEnv.DrawRange) return;
-
-            var range = BattleSystem.Stat.RateValue(StatId.HitRange);
-            Actor.SetRange(StatId.HitRange, range, Color.chartreuse);
-        }
-
         protected virtual void OnDetectionRangeStatChanged()
         {
             if (!AppEnv.DrawRange) return;
@@ -115,18 +108,11 @@ namespace Domivium.Client.Contents.Actors
             Actor.SetRange(StatId.DetectionRange, range, Color.gold);
         }
 
-        protected virtual void OnFieldOfViewStatChanged() { }
-
-        protected virtual void OnAngleOfViewStatChanged() { }
-
         protected virtual void OnMoveSpeedStatChanged() { }
-
         protected virtual void OnAttackSpeedStatChanged() { }
-
         protected virtual void OnReloadSpeedStatChanged() { }
-
+        protected virtual void OnProjectileSpeedStatChanged() { }
         protected virtual void OnCriticalRateStatChanged() { }
-
         protected virtual void OnCriticalDamageStatChanged() { }
 
         #endregion
@@ -146,7 +132,8 @@ namespace Domivium.Client.Contents.Actors
         protected virtual void OnHungerGaugeChanged() { }
         protected virtual void OnStaminaGaugeChanged() { }
         protected virtual void OnSanityGaugeChanged() { }
-        protected virtual void OnDurabilityGaugeChanged() { }
+        protected virtual void OnWeightGaugeChanged() { }
+        protected virtual void OnInventoryCapacityGaugeChanged() { }
         protected virtual void OnProjectileCapacityGaugeChanged() { }
 
         #endregion

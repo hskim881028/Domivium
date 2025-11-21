@@ -29,18 +29,15 @@ namespace Domivium.Client.Contents.Battle.Ability
             
             if (Mathf.Approximately(dist, 0))
             {
-                return Move(source, context.DeltaTime);
+                return Tracking(source, context.DeltaTime);
             }
-
-            // var hitRange = source.Stat.RateValue(StatId.HitRange);
-            // todo: 범위 공격 생기면 구현 필요.
 
             var dir = source.Direction.CurrentValue;
             var mask = context.Target == ActorId.Character ? Layer.CharacterOrPropMask : Layer.MonsterOrPropMask;
             var count = Physics2D.RaycastNonAlloc(pre, dir, _hits, dist, mask);
             if (count <= 0)
             {
-                return Move(source, context.DeltaTime);
+                return Tracking(source, context.DeltaTime);
             }
 
             Array.Sort(_hits, 0, count, HitDistanceComparer.Instance);
@@ -67,12 +64,12 @@ namespace Domivium.Client.Contents.Battle.Ability
                 durability--;
             }
 
-            return Move(source, context.DeltaTime);
+            return Tracking(source, context.DeltaTime);
         }
 
-        private float Move(IBattleSystem source, float deltaTime)
+        private float Tracking(IBattleSystem source, float deltaTime)
         {
-            var speed = source.Stat.RateValue(StatId.MoveSpeed);
+            var speed = source.Stat.RateValue(StatId.ProjectileSpeed);
             var position = source.Position;
             var direction = source.Direction.CurrentValue;
             direction *= speed * deltaTime;

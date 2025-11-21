@@ -40,27 +40,24 @@ namespace Domivium.Client.Core.Utility
         {
             return statId.AsPrimitive() switch
             {
-                0 => "체력",
-                1 => "허기",
+                0 => "생명력",
+                1 => "체력",
                 2 => "지구력",
                 3 => "정신력",
                 4 => "내구도",
                 5 => "무게",
-                6 => "최대 무게",
-                7 => "인벤토리 공간",
-                8 => "탄창용량",
-                9 => "공격력",
-                10 => "방어력",
+                6 => "인벤토리 공간",
+                7 => "스펠 충전량",
+                8 => "공격력",
+                9 => "방어력",
+                10 => "탐지범위",
                 11 => "사거리",
-                12 => "피격범위",
-                13 => "탐지범위",
-                14 => "시야범위",
-                15 => "시야각",
-                16 => "이동속도",
-                17 => "공격속도",
-                18 => "재장전 시간",
-                19 => "치명타율",
-                20 => "치명타 피해",
+                12 => "이동 속도",
+                13 => "공격 속도",
+                14 => "스펠 재충전 시간",
+                15 => "스펠 속도",
+                16 => "치명타율",
+                17 => "치명타 피해",
                 _ => throw new ArgumentOutOfRangeException(nameof(statId))
             };
         }
@@ -78,7 +75,7 @@ namespace Domivium.Client.Core.Utility
                 case ItemType.Backpack:
                     return "가방";
                 case ItemType.Projectile:
-                    return "투사체";
+                    return "스펠";
                 case ItemType.Armor:
                     return "갑옷";
                 case ItemType.Ring:

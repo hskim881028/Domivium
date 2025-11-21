@@ -43,7 +43,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
             _criticalRate.Hide();
             _criticalDamage.Hide();
 
-            _weight.Set(context.Weight);
+            _weight.Set(context.Weight * 0.01f);
             switch (item.Type)
             {
                 case ItemType.Weapon:

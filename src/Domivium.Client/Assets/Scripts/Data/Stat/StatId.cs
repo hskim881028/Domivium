@@ -11,21 +11,18 @@ namespace Domivium.Client.Data.Stat
         public static readonly StatId Sanity = 3;
         public static readonly StatId Durability = 4;
         public static readonly StatId Weight = 5;
-        public static readonly StatId MaxWeight = 6;
-        public static readonly StatId InventoryCapacity = 7;
-        public static readonly StatId ProjectileCapacity = 8;
-        public static readonly StatId Attack = 9;
-        public static readonly StatId Defense = 10;
+        public static readonly StatId InventoryCapacity = 6;
+        public static readonly StatId ProjectileCapacity = 7;
+        public static readonly StatId Attack = 8;
+        public static readonly StatId Defense = 9;
+        public static readonly StatId DetectionRange = 10;
         public static readonly StatId AttackRange = 11;
-        public static readonly StatId HitRange = 12;
-        public static readonly StatId DetectionRange = 13;
-        public static readonly StatId FieldOfView = 14;
-        public static readonly StatId AngleOfView = 15;
-        public static readonly StatId MoveSpeed = 16;
-        public static readonly StatId AttackSpeed = 17;
-        public static readonly StatId ReloadSpeed = 18;
-        public static readonly StatId CriticalRate = 19;
-        public static readonly StatId CriticalDamage = 20;
-        public static readonly StatId StatCount = 21;
+        public static readonly StatId MoveSpeed = 12;
+        public static readonly StatId AttackSpeed = 13;
+        public static readonly StatId ReloadSpeed = 14;
+        public static readonly StatId ProjectileSpeed = 15;
+        public static readonly StatId CriticalRate = 16;
+        public static readonly StatId CriticalDamage = 17;
+        public static readonly StatId StatCount = 18;
     }
 }

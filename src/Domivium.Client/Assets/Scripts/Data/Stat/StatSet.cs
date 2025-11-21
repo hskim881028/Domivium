@@ -94,7 +94,6 @@ namespace Domivium.Client.Data.Stat
                 id == StatId.Sanity ||
                 id == StatId.Durability ||
                 id == StatId.Weight ||
-                id == StatId.MaxWeight ||
                 id == StatId.InventoryCapacity ||
                 id == StatId.ProjectileCapacity ||
                 id == StatId.Attack ||

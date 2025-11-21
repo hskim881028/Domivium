@@ -610,7 +610,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
-      value: "\uC7AC\uC7A5\uC804 \uC2DC\uAC04"
+      value: "\uC2A4\uD3A0 \uC7AC\uCDA9\uC804 \uC2DC\uAC04"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -868,7 +868,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
-      value: "\uACF5\uACA9\uC18D\uB3C4"
+      value: "\uACF5\uACA9 \uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -983,9 +983,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: ProjectileeCapacity
       objectReference: {fileID: 0}
+    - target: {fileID: 8715151704296970367, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_text
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
-      value: "\uD0C4\uCC3D\uC6A9\uB7C9"
+      value: "\uC2A4\uD3A0 \uCDA9\uC804\uB7C9"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1023,6 +1027,10 @@ PrefabInstance:
     - target: {fileID: 509941687553916635, guid: afade5923542c614fb2b5e9b6795bb22, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4366524748366671733, guid: afade5923542c614fb2b5e9b6795bb22, type: 3}
+      propertyPath: m_text
+      value: "\uC0DD\uBA85\uB825"
       objectReference: {fileID: 0}
     - target: {fileID: 5670000742377916170, guid: afade5923542c614fb2b5e9b6795bb22, type: 3}
       propertyPath: m_Pivot.x
@@ -1272,7 +1280,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4366524748366671733, guid: afade5923542c614fb2b5e9b6795bb22, type: 3}
       propertyPath: m_text
-      value: "\uD5C8\uAE30"
+      value: "\uCCB4\uB825"
       objectReference: {fileID: 0}
     - target: {fileID: 5670000742377916170, guid: afade5923542c614fb2b5e9b6795bb22, type: 3}
       propertyPath: m_Pivot.x
@@ -2498,7 +2506,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
-      value: "\uD0C4 \uC18D\uB3C4"
+      value: "\uC2A4\uD3A0 \uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

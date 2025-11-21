@@ -862,10 +862,10 @@ MonoBehaviour:
   _attack: {fileID: 6443219290405187904}
   _defense: {fileID: 2522430464031139084}
   _attackRange: {fileID: 9015616070010340774}
-  _projectileCapacity: {fileID: 5267379336906438411}
   _attackSpeed: {fileID: 4528227304577357571}
-  _reloadSpeed: {fileID: 3515917480408577179}
   _moveSpeed: {fileID: 4916016302555551671}
+  _projectileCapacity: {fileID: 5267379336906438411}
+  _reloadSpeed: {fileID: 3515917480408577179}
   _criticalRate: {fileID: 2993534237539132474}
   _criticalDamage: {fileID: 2137273000044148437}
 --- !u!1001 &152191440064425241
@@ -970,7 +970,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
-      value: "\uACF5\uACA9\uC18D\uB3C4"
+      value: "\uACF5\uACA9 \uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1236,7 +1236,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
-      value: "\uC7AC\uC7A5\uC804 \uC2DC\uAC04"
+      value: "\uC2A4\uD3A0 \uC7AC\uCDA9\uC804 \uC2DC\uAC04"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2107,7 +2107,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
-      value: "\uD0C4\uCC3D\uC6A9\uB7C9"
+      value: "\uC2A4\uD3A0 \uCDA9\uC804\uB7C9"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2240,7 +2240,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
-      value: "\uD0C4 \uC18D\uB3C4"
+      value: "\uC2A4\uD3A0 \uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

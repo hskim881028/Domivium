@@ -33,8 +33,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Stat.Register(StatId.Durability, projectile.Durability, OnDurabilityStatChanged);
             BattleSystem.Stat.Register(StatId.Attack, projectile.Attack, OnAttackStatChanged);
             BattleSystem.Stat.Register(StatId.AttackRange, projectile.AttackRange, OnAttackRangeStatChanged);
-            BattleSystem.Stat.Register(StatId.HitRange, projectile.HitRange, OnHitRangeStatChanged);
-            BattleSystem.Stat.Register(StatId.MoveSpeed, projectile.MoveSpeed, OnAttackStatChanged);
+            BattleSystem.Stat.Register(StatId.ProjectileSpeed, projectile.ProjectileSpeed, OnProjectileSpeedStatChanged);
             BattleSystem.Stat.Register(StatId.CriticalRate, projectile.CriticalRate, OnCriticalRateStatChanged);
             BattleSystem.Stat.Register(StatId.CriticalDamage, projectile.CriticalDamage, OnCriticalDamageStatChanged);
 
@@ -90,8 +89,7 @@ namespace Domivium.Client.Contents.Actors
         protected virtual void OnDurabilityStatChanged() { }
         protected virtual void OnAttackStatChanged() { }
         protected virtual void OnAttackRangeStatChanged() { }
-        protected virtual void OnHitRangeStatChanged() { }
-        protected virtual void OnMoveSpeedStatChanged() { }
+        protected virtual void OnProjectileSpeedStatChanged() { }
         protected virtual void OnCriticalRateStatChanged() { }
         protected virtual void OnCriticalDamageStatChanged() { }
 

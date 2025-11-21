@@ -14,8 +14,7 @@ namespace Domivium.Client.Contents.Actors
         public int Durability { get; }
         public int Attack { get; }
         public int AttackRange { get; }
-        public int HitRange { get; }
-        public int MoveSpeed { get; }
+        public int ProjectileSpeed { get; }
         public int CriticalRate { get; }
         public int CriticalDamage { get; }
 
@@ -28,8 +27,7 @@ namespace Domivium.Client.Contents.Actors
             Durability = row.Durability;
             Attack = row.Attack;
             AttackRange = row.AttackRange;
-            HitRange = row.HitRange;
-            MoveSpeed = row.MoveSpeed;
+            ProjectileSpeed = row.ProjectileSpeed;
             CriticalRate = row.CriticalRate;
             CriticalDamage = row.CriticalDamage;
         }
