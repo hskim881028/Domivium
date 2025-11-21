@@ -1,8 +1,10 @@
 ﻿using System;
 using Domivium.Client.Core.Component;
+using Domivium.Client.Core.Component.Stat;
+using Domivium.Client.Core.Component.Text;
+using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Context;
 using Domivium.Client.Data.Item;
-using TMPro;
 using UnityEngine;
 
 namespace Domivium.Client.Contents.UIComponents.ItemContainer
@@ -10,77 +12,54 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
     public class ItemInformation : MonoBehaviour
     {
         [SerializeField] private ItemVisual _itemVisual;
-        [SerializeField] private TextMeshProUGUI _itemNameText;
-        [SerializeField] private TextMeshProUGUI _itemTypeText;
-
-        [SerializeField] private IntLimitText _durationText;
-
-        [SerializeField] private TextMeshProUGUI _weightText;
-
-        [SerializeField] private TextMeshProUGUI _attackText;
-        [SerializeField] private TextMeshProUGUI _defenseText;
-
-        [SerializeField] private TextMeshProUGUI _attackRangeText;
-
-        [SerializeField] private TextMeshProUGUI _projectileCapacityText;
-
-        [SerializeField] private TextMeshProUGUI _attackSpeedText;
-        [SerializeField] private TextMeshProUGUI _reloadSpeedText;
-        [SerializeField] private TextMeshProUGUI _moveSpeedText;
-
-        [SerializeField] private TextMeshProUGUI _criticalRateText;
-        [SerializeField] private TextMeshProUGUI _criticalDamageText;
-
-        [SerializeField] private GameObject _defense;
-        [SerializeField] private GameObject _attackRange;
-        [SerializeField] private GameObject _projectileCapacity;
-        [SerializeField] private GameObject _attackSpeed;
-        [SerializeField] private GameObject _reloadSpeed;
-        [SerializeField] private GameObject _moveSpeed;
-
+        [SerializeField] private StringText _itemName;
+        [SerializeField] private StringText _itemType;
+        [SerializeField] private FloatStat _weight;
+        [SerializeField] private FloatStat _attack;
+        [SerializeField] private FloatStat _defense;
+        [SerializeField] private FloatStat _attackRange;
+        [SerializeField] private FloatStat _attackSpeed;
+        [SerializeField] private FloatStat _moveSpeed;
+        [SerializeField] private FloatStat _projectileCapacity;
+        [SerializeField] private FloatStat _reloadSpeed;
+        [SerializeField] private FloatStat _criticalRate;
+        [SerializeField] private FloatStat _criticalDamage;
 
         public void Show(Sprite sprite, ItemData item, ItemContext context)
         {
             gameObject.SetActive(true);
             _itemVisual.Show(sprite, item.Count, item.IsStackable);
+            
+            _itemName.Value = Converter.GetItemName(item.Type, item.Id);
+            _itemType.Value = Converter.GetItemTypeName(item.Type);
 
-            _itemNameText.text = $"{item.Type}_{item.Id}";
-            _itemTypeText.text = item.Type.ToString();
-            _durationText.Limit = context.Durability;
-            _durationText.Value = context.Durability;
+            _attack.Hide();
+            _defense.Hide();
+            _attackRange.Hide();
+            _attackSpeed.Hide();
+            _moveSpeed.Hide();
+            _projectileCapacity.Hide();
+            _reloadSpeed.Hide();
+            _criticalRate.Hide();
+            _criticalDamage.Hide();
 
-            _weightText.text = $"{context.Weight}kg";
-
-            _attackText.text = $"{context.Attack}";
-            _defenseText.text = $"{context.Defense}";
-
-            _attackRangeText.text = $"{context.AttackRange * 0.01f}m";
-
-            _projectileCapacityText.text = $"{context.ProjectileCapacity}";
-
-            _attackSpeedText.text = $"{context.AttackSpeed * 0.01f}";
-            _reloadSpeedText.text = $"{context.ReloadSpeed * 0.01f}s";
-            _moveSpeedText.text = $"{context.MoveSpeed * 0.01f}";
-
-            _criticalRateText.text = $"{context.CriticalRate * 0.01f}%";
-            _criticalDamageText.text = $"+{context.CriticalDamage * 0.01f}%";
-
-            _defense.SetActive(false);
+            _weight.Set(context.Weight);
             switch (item.Type)
             {
                 case ItemType.Weapon:
-                    _attackRange.SetActive(true);
-                    _projectileCapacity.SetActive(true);
-                    _attackSpeed.SetActive(true);
-                    _reloadSpeed.SetActive(true);
-                    _moveSpeed.SetActive(false);
+                    _attack.Set(context.Attack);
+                    _attackRange.Set(context.Attack);
+                    _projectileCapacity.Set(context.ProjectileCapacity);
+                    _attackSpeed.Set(context.AttackSpeed * 0.01f);
+                    _reloadSpeed.Set(context.ReloadSpeed * 0.01f);
+                    _criticalRate.Set(context.CriticalRate * 0.01f);
+                    _criticalDamage.Set(context.CriticalDamage * 0.01f);
                     break;
                 case ItemType.Projectile:
-                    _attackRange.SetActive(false);
-                    _projectileCapacity.SetActive(false);
-                    _attackSpeed.SetActive(false);
-                    _reloadSpeed.SetActive(false);
-                    _moveSpeed.SetActive(true);
+                    _attack.Set(context.Attack);
+                    _moveSpeed.Set(context.MoveSpeed * 0.01f);
+                    _criticalRate.Set(context.CriticalRate * 0.01f);
+                    _criticalDamage.Set(context.CriticalDamage * 0.01f);
                     break;
                 case ItemType.Helmet:
                 case ItemType.Necklace:

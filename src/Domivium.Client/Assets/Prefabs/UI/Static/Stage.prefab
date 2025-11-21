@@ -1837,8 +1837,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 10/10
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 7b9e61ae3491fba4595d1b39190ca84f, type: 2}
-  m_sharedMaterial: {fileID: -6765837094796606205, guid: 7b9e61ae3491fba4595d1b39190ca84f, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3e5e203b0bce9e24f809247c31925366, type: 2}
+  m_sharedMaterial: {fileID: -3171694771615495509, guid: 3e5e203b0bce9e24f809247c31925366, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2065,10 +2065,10 @@ MonoBehaviour:
   - {fileID: 2744257516796139177}
   _avoidButton: {fileID: 6014391054943155325}
   _interactButton: {fileID: 706878716861610644}
-  _healthGauge: {fileID: 2842882702718475971}
-  _hungerGauge: {fileID: 840791637740689141}
-  _staminaGauge: {fileID: 9130279037031804720}
-  _sanityGauge: {fileID: 5400635779979127294}
+  _health: {fileID: 2842882702718475971}
+  _hunger: {fileID: 840791637740689141}
+  _stamina: {fileID: 9130279037031804720}
+  _sanity: {fileID: 5400635779979127294}
   _projectileCapacity: {fileID: 2458897002969132962}
 --- !u!1 &8210785844194744344
 GameObject:

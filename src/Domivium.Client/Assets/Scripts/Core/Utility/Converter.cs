@@ -1,5 +1,6 @@
 ﻿using System;
 using Domivium.Client.Data.Item;
+using Domivium.Client.Data.Stat;
 
 namespace Domivium.Client.Core.Utility
 {
@@ -33,6 +34,102 @@ namespace Domivium.Client.Core.Utility
                 ItemType.Ring => 6,
                 _ => throw new ArgumentOutOfRangeException(nameof(itemType))
             };
+        }
+
+        public static string GetStatName(StatId statId)
+        {
+            return statId.AsPrimitive() switch
+            {
+                0 => "체력",
+                1 => "허기",
+                2 => "지구력",
+                3 => "정신력",
+                4 => "내구도",
+                5 => "무게",
+                6 => "최대 무게",
+                7 => "인벤토리 공간",
+                8 => "탄창용량",
+                9 => "공격력",
+                10 => "방어력",
+                11 => "사거리",
+                12 => "피격범위",
+                13 => "탐지범위",
+                14 => "시야범위",
+                15 => "시야각",
+                16 => "이동속도",
+                17 => "공격속도",
+                18 => "재장전 시간",
+                19 => "치명타율",
+                20 => "치명타 피해",
+                _ => throw new ArgumentOutOfRangeException(nameof(statId))
+            };
+        }
+
+        public static string GetItemTypeName(ItemType itemType)
+        {
+            switch (itemType)
+            {
+                case ItemType.Weapon:
+                    return "무기";
+                case ItemType.Helmet:
+                    return "투구";
+                case ItemType.Necklace:
+                    return "목걸이";
+                case ItemType.Backpack:
+                    return "가방";
+                case ItemType.Projectile:
+                    return "투사체";
+                case ItemType.Armor:
+                    return "갑옷";
+                case ItemType.Ring:
+                    return "반지";
+                case ItemType.Food:
+                    return "음식";
+                case ItemType.Potion:
+                    return "물약";
+                case ItemType.None:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(itemType), itemType, null);
+            }
+        }
+
+        public static string GetItemName(ItemType itemType, int id) // temp
+        {
+            switch (itemType)
+            {
+                case ItemType.Weapon:
+                    return id switch
+                    {
+                        1 => "해리포터 지팡이",
+                        _ => throw new ArgumentOutOfRangeException(nameof(id))
+                    };
+                case ItemType.Helmet:
+                    return "투구";
+                case ItemType.Necklace:
+                    return "목걸이";
+                case ItemType.Backpack:
+                    return "가방";
+                case ItemType.Projectile:
+                    return id switch
+                    {
+                        1 => "파이어볼",
+                        2 => "아케인코멧",
+                        3 => "트윈플레어",
+                        4 => "스타폴샤드",
+                        _ => throw new ArgumentOutOfRangeException(nameof(id))
+                    };
+                case ItemType.Armor:
+                    return "갑옷";
+                case ItemType.Ring:
+                    return "반지";
+                case ItemType.Food:
+                    return "음식";
+                case ItemType.Potion:
+                    return "물약";
+                case ItemType.None:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(itemType), itemType, null);
+            }
         }
     }
 }

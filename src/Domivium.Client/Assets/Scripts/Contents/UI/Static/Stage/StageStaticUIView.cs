@@ -1,5 +1,6 @@
 ﻿using Domivium.Client.Contents.UIComponents;
 using Domivium.Client.Core.Component;
+using Domivium.Client.Core.Component.Stat;
 using Domivium.Client.Core.UI.View;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,10 +13,10 @@ namespace Domivium.Client.Contents.UI.Static
         [SerializeField] private Image[] _rightStickImages;
         [SerializeField] private FilledOnScreenButton _avoidButton;
         [SerializeField] private GameObject _interactButton;
-        [SerializeField] private StatGauge _healthGauge;
-        [SerializeField] private StatGauge _hungerGauge;
-        [SerializeField] private StatGauge _staminaGauge;
-        [SerializeField] private StatGauge _sanityGauge;
+        [SerializeField] private GaugeStat _health;
+        [SerializeField] private GaugeStat _hunger;
+        [SerializeField] private GaugeStat _stamina;
+        [SerializeField] private GaugeStat _sanity;
         [SerializeField] private ProjectileCapacity _projectileCapacity;
 
         public void SetAttackButton(bool canAttack)
@@ -39,22 +40,22 @@ namespace Domivium.Client.Contents.UI.Static
 
         public void SetHealth(int cur, int max)
         {
-            _healthGauge.Set(cur, max);
+            _health.Set(cur, max);
         }
 
         public void SetHunger(int cur, int max)
         {
-            _hungerGauge.Set(cur, max);
+            _hunger.Set(cur, max);
         }
 
         public void SetStamina(int cur, int max)
         {
-            _staminaGauge.Set(cur, max);
+            _stamina.Set(cur, max);
         }
 
         public void SetSanity(int cur, int max)
         {
-            _sanityGauge.Set(cur, max);
+            _sanity.Set(cur, max);
         }
 
         public void SetProjectileCapacity(int cur, int max)

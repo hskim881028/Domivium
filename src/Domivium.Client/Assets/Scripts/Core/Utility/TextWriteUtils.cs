@@ -4,22 +4,57 @@ namespace Domivium.Client.Core.Utility
 {
     public static class TextWriteUtils
     {
-        public static int WriteLevelText(int level, char[] buf, int offset = 0)
-        {
-            return WriteWithPrefix(level, "Lv. ".AsSpan(), buf, offset);
-        }
-
         public static int WriteWithPrefix(int value, ReadOnlySpan<char> prefix, char[] buf, int offset = 0)
         {
-            int pLen = prefix.Length;
+            var pLen = prefix.Length;
             if (offset + pLen >= buf.Length) return 0;
 
             prefix.CopyTo(buf.AsSpan(offset, pLen));
-
-            int n = WriteIntToBuffer(value, buf, offset + pLen);
+            var n = WriteIntToBuffer(value, buf, offset + pLen);
             if (n == 0) return 0;
 
             return pLen + n;
+        }
+        
+        public static int WriteWithPrefix(float value, ReadOnlySpan<char> prefix, char[] buf, int offset = 0)
+        {
+            var pLen = prefix.Length;
+            if (offset + pLen >= buf.Length) return 0;
+
+            prefix.CopyTo(buf.AsSpan(offset, pLen));
+            var n = WriteFixed2(value, buf, offset + pLen);
+            if (n == 0) return 0;
+
+            return pLen + n;
+        }
+        
+        public static int WriteFixed2(float value, char[] buf, int offset = 0)
+        {
+            // value * 100을 반올림해서 정수로 만든다 (예: 1.234f → 123)
+            int scaled = (int)MathF.Round(value * 100f);
+
+            // 정수부 / 소수부 분리
+            int intPart = scaled / 100;
+            int fracPart = Math.Abs(scaled % 100);
+
+            // 먼저 정수부를 씀 (offset부터)
+            int len = WriteIntToBuffer(intPart, buf, offset);
+            if (len == 0) return 0;
+
+            int pos = offset + len;
+
+            // '.' 자리 체크
+            if (pos >= buf.Length) return 0;
+            buf[pos++] = '.';
+
+            // 소수 둘째 자리까지 쓸 수 있는지 체크
+            if (pos + 2 > buf.Length) return 0;
+
+            // 항상 두 자리로 채움 (예: 5 → "05")
+            buf[pos++] = (char)('0' + (fracPart / 10));
+            buf[pos++] = (char)('0' + (fracPart % 10));
+
+            return pos - offset;
         }
 
         private static int WriteIntToBuffer(int value, char[] buf, int offset)
