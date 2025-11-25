@@ -11,10 +11,7 @@
             Index = index;
         }
 
-        public bool IsSame(ItemSlotData other)
-        {
-            return Type == other.Type && Index == other.Index;
-        }
+        public bool IsSame(ItemSlotData other) => Type == other.Type && Index == other.Index;
 
         public static ItemSlotData Default => new(ItemSlotType.None, -1);
     }

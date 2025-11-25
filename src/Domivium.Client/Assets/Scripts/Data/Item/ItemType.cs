@@ -11,6 +11,6 @@
         Armor,
         Ring,
         Food,
-        Potion,
+        Potion
     }
 }

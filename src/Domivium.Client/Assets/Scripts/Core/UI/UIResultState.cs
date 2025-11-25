@@ -6,6 +6,6 @@
         Cancel,
         Close,
         Failure,
-        Running,
+        Running
     }
 }

@@ -59,9 +59,6 @@ namespace Domivium.Client.Contents.Factory
             return new ProjectileParams(target, sourceStatSet, spawnPosition, direction, projectileContext, abilities);
         }
 
-        public ActorParam CreateProp(int id, Vector2 spawnPosition)
-        {
-            return new PropParams(spawnPosition);
-        }
+        public ActorParam CreateProp(int id, Vector2 spawnPosition) => new PropParams(spawnPosition);
     }
 }

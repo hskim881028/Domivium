@@ -26,6 +26,9 @@ namespace Domivium.Client.Contents.Battle.Ability
             direction *= Multiply;
             var nextPosition = _stageFieldSystem.GetNextPosition(position, direction, collider);
             context.Source.SetPosition(nextPosition);
+
+            var effect = EffectPool.Get(BattleEffectIds.Avoid, context.Source, context.Source);
+            context.Source.ActivateEffect(effect);
             return Constant.AvoidCooldown;
         }
     }

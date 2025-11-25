@@ -82,7 +82,6 @@ namespace Domivium.Client.Contents.DI.Scene
         {
             var options = builder.RegisterMessagePipe();
             builder.RegisterMessageBroker<SceneMessage>(options);
-            builder.RegisterMessageBroker<SceneUIReadyMessage>(options);
             builder.RegisterMessageBroker<SpawnActorMessage>(options);
             builder.RegisterMessageBroker<BattleCueMessage>(options);
             builder.RegisterMessageBroker<ActorStateMessage>(options);

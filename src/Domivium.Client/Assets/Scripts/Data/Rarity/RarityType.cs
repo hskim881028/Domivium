@@ -9,6 +9,6 @@
         Legendary,
         Mythic,
         Unique,
-        Event,
+        Event
     }
 }

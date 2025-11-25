@@ -19,7 +19,7 @@ namespace Domivium.Client.Contents.Actors
             _flip.Subscribe(Actor.SetFlip).AddTo(ref DisposableBag);
 
             BattleSystem = systemFactory.CreateBattle(Transform, actor.Muzzle, actor.MoveCollider, StateSystem.Tag);
-            BattleSystem.AppliedEffect.Subscribe(OnAppliedEffectChanged).AddTo(ref DisposableBag);
+            BattleSystem.OnAppliedEffect.Subscribe(OnAppliedEffectChanged).AddTo(ref DisposableBag);
             BattleSystem.Direction.Subscribe(OnDirectionChanged).AddTo(ref DisposableBag);
             BattleSystem.LookAt.Subscribe(OnLookAtChanged).AddTo(ref DisposableBag);
         }
@@ -44,7 +44,7 @@ namespace Domivium.Client.Contents.Actors
 
         protected override void OnDie()
         {
-            this.Log();
+            // this.Log();
             Actor.Die();
             base.OnDie();
         }

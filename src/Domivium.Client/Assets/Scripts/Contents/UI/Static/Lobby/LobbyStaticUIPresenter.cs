@@ -32,11 +32,11 @@ namespace Domivium.Client.Contents.UI.Static
             _sceneService = sceneService;
         }
 
-        public void Test()
+        public void Next()
         {
+            this.Log($"[AppEnv.LocalMode] : {AppEnv.LocalMode}");
             if (AppEnv.LocalMode)
             {
-                this.Log($"[AppEnv.LocalMode] : {AppEnv.LocalMode}");
                 _sceneService.Load(SceneScopeIds.Stage);
             }
             else

@@ -11,14 +11,11 @@ namespace Domivium.Client.Contents.DI.Container
         [SerializeField] private List<Sprite> _weapon = new();
         [SerializeField] private List<Sprite> _projectile = new();
 
-        public Dictionary<ItemType, List<Sprite>> Items()
+        public Dictionary<ItemType, List<Sprite>> Items() => new()
         {
-            return new Dictionary<ItemType, List<Sprite>>
-            {
-                { ItemType.None, new List<Sprite>() { _none } },
-                { ItemType.Weapon, _weapon },
-                { ItemType.Projectile, _projectile }
-            };
-        }
+            { ItemType.None, new List<Sprite> { _none } },
+            { ItemType.Weapon, _weapon },
+            { ItemType.Projectile, _projectile }
+        };
     }
 }

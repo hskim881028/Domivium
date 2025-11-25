@@ -9,12 +9,12 @@ namespace Domivium.Client.Core.Component.Stat
         [SerializeField] private IntLimitText _valueText;
         [SerializeField] private Slider _slider;
 
-        public void Set(int value, int limit)
+        public void Set(int current, int limit)
         {
-            _valueText.Value = value;
+            _valueText.Value = current;
             _valueText.Limit = limit;
-            _slider.value = value;
             _slider.maxValue = limit;
+            _slider.value = current;
         }
     }
 }

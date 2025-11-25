@@ -1,8 +1,9 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Services;
+using Domivium.Client.Contents.UI;
 using Domivium.Client.Core;
-using Domivium.Client.Core.Utility;
+using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Data.Cache;
 using Domivium.Client.Network.ClientFilters;
 using Domivium.Shared.Common;
@@ -22,10 +23,11 @@ namespace Domivium.Client.Contents.DI.Entry
         private readonly AuthenticationClientFilter _authenticationClientFilter;
 
         public TitleEntry(
+            IUINavigation uiNavigation,
             SceneService sceneService,
             NetworkService networkService,
             AuthenticationTokenCache tokenCache,
-            AuthenticationClientFilter authenticationClientFilter)
+            AuthenticationClientFilter authenticationClientFilter) : base(uiNavigation)
         {
             _sceneService = sceneService;
             _networkService = networkService;
@@ -35,6 +37,7 @@ namespace Domivium.Client.Contents.DI.Entry
 
         protected override void OnStart()
         {
+            UINavigation.ApplyUILayer(UILayers.Title).Forget();
             if (AppEnv.LocalMode)
             {
                 EnterLobby();

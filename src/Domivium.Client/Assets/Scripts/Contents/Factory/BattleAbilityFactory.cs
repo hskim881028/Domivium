@@ -63,7 +63,7 @@ namespace Domivium.Client.Contents.Factory
                 {
                     Create(BattleAbilityIds.Turn),
                     Create(BattleAbilityIds.Tracking),
-                    Create(BattleAbilityIds.Attack),
+                    Create(BattleAbilityIds.Attack)
                 });
         }
 

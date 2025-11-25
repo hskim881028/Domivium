@@ -45,12 +45,12 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
             return false;
         }
 
-        public virtual void SetSlot(int slotCount, int index, Sprite sprite, int itemCount, bool isStackable)
+        public void SetSlot(int index, Sprite sprite, int itemCount, bool isStackable)
         {
             _slots[index].Set(sprite, itemCount, isStackable);
         }
 
-        public virtual void ClearSlot(int slotCount, int index)
+        public void ClearSlot(int index)
         {
             _slots[index].Clear();
         }

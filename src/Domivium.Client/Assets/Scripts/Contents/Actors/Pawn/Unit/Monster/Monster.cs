@@ -45,10 +45,7 @@ namespace Domivium.Client.Contents.Actors
             _cts = null;
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            
-        }
+        private void OnTriggerEnter2D(Collider2D other) { }
 
         private void OnTriggerExit2D(Collider2D other)
         {

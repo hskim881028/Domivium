@@ -30,14 +30,21 @@ namespace Domivium.Client.Contents.Actors
             var projectile = p.ProjectileContext;
             BattleSystem.Initialize(Uid, projectile.ActorId, projectile.Id, projectile.RarityType, p.SpawnPosition);
 
-            BattleSystem.Stat.Register(StatId.Durability, projectile.Durability, OnDurabilityStatChanged);
-            BattleSystem.Stat.Register(StatId.Attack, projectile.Attack, OnAttackStatChanged);
-            BattleSystem.Stat.Register(StatId.AttackRange, projectile.AttackRange, OnAttackRangeStatChanged);
-            BattleSystem.Stat.Register(StatId.ProjectileSpeed, projectile.ProjectileSpeed, OnProjectileSpeedStatChanged);
-            BattleSystem.Stat.Register(StatId.CriticalRate, projectile.CriticalRate, OnCriticalRateStatChanged);
-            BattleSystem.Stat.Register(StatId.CriticalDamage, projectile.CriticalDamage, OnCriticalDamageStatChanged);
+            BattleSystem.Stat.Register(StatId.Durability, projectile.Durability);
+            BattleSystem.Stat.Register(StatId.Attack, projectile.Attack);
+            BattleSystem.Stat.Register(StatId.AttackRange, projectile.AttackRange);
+            BattleSystem.Stat.Register(StatId.ProjectileSpeed, projectile.ProjectileSpeed);
+            BattleSystem.Stat.Register(StatId.CriticalRate, projectile.CriticalRate);
+            BattleSystem.Stat.Register(StatId.CriticalDamage, projectile.CriticalDamage);
 
-            BattleSystem.Gauge.Register(StatId.Durability, projectile.Durability);
+            BattleSystem.Stat.AddListener(StatId.Durability, OnDurabilityStatChanged);
+            BattleSystem.Stat.AddListener(StatId.Attack, OnAttackStatChanged);
+            BattleSystem.Stat.AddListener(StatId.AttackRange, OnAttackRangeStatChanged);
+            BattleSystem.Stat.AddListener(StatId.ProjectileSpeed, OnProjectileSpeedStatChanged);
+            BattleSystem.Stat.AddListener(StatId.CriticalRate, OnCriticalRateStatChanged);
+            BattleSystem.Stat.AddListener(StatId.CriticalDamage, OnCriticalDamageStatChanged);
+
+            BattleSystem.Gauge.Register(StatId.Durability, projectile.Durability, projectile.Durability);
             BattleSystem.Gauge.AddListener(StatId.Health, OnDurabilityGaugeChanged);
 
             var sourceStatSet = p.SourceStatSet;
@@ -70,8 +77,7 @@ namespace Domivium.Client.Contents.Actors
             var context = BattleAbilityContext.Create(BattleAbilityIds.Tracking, BattleSystem, _target, deltaTime);
             BattleSystem.TryActivateAbility(ref context);
         }
-        
-        
+
 
         protected override void OnIdle()
         {

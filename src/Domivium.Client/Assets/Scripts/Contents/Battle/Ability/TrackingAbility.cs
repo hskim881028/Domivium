@@ -26,7 +26,7 @@ namespace Domivium.Client.Contents.Battle.Ability
             var pre = source.PrePosition;
             var cur = source.Position;
             var dist = Vector3.Distance(pre, cur);
-            
+
             if (Mathf.Approximately(dist, 0))
             {
                 return Tracking(source, context.DeltaTime);
@@ -45,7 +45,7 @@ namespace Domivium.Client.Contents.Battle.Ability
             for (var i = 0; i < count; i++)
             {
                 if (durability <= 0) break;
-                
+
                 var actor = _hits[i].transform.GetComponent<Actor>();
                 if (!context.Source.TryAddHistory(actor.Uid)) continue;
 

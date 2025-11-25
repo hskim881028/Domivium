@@ -422,6 +422,7 @@ RectTransform:
   m_Children:
   - {fileID: 7985404658873426390}
   - {fileID: 1493589585741936026}
+  - {fileID: 6289496803254657805}
   - {fileID: 5379222068705940784}
   - {fileID: 679001524384499605}
   - {fileID: 8323215284516652833}
@@ -803,7 +804,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -60}
-  m_SizeDelta: {x: 560, y: 600}
+  m_SizeDelta: {x: 560, y: 640}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2375489564126137852
 CanvasRenderer:
@@ -861,9 +862,10 @@ MonoBehaviour:
   _weight: {fileID: 5602329094844427372}
   _attack: {fileID: 6443219290405187904}
   _defense: {fileID: 2522430464031139084}
+  _moveSpeed: {fileID: 6986203359650722715}
   _attackRange: {fileID: 9015616070010340774}
   _attackSpeed: {fileID: 4528227304577357571}
-  _moveSpeed: {fileID: 4916016302555551671}
+  _projectileSpeed: {fileID: 4916016302555551671}
   _projectileCapacity: {fileID: 5267379336906438411}
   _reloadSpeed: {fileID: 3515917480408577179}
   _criticalRate: {fileID: 2993534237539132474}
@@ -958,7 +960,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: AttackSpeedStatText
+      value: AttackSpeed
       objectReference: {fileID: 0}
     - target: {fileID: 2189160812427565900, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: _suffix.Array.size
@@ -1224,7 +1226,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: ReloadSpeedStatText
+      value: ReloadSpeed
       objectReference: {fileID: 0}
     - target: {fileID: 2189160812427565900, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: _suffix.Array.size
@@ -1349,7 +1351,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: CriticalRateStatText
+      value: CriticalRate
       objectReference: {fileID: 0}
     - target: {fileID: 2189160812427565900, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: _suffix.Array.size
@@ -1474,7 +1476,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: DefenseStatText
+      value: Defense
       objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
@@ -1591,7 +1593,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: CriticalDamageStatText
+      value: CriticalDamage
       objectReference: {fileID: 0}
     - target: {fileID: 2189160812427565900, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: _suffix.Array.size
@@ -1716,7 +1718,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: AttackRangeStatText
+      value: AttackRange
       objectReference: {fileID: 0}
     - target: {fileID: 2189160812427565900, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: _suffix.Array.size
@@ -1900,6 +1902,123 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08f3c7f6f7594378b98bf63dac7cd58e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Domivium.Client.Core::Domivium.Client.Core.Component.StatText
+--- !u!1001 &6645119541245692289
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4610598711673820537}
+    m_Modifications:
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_Pivot.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_Name
+      value: MoveSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+      propertyPath: m_text
+      value: "\uBC29\uC5B4"
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+--- !u!224 &6289496803254657805 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 824436938382912140, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+  m_PrefabInstance: {fileID: 6645119541245692289}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6986203359650722715 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4380823705625557530, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
+  m_PrefabInstance: {fileID: 6645119541245692289}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08f3c7f6f7594378b98bf63dac7cd58e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Domivium.Client.Core::Domivium.Client.Core.Component.StatText
 --- !u!1001 &7323176514862730074
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1990,7 +2109,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: AttackStatText
+      value: Attack
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2103,7 +2222,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: ProjectileeCapacityStatText
+      value: ProjectileeCapacity
       objectReference: {fileID: 0}
     - target: {fileID: 8738704815569093363, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_text
@@ -2220,7 +2339,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: ProjectileMoveSpeedStatText
+      value: ProjectileSpeed
       objectReference: {fileID: 0}
     - target: {fileID: 2189160812427565900, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: _suffix.Array.size

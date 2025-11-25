@@ -1,5 +1,6 @@
 ﻿using System;
 using Domivium.Client.Core.Message;
+using Domivium.Client.Core.Systems;
 using JetBrains.Annotations;
 using MessagePipe;
 using UnityEngine;
@@ -12,12 +13,14 @@ namespace Domivium.Client.Core.Scene
     public sealed class SceneScopeManager : Disposable, ISceneScopeManager
     {
         private readonly LifetimeScope _root;
+        private readonly IAppContext _appContext;
         private readonly IPublisher<SceneMessage> _publisher;
         private SceneScope _current;
 
-        public SceneScopeManager(LifetimeScope root, IPublisher<SceneMessage> publisher)
+        public SceneScopeManager(LifetimeScope root, IAppContext appContext, IPublisher<SceneMessage> publisher)
         {
             _root = root;
+            _appContext = appContext;
             _publisher = publisher;
         }
 
@@ -28,9 +31,12 @@ namespace Domivium.Client.Core.Scene
                 Unload();
             }
 
+            _appContext.SetScene(sceneScopeId);
+            _appContext.SetMode(StageMode.Loading);
             _current = _root.CreateChild<T>(
                 builder => builder.RegisterInstance(sceneScopeId).AsSelf(),
                 typeof(T).Name);
+
             _publisher.Publish(SceneMessage.Load(_current));
         }
 

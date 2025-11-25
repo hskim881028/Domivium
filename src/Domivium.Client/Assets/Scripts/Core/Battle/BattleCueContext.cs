@@ -29,7 +29,7 @@ namespace Domivium.Client.Core.Battle
         {
             ActorId = actorId,
             Position = position,
-            Direction = direction,
+            Direction = direction
         };
     }
 }

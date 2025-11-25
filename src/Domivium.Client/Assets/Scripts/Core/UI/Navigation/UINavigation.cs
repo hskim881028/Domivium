@@ -32,6 +32,7 @@ namespace Domivium.Client.Core.UI.Navigation
         public bool IsRunning { get; private set; }
         public bool HasOpenSystemUI => _systemNodes.Count > 0;
         public bool HasOpenStackUI => _stackNodes.Count > 0;
+
         public bool IsTopOfStack(UIId id)
         {
             if (!_stackNodes.TryPeek(out var node)) return false;

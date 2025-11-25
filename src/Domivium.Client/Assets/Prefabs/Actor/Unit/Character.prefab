@@ -190,7 +190,7 @@ MonoBehaviour:
   m_LightType: 3
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.328
-  m_Color: {r: 0.990566, g: 0.9862105, b: 0.9111338, a: 1}
+  m_Color: {r: 0.42352942, g: 0.5137255, b: 0.99215686, a: 1}
   m_Intensity: 1.1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
@@ -5512,7 +5512,6 @@ MonoBehaviour:
   _hitCollider: {fileID: 99624109329497583}
   _moveMoveCollider: {fileID: 2313943922515393872}
   _particleSystem: {fileID: 6567367874146459167}
-  _fov: {fileID: 2520737547908155339}
   _lineRenderer: {fileID: 8433643454932308709}
 --- !u!61 &99624109329497583
 BoxCollider2D:
@@ -5608,7 +5607,7 @@ MonoBehaviour:
   m_LightType: 3
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.328
-  m_Color: {r: 1, g: 0.9650031, b: 0.8915094, a: 1}
+  m_Color: {r: 0.42352942, g: 0.5137255, b: 0.99215686, a: 1}
   m_Intensity: 1.1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0

@@ -34,28 +34,38 @@ namespace Domivium.Client.Data.Item
             Count += value;
         }
 
-        public ItemData Split(int amount)
+        public ItemData Remove(int value)
         {
             if (!IsStackable)
             {
                 throw new InvalidOperationException("Non stackable item cannot be split.");
             }
 
-            if (amount <= 0 || amount >= Count)
+            if (value <= 0 || value > Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(amount));
+                throw new ArgumentOutOfRangeException($"value: {value}({Count})");
             }
 
-            Count -= amount;
-            return new ItemData(Type, Id, amount);
+            Count -= value;
+            return new ItemData(Type, Id, Count);
         }
 
-        public bool CanMerge(ItemData other)
+        public ItemData Split(int value)
         {
-            return IsStackable &&
-                   other.IsStackable &&
-                   Id == other.Id &&
-                   Type == other.Type;
+            if (!IsStackable)
+            {
+                throw new InvalidOperationException("Non stackable item cannot be split.");
+            }
+
+            if (value <= 0 || value >= Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value));
+            }
+
+            Count -= value;
+            return new ItemData(Type, Id, value);
         }
+
+        public bool CanMerge(ItemData other) => IsStackable && other.IsStackable && Id == other.Id && Type == other.Type;
     }
 }

@@ -9,12 +9,15 @@ using Domivium.Client.Core.UI.View;
 using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Context;
 using Domivium.Client.Data.Item;
+using Domivium.Client.Data.Stat;
 using UnityEngine;
 
 namespace Domivium.Client.Contents.UI.Stack
 {
     public class ItemContainerStackUIView : StackUIView<IItemContainerStackUIMessage>
     {
+        [SerializeField] private Wallet _wallet;
+        [SerializeField] private Status _status;
         [SerializeField] private Equipment _equipment;
         [SerializeField] private Inventory _inventory;
         [SerializeField] private Loot _loot;
@@ -57,53 +60,65 @@ namespace Domivium.Client.Contents.UI.Stack
             {
                 case InventoryParams:
                     _openType = ItemSlotType.Inventory;
+                    _status.Show();
                     _loot.Hide();
                     break;
                 case InventoryWithLootParams:
                     _openType = ItemSlotType.Loot;
+                    _status.Hide();
                     _loot.Show();
                     break;
             }
         }
 
+        public void SetFilledInventoryCapacity(int capacity)
+        {
+            _inventory.SetFilledCapacity(capacity);
+        }
+
         public void SetInventoryCapacity(int capacity)
         {
-            _inventory.SetInventoryCapacity(capacity);
+            _inventory.SetCapacity(capacity);
+        }
+
+        public void SetFilledLootCapacity(int capacity)
+        {
+            _loot.SetFilledCapacity(capacity);
         }
 
         public void SetLootCapacity(int capacity)
         {
-            _loot.SetInventoryCapacity(capacity);
+            _loot.SetCapacity(capacity);
         }
 
-        public void SetEquipmentSlot(int slotCount, int index, Sprite sprite, int count, bool isStackable)
+        public void SetEquipmentSlot(int index, Sprite sprite, int count, bool isStackable)
         {
-            _equipment.SetSlot(slotCount, index, sprite, count, isStackable);
+            _equipment.SetSlot(index, sprite, count, isStackable);
         }
 
-        public void SetInventorySlot(int slotCount, int index, Sprite sprite, int count, bool isStackable)
+        public void SetInventorySlot(int index, Sprite sprite, int count, bool isStackable)
         {
-            _inventory.SetSlot(slotCount, index, sprite, count, isStackable);
+            _inventory.SetSlot(index, sprite, count, isStackable);
         }
 
-        public void SetLootSlot(int slotCount, int index, Sprite sprite, int count, bool isStackable)
+        public void SetLootSlot(int index, Sprite sprite, int count, bool isStackable)
         {
-            _loot.SetSlot(slotCount, index, sprite, count, isStackable);
+            _loot.SetSlot(index, sprite, count, isStackable);
         }
 
-        public void ClearEquipmentSlot(int slotCount, int index)
+        public void ClearEquipmentSlot(int index)
         {
-            _equipment.ClearSlot(slotCount, index);
+            _equipment.ClearSlot(index);
         }
 
-        public void ClearInventorySlot(int slotCount, int index)
+        public void ClearInventorySlot(int index)
         {
-            _inventory.ClearSlot(slotCount, index);
+            _inventory.ClearSlot(index);
         }
 
-        public void ClearLootSlot(int slotCount, int index)
+        public void ClearLootSlot(int index)
         {
-            _loot.ClearSlot(slotCount, index);
+            _loot.ClearSlot(index);
         }
 
         public void SetUICamera(Camera uiCamera)
@@ -195,6 +210,41 @@ namespace Domivium.Client.Contents.UI.Stack
         public void ShowSplitter(ItemSlotData slot, int itemCount)
         {
             _itemSplitter.Show(slot, itemCount);
+        }
+
+        public void SetLevel(int value)
+        {
+            _status.SetLevel(value);
+        }
+
+        public void SetExp(int value, int limit)
+        {
+            _status.SetExp(value, limit);
+        }
+
+        public void SetStat(StatId statId, float value)
+        {
+            _status.SetStat(statId, value);
+        }
+
+        public void SetGauge(StatId statId, int current, int limit)
+        {
+            _status.SetGauge(statId, current, limit);
+        }
+
+        public void SetWeight(float current, float limit)
+        {
+            _wallet.SetWeight(current, limit);
+        }
+
+        public void SetMoney(int value)
+        {
+            _wallet.SetMoney(value);
+        }
+
+        public void SetGem(int value)
+        {
+            _wallet.SetGem(value);
         }
 
         private ItemSlot GetSlot(ItemSlotData slot)

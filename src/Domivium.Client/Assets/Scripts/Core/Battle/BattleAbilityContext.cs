@@ -17,7 +17,7 @@ namespace Domivium.Client.Core.Battle
             => new()
             {
                 AbilityId = abilityId,
-                Source = source,
+                Source = source
             };
 
         public static BattleAbilityContext Create(

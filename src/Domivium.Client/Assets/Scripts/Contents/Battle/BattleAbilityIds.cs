@@ -12,7 +12,7 @@ namespace Domivium.Client.Contents.Battle
         public static BattleAbilityId Tracking = new(5);
         public static BattleAbilityId Reload = new(6);
         public static BattleAbilityId CancelReload = new(7);
-        
+
         public static BattleAbilityId Chase = new(10);
 
         public static BattleAbilityId Heal = new(101);

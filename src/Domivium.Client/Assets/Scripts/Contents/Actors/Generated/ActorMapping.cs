@@ -12,13 +12,13 @@ namespace Domivium.Client.Contents.Actors.Generated
             { ActorId.Character, (typeof(CharacterPresenter), typeof(Character)) },
             { ActorId.Monster, (typeof(MonsterPresenter), typeof(Monster)) },
             { ActorId.Projectile, (typeof(ProjectilePresenter), typeof(Projectile)) },
-            
+
             // VFX
             { ActorId.DamageText, (typeof(DamageTextPresenter), typeof(DamageText)) },
             { ActorId.HealText, (typeof(HealTextPresenter), typeof(HealText)) },
 
             // Prop
-            { ActorId.Prop, (typeof(PropPresenter), typeof(Prop)) },
+            { ActorId.Prop, (typeof(PropPresenter), typeof(Prop)) }
         };
     }
 }

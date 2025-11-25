@@ -1,8 +1,4 @@
-﻿using R3;
-
-namespace Domivium.Client.Core.Systems
+﻿namespace Domivium.Client.Core.Systems
 {
-    public interface IStageSystem
-    {
-    }
+    public interface IStageSystem { }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors;
-using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.State;
+using Domivium.Client.Contents.UI;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
@@ -11,6 +11,7 @@ using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Systems;
+using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Data.Item;
 using MessagePipe;
 using R3;
@@ -22,6 +23,7 @@ namespace Domivium.Client.Contents.Systems
     {
         private readonly IAppContext _context;
         private readonly IAudioPlayer _audioPlayer;
+        private readonly IUINavigation _uiNavigation;
         private readonly IActorSpawner _actorSpawner;
         private readonly IActorManager _actorManager;
         private readonly IBattleAbilityFactory _abilityFactory;
@@ -35,6 +37,7 @@ namespace Domivium.Client.Contents.Systems
         public StageSystem(
             IAppContext context,
             IAudioPlayer audioPlayer,
+            IUINavigation uiNavigation,
             IActorSpawner actorSpawner,
             IActorManager actorManager,
             IBattleAbilityFactory abilityFactory,
@@ -49,6 +52,7 @@ namespace Domivium.Client.Contents.Systems
         {
             _context = context;
             _audioPlayer = audioPlayer;
+            _uiNavigation = uiNavigation;
             _actorSpawner = actorSpawner;
             _actorManager = actorManager;
             _lootSystemCommand = lootSystemCommand;
@@ -72,12 +76,6 @@ namespace Domivium.Client.Contents.Systems
             }
             _stageFieldSystemCommand.InitializeAsync(stageFieldPresenter.ColliderGrid);
 
-            _itemSystemCommand.SetLootCapacity(8);
-            _itemSystemCommand.SetInventoryCapacity(16);
-            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 1, 1));
-            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 5));
-            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 2, 77));
-            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 4));
 
             var abilities = _abilityFactory.GetAbilities(ActorId.Character);
             var actorParam = _actorParamFactory.CreateCharacter(1, new Vector2(7, 5), abilities);
@@ -91,10 +89,22 @@ namespace Domivium.Client.Contents.Systems
             _cameraSystemCommand.Initialize(characterPresenter.Transform);
             _lootSystemCommand.Initialize(characterPresenter.Transform, stageFieldPresenter.StageProp);
 
+            _itemSystemCommand.SetLootCapacity(8);
+            _itemSystemCommand.SetInventoryCapacity(16);
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 1, 1));
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 2, 1));
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 5));
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 2, 77));
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 4));
+
             var monsterAbilities = _abilityFactory.GetAbilities(ActorId.Monster);
             var monsterParam = _actorParamFactory.CreateMonster(1, new Vector2(24, 9), monsterAbilities, characterPresenter.BattleSystem);
             await _actorSpawner.SpawnAsync(ActorId.Monster, monsterParam);
 
+            var dummy = _actorParamFactory.CreateMonster(2, new Vector2(10, 6), monsterAbilities, characterPresenter.BattleSystem);
+            await _actorSpawner.SpawnAsync(ActorId.Monster, dummy);
+
+            _uiNavigation.ApplyUILayer(UILayers.Stage).Forget();
             _context.SetMode(StageMode.Run);
         }
 
@@ -104,7 +114,7 @@ namespace Domivium.Client.Contents.Systems
             {
                 case SceneMessageType.Unload:
                 case SceneMessageType.Load:
-                    _context.SetMode(StageMode.Prepare);
+                    _context.SetMode(StageMode.Loading);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

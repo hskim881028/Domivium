@@ -8,13 +8,13 @@ namespace Domivium.Client.Contents.UI.Static
 {
     public class LobbyStaticUIView : StaticUIView<ILobbyStaticUIMessage>
     {
-        [SerializeField] private Button _testButton;
+        [SerializeField] private Button _nextButton;
 
         public override async UniTask<bool> InitializeAsync(CancellationToken token)
         {
             if (!await base.InitializeAsync(token)) return false;
 
-            _testButton.onClick.AddListener(Message.Test);
+            _nextButton.onClick.AddListener(Message.Next);
             return true;
         }
     }

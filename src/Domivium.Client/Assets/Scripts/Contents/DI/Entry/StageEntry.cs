@@ -1,6 +1,7 @@
 ﻿using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Systems;
+using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Data.Config;
 using UnityEngine;
 using VContainer.Unity;
@@ -12,10 +13,11 @@ namespace Domivium.Client.Contents.DI.Entry
         private readonly IStageSystemCommand _stageSystemCommand;
 
         public StageEntry(
+            IUINavigation uiNavigation,
             IInputComposition inputComposition,
             IBattleEffectPool effectPool,
             IBattleCuePlayer cuePlayer,
-            IStageSystemCommand stageSystemCommand)
+            IStageSystemCommand stageSystemCommand) : base(uiNavigation)
         {
             _stageSystemCommand = stageSystemCommand;
         }

@@ -22,7 +22,7 @@ namespace Domivium.Client.Core.Provider
             biome.CompressBounds();
             return biome;
         }
-        
+
         public void GetNeighbors(
             int stageId,
             Vector3Int pivot,

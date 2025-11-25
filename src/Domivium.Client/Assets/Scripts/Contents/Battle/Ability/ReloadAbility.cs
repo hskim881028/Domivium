@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Stat;
@@ -16,9 +17,16 @@ namespace Domivium.Client.Contents.Battle.Ability
         {
             if (!base.CanActivate(source)) return false;
 
-            var cur = source.Gauge.Current(StatId.ProjectileCapacity);
+            if (source.ActorId == ActorId.Monster) return true;
+
             var max = source.Gauge.Max(StatId.ProjectileCapacity);
-            return cur < max;
+            if (max == 0) return false;
+
+            var cur = source.Gauge.Current(StatId.ProjectileCapacity);
+            var capacity = source.Stat.Value(StatId.ProjectileCapacity);
+            if (cur == capacity) return false;
+
+            return cur < capacity;
         }
 
         public override float Activate(ref BattleAbilityContext context)

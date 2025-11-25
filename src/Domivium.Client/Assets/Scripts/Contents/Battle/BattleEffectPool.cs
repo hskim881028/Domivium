@@ -40,7 +40,9 @@ namespace Domivium.Client.Contents.Battle
             }
 
             var effect = _effectFactory.Create(id, ref context);
-            return new BattleEffectSpec(effect, _cuePublisher, Return);
+            var effectSpec = new BattleEffectSpec(effect, _cuePublisher, Return);
+            effectSpec.Reset(ref context);
+            return effectSpec;
         }
 
         private void Return(BattleEffectSpec spec)

@@ -78,7 +78,7 @@ namespace Domivium.Client.Contents.Input.Consumer
                     layer = UILayers.Stage;
                 }
 
-                _uiNavigation.ApplyUILayer(layer).Forget();
+                await _uiNavigation.ApplyUILayer(layer);
             }
         }
     }

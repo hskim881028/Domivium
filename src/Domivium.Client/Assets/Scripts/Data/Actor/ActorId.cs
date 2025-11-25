@@ -11,7 +11,7 @@ namespace Domivium.Client.Core.Actors
         public static ActorId Monster = new(3);
         public static ActorId Projectile = new(4);
         public static ActorId Prop = new(5);
-        
+
         public static ActorId DamageText = new(100);
         public static ActorId HealText = new(101);
     }

@@ -11,14 +11,14 @@ namespace Domivium.Client.Contents.Systems
         private readonly ReactiveProperty<Vector2> _direction = new();
         private readonly ReactiveProperty<Vector2> _lookAt = new();
 
-        public ReactiveCommand<IBattleSystem> OnInitialize { get; } = new();
+        public IBattleSystem Character { get; private set; }
         public ReactiveCommand<BattleTag> OnBattleTag { get; } = new();
         public ReadOnlyReactiveProperty<Vector2> OnTurn => _direction;
         public ReadOnlyReactiveProperty<Vector2> OnLookAt => _lookAt;
 
         public void Initialize(IBattleSystem character)
         {
-            OnInitialize.Execute(character);
+            Character = character;
             _lookAt.Value = Vector2.one * 0.1f;
         }
 

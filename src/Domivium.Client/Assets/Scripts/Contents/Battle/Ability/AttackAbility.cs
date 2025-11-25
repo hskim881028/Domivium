@@ -46,7 +46,7 @@ namespace Domivium.Client.Contents.Battle.Ability
             var abilities = _abilityFactory.GetAbilities(ActorId.Projectile);
             var param = _actorParamFactory.CreateProjectile(1, target, stat, position, direction, abilities);
             _actorSpawner.SpawnAsync(ActorId.Projectile, param).Forget();
-            
+
             var attackSpeed = stat.RateValue(StatId.AttackSpeed);
             return attackSpeed;
         }

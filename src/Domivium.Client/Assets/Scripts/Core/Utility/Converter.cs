@@ -98,6 +98,7 @@ namespace Domivium.Client.Core.Utility
                     return id switch
                     {
                         1 => "해리포터 지팡이",
+                        2 => "말포이 지팡이",
                         _ => throw new ArgumentOutOfRangeException(nameof(id))
                     };
                 case ItemType.Helmet:

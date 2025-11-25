@@ -1,5 +1,4 @@
-﻿using Domivium.Client.Core.Component;
-using Domivium.Client.Core.Component.Text;
+﻿using Domivium.Client.Core.Component.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,19 +17,12 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
             _scrollRect.verticalNormalizedPosition = 1;
         }
 
-        public override void SetSlot(int slotCount, int index, Sprite sprite, int itemCount, bool isStackable)
+        public void SetFilledCapacity(int capacity)
         {
-            base.SetSlot(slotCount, index, sprite, itemCount, isStackable);
-            _capacity.Value = slotCount;
+            _capacity.Value = capacity;
         }
 
-        public override void ClearSlot(int slotCount, int index)
-        {
-            base.ClearSlot(slotCount, index);
-            _capacity.Value = slotCount;
-        }
-
-        public void SetInventoryCapacity(int capacity)
+        public void SetCapacity(int capacity)
         {
             _scrollRect.vertical = capacity > ScrollTriggerCount;
             _scrollRect.verticalNormalizedPosition = 1;

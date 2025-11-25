@@ -9,11 +9,6 @@ namespace Domivium.Client.Contents.Battle.Ability
 
         public HealAbility(IBattleEffectPool effectPool) : base(effectPool) { }
 
-        public override float Activate(ref BattleAbilityContext context)
-        {
-            // var effect = EffectPool.Get(BattleEffectIds.Heal, context.Source, context.Target);
-            // context.Target.ActivateEffect(effect);
-            return 0;
-        }
+        public override float Activate(ref BattleAbilityContext context) => 0;
     }
 }

@@ -4,72 +4,18 @@ namespace Domivium.Client.Core.Utility
 {
     public static class TextWriteUtils
     {
-        public static int WriteWithPrefix(int value, ReadOnlySpan<char> prefix, char[] buf, int offset = 0)
+        public static int WriteIntToBuffer(int value, char[] buf, int offset = 0)
         {
-            var pLen = prefix.Length;
-            if (offset + pLen >= buf.Length) return 0;
-
-            prefix.CopyTo(buf.AsSpan(offset, pLen));
-            var n = WriteIntToBuffer(value, buf, offset + pLen);
-            if (n == 0) return 0;
-
-            return pLen + n;
-        }
-        
-        public static int WriteWithPrefix(float value, ReadOnlySpan<char> prefix, char[] buf, int offset = 0)
-        {
-            var pLen = prefix.Length;
-            if (offset + pLen >= buf.Length) return 0;
-
-            prefix.CopyTo(buf.AsSpan(offset, pLen));
-            var n = WriteFixed2(value, buf, offset + pLen);
-            if (n == 0) return 0;
-
-            return pLen + n;
-        }
-        
-        public static int WriteFixed2(float value, char[] buf, int offset = 0)
-        {
-            // value * 100을 반올림해서 정수로 만든다 (예: 1.234f → 123)
-            int scaled = (int)MathF.Round(value * 100f);
-
-            // 정수부 / 소수부 분리
-            int intPart = scaled / 100;
-            int fracPart = Math.Abs(scaled % 100);
-
-            // 먼저 정수부를 씀 (offset부터)
-            int len = WriteIntToBuffer(intPart, buf, offset);
-            if (len == 0) return 0;
-
-            int pos = offset + len;
-
-            // '.' 자리 체크
-            if (pos >= buf.Length) return 0;
-            buf[pos++] = '.';
-
-            // 소수 둘째 자리까지 쓸 수 있는지 체크
-            if (pos + 2 > buf.Length) return 0;
-
-            // 항상 두 자리로 채움 (예: 5 → "05")
-            buf[pos++] = (char)('0' + (fracPart / 10));
-            buf[pos++] = (char)('0' + (fracPart % 10));
-
-            return pos - offset;
-        }
-
-        private static int WriteIntToBuffer(int value, char[] buf, int offset)
-        {
-            int end = buf.Length;
-            int i = end;
-
-            bool neg = value < 0;
-            uint v = neg ? (uint)(-value) : (uint)value;
+            var end = buf.Length;
+            var i = end;
+            var neg = value < 0;
+            var v = neg ? (uint)-value : (uint)value;
 
             do
             {
-                if (i == offset) return 0; // 공간 부족
+                if (i == offset) return 0;
 
-                uint d = v % 10u;
+                var d = v % 10u;
                 v /= 10u;
                 buf[--i] = (char)('0' + d);
             } while (v > 0);
@@ -81,44 +27,18 @@ namespace Domivium.Client.Core.Utility
                 buf[--i] = '-';
             }
 
-            int written = end - i;
-            // [i..end) → [offset..offset+written) 로 제자리 복사
-            for (int k = 0; k < written; k++)
+            var written = end - i;
+            for (var k = 0; k < written; k++)
+            {
                 buf[offset + k] = buf[i + k];
-
-            return written;
-        }
-
-        public static int WriteIntToBuffer(int value, char[] buf)
-        {
-            var i = buf.Length;
-            var neg = value < 0;
-            var v = neg ? (uint)-value : (uint)value;
-
-            do
-            {
-                var d = v % 10u;
-                v /= 10u;
-                buf[--i] = (char)('0' + d);
-            } while (v > 0);
-
-            if (neg)
-            {
-                buf[--i] = '-';
-            }
-
-            var written = buf.Length - i;
-            if (i != 0)
-            {
-                Array.Copy(buf, i, buf, 0, written);
             }
 
             return written;
         }
 
-        public static int WriteIntGrouped(int value, char[] buf, char groupSep = ',') => WriteIntGrouped(value, buf, 0, groupSep);
+        public static int WriteIntGrouped(int value, char[] buf, char groupSep) => WriteIntGrouped(value, buf, 0, groupSep);
 
-        public static int WriteIntGrouped(int value, char[] buf, int offset, char groupSep = ',')
+        public static int WriteIntGrouped(int value, char[] buf, int offset, char groupSep)
         {
             var end = offset + 16;
             if (end > buf.Length)
@@ -131,7 +51,6 @@ namespace Domivium.Client.Core.Utility
             var v = neg ? (uint)-value : (uint)value;
             var groupCount = 0;
             do
-
             {
                 if (groupCount == 3)
                 {
@@ -164,11 +83,73 @@ namespace Domivium.Client.Core.Utility
             return written;
         }
 
-        public static int WriteString(ReadOnlySpan<char> value, char[] buf)
+        public static int WriteFixed2(float value, char[] buf, int offset = 0)
+        {
+            var intPart = ScaleToFixed2(value, out var fracPart);
+            var len = WriteIntToBuffer(intPart, buf, offset);
+            return len == 0 ? 0 : WriteFrac2(buf, offset, len, fracPart);
+        }
+
+        public static int WriteIntGroupedFixed2(float value, char[] buf, int offset, char groupSep)
+        {
+            var intPart = ScaleToFixed2(value, out var fracPart);
+            var len = WriteIntGrouped(intPart, buf, offset, groupSep);
+            return len == 0 ? 0 : WriteFrac2(buf, offset, len, fracPart);
+        }
+
+        public static int WriteIntGroupedFixed2(float value, char[] buf, char groupSep)
+            => WriteIntGroupedFixed2(value, buf, 0, groupSep);
+
+        public static int WriteString(ReadOnlySpan<char> value, char[] buf, int offset = 0)
         {
             var len = value.Length;
-            value.CopyTo(buf.AsSpan(0, len));
+            if (offset + len > buf.Length) return 0;
+
+            value.CopyTo(buf.AsSpan(offset));
             return len;
+        }
+
+        public static int WriteWithPrefix(int value, ReadOnlySpan<char> prefix, char[] buf, int offset = 0)
+            => WriteWithPrefixCore(prefix, buf, offset, (b, o) => WriteIntToBuffer(value, b, o));
+
+        public static int WriteWithPrefix(float value, ReadOnlySpan<char> prefix, char[] buf, int offset = 0)
+            => WriteWithPrefixCore(prefix, buf, offset, (b, o) => WriteFixed2(value, b, o));
+
+        private static int ScaleToFixed2(float value, out int fracPart)
+        {
+            var scaled = (int)MathF.Round(value * 100f);
+            var intPart = scaled / 100;
+            fracPart = Math.Abs(scaled % 100);
+            return intPart;
+        }
+
+        private static int WriteFrac2(char[] buf, int offset, int len, int fracPart)
+        {
+            var pos = offset + len;
+            if (pos >= buf.Length) return 0;
+
+            buf[pos++] = '.';
+            if (pos + 2 > buf.Length) return 0;
+
+            buf[pos++] = (char)('0' + fracPart / 10);
+            buf[pos++] = (char)('0' + fracPart % 10);
+            return pos - offset;
+        }
+
+        private static int WriteWithPrefixCore(
+            ReadOnlySpan<char> prefix,
+            char[] buf,
+            int offset,
+            Func<char[], int, int> writeValue)
+        {
+            var pLen = prefix.Length;
+            if (offset + pLen > buf.Length) return 0;
+
+            prefix.CopyTo(buf.AsSpan(offset, pLen));
+            var n = writeValue(buf, offset + pLen);
+            if (n == 0) return 0;
+
+            return pLen + n;
         }
     }
 }

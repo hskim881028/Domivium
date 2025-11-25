@@ -1,5 +1,4 @@
 ﻿using Domivium.Client.Core.Message;
-using Domivium.Client.Data.Stat;
 using MessagePipe;
 
 namespace Domivium.Client.Core.Battle
@@ -7,17 +6,15 @@ namespace Domivium.Client.Core.Battle
     public class BattleAbilitySpec
     {
         private readonly BattleAbility _ability;
-        private readonly StatSet _stat;
         private readonly IPublisher<BattleCueMessage> _cuePublisher;
         private float _remainCooldown;
 
         public BattleAbilityId Id => _ability.Id;
         public float Cooldown { get; private set; }
 
-        public BattleAbilitySpec(BattleAbility ability, StatSet stat, IPublisher<BattleCueMessage> cuePublisher)
+        public BattleAbilitySpec(BattleAbility ability, IPublisher<BattleCueMessage> cuePublisher)
         {
             _ability = ability;
-            _stat = stat;
             _cuePublisher = cuePublisher;
         }
 

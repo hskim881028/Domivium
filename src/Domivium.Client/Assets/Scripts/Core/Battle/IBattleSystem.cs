@@ -21,7 +21,8 @@ namespace Domivium.Client.Core.Battle
         public Vector2 MuzzlePosition { get; }
         public Vector2 ColliderSize { get; }
         public StateTag State { get; }
-        public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect { get; }
+        public ReactiveCommand<BattleEffectContext> OnAppliedEffect { get; }
+        public ReactiveCommand<BattleAbilitySpec> OnActivateAbility { get; }
         public ReadOnlyReactiveProperty<Vector2> Direction { get; }
         public ReadOnlyReactiveProperty<Vector2> LookAt { get; }
         public bool ContainsEffectTag(BattleEffectTag tag);

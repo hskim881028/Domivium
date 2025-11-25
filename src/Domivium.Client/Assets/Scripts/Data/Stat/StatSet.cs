@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Domivium.Client.Data.Stat
@@ -6,13 +7,20 @@ namespace Domivium.Client.Data.Stat
     public sealed class StatSet
     {
         private readonly Stat[] _stats = new Stat[StatId.StatCount];
-        private readonly Action[] _onChanged = new Action[StatId.StatCount];
+        private readonly HashSet<Action>[] _onChanged = new HashSet<Action>[StatId.StatCount];
 
-        public void Register(StatId id, int value, Action onChanged = null)
+        public void Register(StatId id, int value)
         {
             _stats[id] = new Stat(GetDomain(id), value);
-            _onChanged[id] = onChanged;
-            _onChanged[id]?.Invoke();
+        }
+
+        public void AddListener(StatId id, Action onChanged)
+        {
+            if (onChanged == null) return;
+
+            _onChanged[id] ??= new HashSet<Action>();
+            _onChanged[id].Add(onChanged);
+            onChanged.Invoke();
         }
 
         public int Value(StatId id)
@@ -66,27 +74,25 @@ namespace Domivium.Client.Data.Stat
                 Ref(id).AddMultiplier(value);
             }
 
-            _onChanged[id]?.Invoke();
+            foreach (var action in _onChanged[id])
+            {
+                action?.Invoke();
+            }
         }
 
-        public void Reset(StatId id)
-        {
-            Ref(id).Reset();
-            _onChanged[id]?.Invoke();
-        }
 
         public void Clear()
         {
             for (var i = 0; i < StatId.StatCount; i++)
             {
+                if (_onChanged[i] == null) continue;
+
                 _onChanged[i] = null;
-                Reset(i);
+                Ref(i).Reset();
             }
         }
 
-        private ref Stat Ref(StatId id) => ref _stats[id];
-
-        private static StatDomain GetDomain(StatId id)
+        public static StatDomain GetDomain(StatId id)
         {
             if (id == StatId.Health ||
                 id == StatId.Hunger ||
@@ -104,5 +110,7 @@ namespace Domivium.Client.Data.Stat
 
             return StatDomain.Rate;
         }
+
+        private ref Stat Ref(StatId id) => ref _stats[id];
     }
 }

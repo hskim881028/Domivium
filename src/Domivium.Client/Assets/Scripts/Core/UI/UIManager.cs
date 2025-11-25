@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
+using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI.Presenter;
 using Domivium.Client.Core.UI.View;
 using MessagePipe;
@@ -18,7 +19,7 @@ namespace Domivium.Client.Core.UI
         private readonly Dictionary<UIId, (Type presenter, Type view)> _uiContainer;
         private readonly Dictionary<UILayer, HashSet<UIId>> _uisByLayer;
         private readonly List<UIBehaviour> _prefabs;
-        private readonly IPublisher<SceneUIReadyMessage> _publisher;
+        private readonly IAppContext _appContext;
         private readonly Dictionary<Type, UICanvasScope> _canvas = new();
         private readonly Dictionary<UIId, UIScope> _ui = new();
         private UIRootScope _uiRoot;
@@ -28,14 +29,14 @@ namespace Domivium.Client.Core.UI
             Dictionary<UIId, (Type presenter, Type view)> uiContainer,
             Dictionary<UILayer, HashSet<UIId>> uisByLayer,
             List<UIBehaviour> prefabs,
-            IPublisher<SceneUIReadyMessage> publisher,
+            IAppContext appContext,
             ISubscriber<SceneMessage> sceneSubscriber)
         {
             _rooLifetimeScope = rooLifetimeScope;
             _uiContainer = uiContainer;
             _uisByLayer = uisByLayer;
             _prefabs = prefabs;
-            _publisher = publisher;
+            _appContext = appContext;
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
@@ -103,7 +104,7 @@ namespace Domivium.Client.Core.UI
                     break;
                 case SceneMessageType.Load:
                     _uiRoot = message.SceneScope.UIScope;
-                    _publisher.Publish(SceneUIReadyMessage.Ready(message.SceneScope.Id));
+                    _appContext.SetMode(StageMode.UILoaded);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

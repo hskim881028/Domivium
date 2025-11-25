@@ -13,7 +13,7 @@ namespace Domivium.Client.Contents.Systems
         private Transform _character;
         private IReadOnlyDictionary<ushort, Vector2> _stageProps;
         private ushort _lootId;
-        
+
         // todo: 첫 세팅시키기.
 
         public ReactiveCommand<ushort> OnFind => _onFind;

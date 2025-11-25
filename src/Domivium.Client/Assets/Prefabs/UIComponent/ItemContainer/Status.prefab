@@ -497,13 +497,13 @@ MonoBehaviour:
   _health: {fileID: 6820059290155300160}
   _hunger: {fileID: 5674335414254387687}
   _stamina: {fileID: 8388571346839403242}
-  _sanity: {fileID: 8388571346839403242}
+  _sanity: {fileID: 8766861509626353555}
   _attack: {fileID: 6598448837426148838}
   _defense: {fileID: 6006020491117999214}
   _moveSpeed: {fileID: 456011928779289361}
   _attackRange: {fileID: 6939963185669631034}
   _attackSpeed: {fileID: 570205585785002872}
-  _projectileMoveSpeed: {fileID: 4844362090069694867}
+  _projectileSpeed: {fileID: 4844362090069694867}
   _projectileCapacity: {fileID: 8917764040037358029}
   _reloadSpeed: {fileID: 1950534634535014658}
   _criticalRate: {fileID: 5251474270264327366}
@@ -2154,6 +2154,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5670000742377916170, guid: afade5923542c614fb2b5e9b6795bb22, type: 3}
   m_PrefabInstance: {fileID: 7720875151245132571}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8766861509626353555 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1336488351360455816, guid: afade5923542c614fb2b5e9b6795bb22, type: 3}
+  m_PrefabInstance: {fileID: 7720875151245132571}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcb57c469e7241f395335d4ee3ae9890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Domivium.Client.Core::Domivium.Client.Core.Component.StatGaugeText
 --- !u!1001 &8039598389041942132
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2486,7 +2497,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2059386496476666040, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: m_Name
-      value: ProjectileMoveSpeed
+      value: ProjectileSpeed
       objectReference: {fileID: 0}
     - target: {fileID: 2189160812427565900, guid: ee2f4f8043a215a41bdc1e25ec49fbba, type: 3}
       propertyPath: _suffix.Array.size

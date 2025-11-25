@@ -1,20 +1,20 @@
 {
-    "name": "Domivium.Client.Editor",
-    "rootNamespace": "Domivium.Client",
-    "references": [
-        "GUID:3d10d29a0c966f54ca0c48ca9ef92ed6",
-        "GUID:b9270cfbddf96ab46adc1092eeb7f0b0",
-        "GUID:01bffef0339f4b7448541708ad084c46"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Domivium.Client.Editor",
+  "rootNamespace": "Domivium.Client",
+  "references": [
+    "GUID:3d10d29a0c966f54ca0c48ca9ef92ed6",
+    "GUID:b9270cfbddf96ab46adc1092eeb7f0b0",
+    "GUID:01bffef0339f4b7448541708ad084c46"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }
