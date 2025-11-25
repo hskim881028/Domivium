@@ -9,13 +9,17 @@ namespace Domivium.Client.Contents.Actors
 {
     public abstract class PawnPresenter<TPawn> : ActorPresenter<TPawn>, IPawnPresenter where TPawn : Pawn
     {
+        private readonly ReactiveProperty<bool> _flip = new();
+
         public IBattleSystem BattleSystem { get; }
 
         protected PawnPresenter(TPawn actor, ISystemFactory systemFactory)
             : base(actor, systemFactory)
         {
-            BattleSystem = systemFactory.CreateBattle(actor.transform, actor.Muzzle, actor.Collider, StateSystem.Tag);
-            BattleSystem.AppliedEffect.Subscribe(OnAppliedEffectChanged).AddTo(ref DisposableBag);
+            _flip.Subscribe(Actor.SetFlip).AddTo(ref DisposableBag);
+
+            BattleSystem = systemFactory.CreateBattle(Transform, actor.Muzzle, actor.MoveCollider, StateSystem.Tag);
+            BattleSystem.OnAppliedEffect.Subscribe(OnAppliedEffectChanged).AddTo(ref DisposableBag);
             BattleSystem.Direction.Subscribe(OnDirectionChanged).AddTo(ref DisposableBag);
             BattleSystem.LookAt.Subscribe(OnLookAtChanged).AddTo(ref DisposableBag);
         }
@@ -40,7 +44,7 @@ namespace Domivium.Client.Contents.Actors
 
         protected override void OnDie()
         {
-            this.Log();
+            // this.Log();
             Actor.Die();
             base.OnDie();
         }
@@ -65,7 +69,9 @@ namespace Domivium.Client.Contents.Actors
 
         protected virtual void OnLookAtChanged(Vector2 lookAt)
         {
-            Actor.SetFlip(lookAt.x);
+            if (Mathf.Approximately(lookAt.x, 0f)) return;
+
+            _flip.Value = lookAt.x > 0;
         }
     }
 }

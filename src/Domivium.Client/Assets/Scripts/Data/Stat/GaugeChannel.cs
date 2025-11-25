@@ -8,6 +8,5 @@ namespace Domivium.Client.Data.Stat
         public static readonly GaugeChannel Set = new(0);
         public static readonly GaugeChannel Add = new(1);
         public static readonly GaugeChannel Max = new(2);
-        public static readonly GaugeChannel Empty = new(3);
     }
 }

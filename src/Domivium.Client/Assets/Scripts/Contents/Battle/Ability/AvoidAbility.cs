@@ -17,7 +17,7 @@ namespace Domivium.Client.Contents.Battle.Ability
             _stageFieldSystem = stageFieldSystem;
         }
 
-        protected override bool OnActivate(ref BattleAbilityContext context)
+        public override float Activate(ref BattleAbilityContext context)
         {
             var source = context.Source;
             var position = source.Position;
@@ -26,7 +26,10 @@ namespace Domivium.Client.Contents.Battle.Ability
             direction *= Multiply;
             var nextPosition = _stageFieldSystem.GetNextPosition(position, direction, collider);
             context.Source.SetPosition(nextPosition);
-            return true;
+
+            var effect = EffectPool.Get(BattleEffectIds.Avoid, context.Source, context.Source);
+            context.Source.ActivateEffect(effect);
+            return Constant.AvoidCooldown;
         }
     }
 }

@@ -8,11 +8,11 @@ namespace Domivium.Client.Contents.Battle.Ability
 
         public TurnAbility(IBattleEffectPool effectPool) : base(effectPool) { }
 
-        protected override bool OnActivate(ref BattleAbilityContext context)
+        public override float Activate(ref BattleAbilityContext context)
         {
             context.Delta.Normalize();
             context.Source.SetDirection(context.Delta);
-            return true;
+            return 0;
         }
     }
 }

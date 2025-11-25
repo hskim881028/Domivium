@@ -34,7 +34,7 @@ namespace Domivium.Client.Contents.Factory
             _actorSpawner = actorSpawner;
             _stageFieldSystem = stageFieldSystem;
 
-            _abilities.Add(ActorIds.Character,
+            _abilities.Add(ActorId.Character,
                 new List<BattleAbility>
                 {
                     Create(BattleAbilityIds.Turn),
@@ -46,7 +46,7 @@ namespace Domivium.Client.Contents.Factory
                     Create(BattleAbilityIds.CancelReload)
                 });
 
-            _abilities.Add(ActorIds.Monster,
+            _abilities.Add(ActorId.Monster,
                 new List<BattleAbility>
                 {
                     Create(BattleAbilityIds.Turn),
@@ -58,12 +58,12 @@ namespace Domivium.Client.Contents.Factory
                     Create(BattleAbilityIds.Chase)
                 });
 
-            _abilities.Add(ActorIds.Projectile,
+            _abilities.Add(ActorId.Projectile,
                 new List<BattleAbility>
                 {
                     Create(BattleAbilityIds.Turn),
                     Create(BattleAbilityIds.Tracking),
-                    Create(BattleAbilityIds.Attack),
+                    Create(BattleAbilityIds.Attack)
                 });
         }
 

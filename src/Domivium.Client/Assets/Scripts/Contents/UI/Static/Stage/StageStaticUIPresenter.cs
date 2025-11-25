@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Battle;
-using Domivium.Client.Contents.DI;
-using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI;
+using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.Presenter;
 using Domivium.Client.Data.Stat;
@@ -16,10 +17,8 @@ namespace Domivium.Client.Contents.UI.Static
 {
     public class StageStaticUIPresenter : StaticUIPresenter<StageStaticUIView, IStageStaticUIMessage>, IStageStaticUIMessage
     {
-        private readonly SceneService _sceneService;
         private readonly ICharacterSystem _characterSystem;
         private readonly ICameraSystem _cameraSystem;
-        private IBattleSystem _character;
 
         protected override HashSet<UILayer> Layer => UILayer.Set(UILayers.Stage);
 
@@ -29,94 +28,102 @@ namespace Domivium.Client.Contents.UI.Static
             StageStaticUIView view,
             IUINavigation navigation,
             IAudioPlayer audioPlayer,
-            SceneService sceneService,
-            ICharacterSystem characterSystem)
+            ICharacterSystem characterSystem,
+            ILootSystem lootSystem)
             : base(view, navigation, audioPlayer)
         {
-            _sceneService = sceneService;
-            characterSystem.OnInitialize.Subscribe(OnInitialize).AddTo(ref DisposableBag);
-            characterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
-            characterSystem.OnAvoid.Subscribe(OnAvoid).AddTo(ref DisposableBag);
-            characterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
+            _characterSystem = characterSystem;
+            lootSystem.OnFind.Subscribe(OnFindProp).AddTo(ref DisposableBag);
         }
 
-        public void EnterLobby()
+        public override async UniTask<bool> InitializeAsync(CancellationToken token)
         {
-            _sceneService.Load(SceneScopeIds.Lobby);
-        }
+            if (!await base.InitializeAsync(token)) return false;
 
-        private void OnInitialize(IBattleSystem character)
-        {
-            _character = character;
-            _character.Gauge.AddListener(StatId.Health, OnHealthChanged);
-            _character.Gauge.AddListener(StatId.Hunger, OnHungerChanged);
-            _character.Gauge.AddListener(StatId.Stamina, OnStaminaChanged);
-            _character.Gauge.AddListener(StatId.Sanity, OnSanityChanged);
-            _character.Gauge.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityChanged);
+            _characterSystem.Character.OnAppliedEffect.Subscribe(OnAppliedEffect).AddTo(ref DisposableBag);
+            _characterSystem.Character.OnActivateAbility.Subscribe(OnActivateAbility).AddTo(ref DisposableBag);
+            _characterSystem.Character.LookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
+            // _characterSystem.Character.Stat.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityChanged); // 무기 장착여부
+
+            _characterSystem.Character.Gauge.AddListener(StatId.Health, OnHealthChanged);
+            _characterSystem.Character.Gauge.AddListener(StatId.Hunger, OnHungerChanged);
+            _characterSystem.Character.Gauge.AddListener(StatId.Stamina, OnStaminaChanged);
+            _characterSystem.Character.Gauge.AddListener(StatId.Sanity, OnSanityChanged);
+            _characterSystem.Character.Gauge.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityChanged);
             View.SetAvoidButton(Constant.AvoidCooldown);
+            View.SetInteractButton(false);
+            return true;
         }
+
+        public override async UniTask ShowAsync(CancellationToken token, UIParam param, bool immediately = false)
+        {
+            await base.ShowAsync(token, param, immediately);
+            OnProjectileCapacityChanged();
+        }
+
+        private void OnActivateAbility(BattleAbilitySpec ability)
+        {
+            if (ability.Id == BattleAbilityIds.Reload)
+            {
+                var reloadSpeed = _characterSystem.Character.Stat.RateValue(StatId.ReloadSpeed);
+                View.Reload(reloadSpeed);
+            }
+            else if (ability.Id == BattleAbilityIds.CancelReload)
+            {
+                View.CancelReload();
+            }
+
+            else if (ability.Id == BattleAbilityIds.Avoid)
+            {
+                View.SetAvoidButton(ability.Cooldown);
+            }
+        }
+
+        private void OnAppliedEffect(BattleEffectContext context) { }
 
         private void OnLookAt(Vector2 value)
         {
             View.SetAttackButton(value.sqrMagnitude > Constant.CanAttackRange);
         }
 
-        private void OnAvoid(Unit unit)
-        {
-            if (!_character.CanActivateAbility(BattleAbilityIds.Avoid, out var cooldown)) return;
-
-            View.SetAvoidButton(cooldown);
-        }
-
         private void OnHealthChanged()
         {
-            var cur = _character.Gauge.Current(StatId.Health);
-            var max = _character.Stat.Value(StatId.Health);
+            var cur = _characterSystem.Character.Gauge.Current(StatId.Health);
+            var max = _characterSystem.Character.Stat.Value(StatId.Health);
             View.SetHealth(cur, max);
         }
 
         private void OnHungerChanged()
         {
-            var cur = _character.Gauge.Current(StatId.Hunger);
-            var max = _character.Stat.Value(StatId.Hunger);
+            var cur = _characterSystem.Character.Gauge.Current(StatId.Hunger);
+            var max = _characterSystem.Character.Stat.Value(StatId.Hunger);
             View.SetHunger(cur, max);
         }
 
         private void OnStaminaChanged()
         {
-            var cur = _character.Gauge.Current(StatId.Stamina);
-            var max = _character.Stat.Value(StatId.Stamina);
+            var cur = _characterSystem.Character.Gauge.Current(StatId.Stamina);
+            var max = _characterSystem.Character.Stat.Value(StatId.Stamina);
             View.SetStamina(cur, max);
         }
 
         private void OnSanityChanged()
         {
-            var cur = _character.Gauge.Current(StatId.Sanity);
-            var max = _character.Stat.Value(StatId.Sanity);
+            var cur = _characterSystem.Character.Gauge.Current(StatId.Sanity);
+            var max = _characterSystem.Character.Stat.Value(StatId.Sanity);
             View.SetSanity(cur, max);
         }
 
         private void OnProjectileCapacityChanged()
         {
-            var cur = _character.Gauge.Current(StatId.ProjectileCapacity);
-            var max = _character.Stat.Value(StatId.ProjectileCapacity);
+            var cur = _characterSystem.Character.Gauge.Current(StatId.ProjectileCapacity);
+            var max = _characterSystem.Character.Gauge.Max(StatId.ProjectileCapacity);
             View.SetProjectileCapacity(cur, max);
         }
 
-        private void OnBattleTag(BattleTag tag)
+        private void OnFindProp(ushort lootId)
         {
-            if (tag == BattleTags.Idle)
-            {
-                if (!_character.CanActivateAbility(BattleAbilityIds.Reload, out var _)) return;
-
-                var reloadSpeed = _character.Stat.RateValue(StatId.ReloadSpeed);
-                View.Reload(reloadSpeed);
-            }
-
-            if (tag == BattleTags.Aiming || tag == BattleTags.Firing)
-            {
-                View.CancelReload();
-            }
+            View.SetInteractButton(lootId > 0);
         }
     }
 }

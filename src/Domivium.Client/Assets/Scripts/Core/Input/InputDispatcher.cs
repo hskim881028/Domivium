@@ -21,7 +21,7 @@ namespace Domivium.Client.Core.Input
             BindAction("UI/Cancel", performed: Cancel);
             BindAction("UI/Click", performed: Click);
             BindAction("UI/Point", performed: Point);
-            
+
             BindAction("Player/Move", performed: Move, canceled: Move);
             BindAction("Player/Look", performed: Look, canceled: LookEnd);
             BindAction("Player/Quick", performed: Quick, canceled: QuickEnd);

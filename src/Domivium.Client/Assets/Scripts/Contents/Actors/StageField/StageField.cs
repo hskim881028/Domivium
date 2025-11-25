@@ -1,8 +1,6 @@
-﻿using System.Threading;
-using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Actors.Contract;
+﻿using System.Collections.Generic;
+using Domivium.Client.Contents.Components;
 using Domivium.Client.Core.Actors;
-using Domivium.Client.Core.Actors.Contract;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -10,36 +8,21 @@ namespace Domivium.Client.Contents.Actors
 {
     public class StageField : Actor
     {
-        [SerializeField] private Tilemap _background;
         [SerializeField] private Tilemap _colliderGrid;
-        [SerializeField] private Tilemap _debug;
-        [SerializeField] private TileBase _backgroundBase;
-        [SerializeField] private TileBase _treeTile;
-        [SerializeField] private Transform _propContainer;
 
-        private Vector3Int _cell;
+        private readonly Dictionary<ushort, Vector2> _stageProps = new();
 
-        public Tilemap ColliderGrid => _colliderGrid;
-
-        public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
+        protected override void OnAwake()
         {
-            await base.SpawnAsync(token, param);
-
-            var tilemap = param.As<StageFieldParams>().Tilemap;
-
-            foreach (var cell in tilemap.cellBounds.allPositionsWithin)
+            base.OnAwake();
+            var props = transform.GetComponentsInChildren<StageProp>();
+            foreach (var prop in props)
             {
-                _background.SetTile(cell, _backgroundBase);
-
-                if (tilemap.HasTile(cell))
-                {
-                    _colliderGrid.SetTile(cell, _backgroundBase);
-                }
-                else
-                {
-                    _debug.SetTile(cell, _treeTile);
-                }
+                _stageProps.Add(prop.LootId, prop.transform.position);
             }
         }
+
+        public Tilemap ColliderGrid => _colliderGrid;
+        public IReadOnlyDictionary<ushort, Vector2> StageProps => _stageProps;
     }
 }

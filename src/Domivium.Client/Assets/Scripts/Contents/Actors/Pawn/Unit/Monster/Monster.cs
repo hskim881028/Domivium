@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -42,6 +43,13 @@ namespace Domivium.Client.Contents.Actors
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
+        }
+
+        private void OnTriggerEnter2D(Collider2D other) { }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -16,8 +16,8 @@ namespace Domivium.Client.Contents.Actors
         protected IStateSystem StateSystem { get; }
 
         public ushort Uid { get; private set; }
-
         public ActorId ActorId { get; private set; }
+        public Transform Transform => Actor.transform;
 
         protected ActorPresenter(TActor actor, ISystemFactory systemFactory)
         {
@@ -68,10 +68,12 @@ namespace Domivium.Client.Contents.Actors
         protected virtual void OnMoveTick(float deltaTime) { }
         protected virtual void OnPostStateTick(float deltaTime) { }
 
-        protected virtual void OnIdle() => this.Log(Uid);
-        protected virtual void OnMove() => this.Log(Uid);
+        protected virtual void OnIdle() { } //this.Log(Uid);
+
+        protected virtual void OnMove() { } //this.Log(Uid);
+
         protected virtual void OnDie() { }
-        protected virtual void OnTerminated() => this.Log(Uid);
+        protected virtual void OnTerminated() { } //this.Log(Uid);
 
         private void StateTick(float deltaTime)
         {

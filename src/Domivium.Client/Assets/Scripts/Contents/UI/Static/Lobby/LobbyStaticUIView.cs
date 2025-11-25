@@ -1,19 +1,21 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
-using Domivium.Client.Core.Component;
 using Domivium.Client.Core.UI.View;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Domivium.Client.Contents.UI.Static
 {
     public class LobbyStaticUIView : StaticUIView<ILobbyStaticUIMessage>
     {
-        [SerializeField] private DvmButton _testButton;
+        [SerializeField] private Button _nextButton;
 
-        public override async UniTask InitializeAsync(CancellationToken token)
+        public override async UniTask<bool> InitializeAsync(CancellationToken token)
         {
-            _testButton.onClick.AddListener(Message.Test);
-            await base.InitializeAsync(token);
+            if (!await base.InitializeAsync(token)) return false;
+
+            _nextButton.onClick.AddListener(Message.Next);
+            return true;
         }
     }
 }

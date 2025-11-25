@@ -19,8 +19,8 @@ namespace Domivium.Client.Contents.Input.Consumer
         {
             switch (message.Type)
             {
-                case InputMessageType.Cancel:
                 case InputMessageType.Submit:
+                case InputMessageType.Cancel:
                 case InputMessageType.Move:
                     return false;
                 case InputMessageType.Point:

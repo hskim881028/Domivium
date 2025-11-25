@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a71830fe78de4e82914d6e37706d5a70, type: 3}
+  m_Name: SpriteContainer
+  m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.DI.Container.SpriteContainer
+  _none: {fileID: 21300000, guid: e744f64d6f5090a46a58e9563356849c, type: 3}
+  _weapon:
+  - {fileID: 21300000, guid: 6c5a0631b82a115488399a365a6ab920, type: 3}
+  - {fileID: 21300000, guid: 810668cb96886b242ab1adf43ee99f26, type: 3}
+  - {fileID: 21300000, guid: 65bc054c236514f4dafc525ec0ab817b, type: 3}
+  - {fileID: 21300000, guid: aff74e77eb6fe7c41b0cf80e8f0617ce, type: 3}
+  _projectile:
+  - {fileID: 21300000, guid: 83b4b940d40efa64a9b370f81e282a5d, type: 3}
+  - {fileID: 21300000, guid: 949cfc083a7a90b43976fd1840763ab4, type: 3}
+  - {fileID: 21300000, guid: 08b90d219c2602041831bc88725cad25, type: 3}
+  - {fileID: 21300000, guid: 1200f17d39cb5884fbdd0b97ce623c69, type: 3}

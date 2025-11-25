@@ -15,11 +15,13 @@ namespace Domivium.Client.Core.Battle
 
         public BattleEffectId Id => _effect.Id;
         public BattleEffectContext Context => _effect.Context;
-        public IReadOnlyCollection<BattleTag> GrantedTags => _effect.GrantedBattleTags;
+        public IReadOnlyCollection<BattleEffectTag> GrantedTags => _effect.GrantedEffectTags;
         public IReadOnlyList<BattleStatModifier> StatModifiers => _effect.StatModifiers;
         public IReadOnlyList<BattleStatModifier> StatPeriodicModifiers => _effect.StatPeriodicModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugeModifiers => _effect.GaugeModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugePeriodicModifiers => _effect.GaugePeriodicModifiers;
+        public IReadOnlyList<Action> ActionModifiers => _effect.ActionModifiers;
+        public IReadOnlyList<Action> ActionPeriodicModifiers => _effect.ActionPeriodicModifiers;
 
         public BattleEffectSpec(
             BattleEffect effect,
@@ -29,13 +31,13 @@ namespace Domivium.Client.Core.Battle
             _effect = effect;
             _cuePublisher = cuePublisher;
             _onDeactivate = onDeactivate;
-            ResetInternal(_effect);
         }
 
         public void Reset(ref BattleEffectContext context)
         {
             _effect.Reset(context);
-            ResetInternal(_effect);
+            _duration = _effect.Duration;
+            _periodicInterval = _effect.PeriodicInterval;
         }
 
         public bool Tick(float deltaTime)
@@ -74,12 +76,6 @@ namespace Domivium.Client.Core.Battle
             }
 
             _onDeactivate.Invoke(this);
-        }
-
-        private void ResetInternal(BattleEffect effect)
-        {
-            _duration = effect.Duration;
-            _periodicInterval = effect.PeriodicInterval;
         }
     }
 }

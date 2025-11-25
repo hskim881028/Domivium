@@ -12,5 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4baa93ea1e9447281934df62d3d389b, type: 3}
   m_Name: StageFieldContainer
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.DI.Container.StageMapContainer
-  _biome:
-  - {fileID: 8955783773557650589, guid: c8c90b399cfdf5f45b460030e1864faa, type: 3}
+  _biome: []

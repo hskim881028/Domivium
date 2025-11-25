@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.State;
+using Domivium.Client.Data.Rarity;
 using Domivium.Client.Data.Stat;
 using MessagePipe;
 using R3;
@@ -17,9 +19,11 @@ namespace Domivium.Client.Core.Battle
         private readonly Queue<BattleEffectSpec> _deactivateEffectSpecs = new();
         private readonly Queue<BattleStatModifier> _statModifiers = new();
         private readonly Queue<BattleGaugeModifier> _gaugeModifiers = new();
+        private readonly Queue<Action> _actionModifiers = new();
         private readonly ReadOnlyReactiveProperty<StateTag> _state;
-        private readonly HashSet<BattleTag> _tags = new();
-        private readonly ReactiveProperty<BattleEffectContext> _appliedEffect = new();
+
+        private readonly HashSet<BattleEffectTag> _effectTags = new();
+
         private readonly ReactiveProperty<Vector2> _direction = new();
         private readonly ReactiveProperty<Vector2> _lookAt = new();
         private readonly HashSet<ushort> _hitHistory = new();
@@ -33,15 +37,18 @@ namespace Domivium.Client.Core.Battle
         public int Id { get; private set; }
         public ActorId ActorId { get; private set; }
         public RarityType Rarity { get; private set; }
-        public StatSet Stat { get; }
-        public GaugeSet Gauge { get; }
+        public StatSet Stat { get; } = new();
+        public GaugeSet Gauge { get; } = new();
         public Vector2 PrePosition { get; private set; }
         public Vector2 Position => _pawn.position;
         public Vector2 MuzzlePosition => _muzzle.position;
         public Vector2 ColliderSize => _collider.bounds.size;
 
         public StateTag State => _state.CurrentValue;
-        public ReadOnlyReactiveProperty<BattleEffectContext> AppliedEffect => _appliedEffect;
+
+        public ReactiveCommand<BattleEffectContext> OnAppliedEffect { get; } = new();
+
+        public ReactiveCommand<BattleAbilitySpec> OnActivateAbility { get; } = new();
         public ReadOnlyReactiveProperty<Vector2> Direction => _direction;
         public ReadOnlyReactiveProperty<Vector2> LookAt => _lookAt;
 
@@ -52,8 +59,6 @@ namespace Domivium.Client.Core.Battle
             ReadOnlyReactiveProperty<StateTag> state,
             IPublisher<BattleCueMessage> cuePublisher)
         {
-            Stat = new StatSet();
-            Gauge = new GaugeSet(Stat);
             _pawn = pawn;
             _muzzle = muzzle;
             _collider = collider;
@@ -61,7 +66,7 @@ namespace Domivium.Client.Core.Battle
             _cuePublisher = cuePublisher;
         }
 
-        public bool ContainsTag(BattleTag tag) => _tags.Contains(tag);
+        public bool ContainsEffectTag(BattleEffectTag tag) => _effectTags.Contains(tag);
 
         public void Initialize(
             ushort uid,
@@ -89,11 +94,12 @@ namespace Domivium.Client.Core.Battle
                 effect.Deactivate(true);
             }
 
-            _tags.Clear();
+            _effectTags.Clear();
             _deactivateEffectSpecs.Clear();
             _effectSpecs.Clear();
             _statModifiers.Clear();
             _gaugeModifiers.Clear();
+            _actionModifiers.Clear();
             Stat.Clear();
             Gauge.Clear();
         }
@@ -116,37 +122,31 @@ namespace Domivium.Client.Core.Battle
 
         public void GrantAbility(BattleAbility ability)
         {
-            _abilitySpecs.Add(ability.Id, new BattleAbilitySpec(ability, Stat, _cuePublisher));
+            _abilitySpecs.Add(ability.Id, new BattleAbilitySpec(ability, _cuePublisher));
         }
 
-        public void SetAbilityCooldown(BattleAbilityId abilityId, float cooldown)
+        public bool CanActivateAbility(BattleAbilityId abilityId) => _abilitySpecs.TryGetValue(abilityId, out var spec) && spec.CanActivateAbility(this);
+
+        public bool TryActivateAbility(ref BattleAbilityContext context)
         {
-            if (!_abilitySpecs.TryGetValue(abilityId, out var spec)) return;
+            if (!_abilitySpecs.TryGetValue(context.AbilityId, out var spec))
+                return false;
 
-            spec.SetCooldown(cooldown);
+
+            if (!spec.TryActivate(ref context)) return false;
+
+            OnActivateAbility.Execute(spec);
+            return true;
         }
-
-        public bool CanActivateAbility(BattleAbilityId abilityId, out float cooldown)
-        {
-            cooldown = 0;
-
-            if (!_abilitySpecs.TryGetValue(abilityId, out var spec)) return false;
-
-            cooldown = spec.Cooldown;
-            return spec.CanActivateAbility(this);
-        }
-
-        public bool TryActivateAbility(ref BattleAbilityContext context) => _abilitySpecs.TryGetValue(context.AbilityId, out var spec) && spec.TryActivate(ref context);
 
         public void ActivateEffect(BattleEffectSpec spec)
         {
             if (!spec.TryActivate()) return;
 
-            EnqueueModifiers(spec.StatModifiers, spec.GaugeModifiers);
+            EnqueueModifiers(spec.StatModifiers, spec.GaugeModifiers, spec.ActionModifiers);
             AddTags(spec.GrantedTags);
             _effectSpecs.Add(spec);
-            _appliedEffect.Value = spec.Context;
-            _appliedEffect.ForceNotify();
+            OnAppliedEffect.Execute(spec.Context);
         }
 
         public void DeactivateEffect(BattleEffectId effectId)
@@ -175,7 +175,8 @@ namespace Domivium.Client.Core.Battle
             if (_isDisposed) return;
 
             _isDisposed = true;
-            _appliedEffect?.Dispose();
+            OnAppliedEffect?.Dispose();
+            OnActivateAbility.Dispose();
         }
 
         private void UpdateAttributeSet()
@@ -191,6 +192,12 @@ namespace Domivium.Client.Core.Battle
                 var modifier = _gaugeModifiers.Dequeue();
                 Gauge.Apply(modifier.Id, modifier.Value, modifier.Channel);
             }
+
+            while (_actionModifiers.Count > 0)
+            {
+                var action = _actionModifiers.Dequeue();
+                action.Invoke();
+            }
         }
 
         private void UpdateEffects(float deltaTime)
@@ -201,7 +208,7 @@ namespace Domivium.Client.Core.Battle
             {
                 if (spec.TryActivateForPeriodic(deltaTime))
                 {
-                    EnqueueModifiers(spec.StatPeriodicModifiers, spec.GaugePeriodicModifiers);
+                    EnqueueModifiers(spec.StatPeriodicModifiers, spec.GaugePeriodicModifiers, spec.ActionPeriodicModifiers);
                 }
 
                 if (!spec.Tick(deltaTime))
@@ -213,7 +220,10 @@ namespace Domivium.Client.Core.Battle
             DeactivateEffects();
         }
 
-        private void EnqueueModifiers(IReadOnlyList<BattleStatModifier> stats, IReadOnlyList<BattleGaugeModifier> gauges)
+        private void EnqueueModifiers(
+            IReadOnlyList<BattleStatModifier> stats,
+            IReadOnlyList<BattleGaugeModifier> gauges,
+            IReadOnlyList<Action> actions)
         {
             foreach (var stat in stats)
             {
@@ -223,6 +233,11 @@ namespace Domivium.Client.Core.Battle
             foreach (var gauge in gauges)
             {
                 _gaugeModifiers.Enqueue(gauge);
+            }
+
+            foreach (var action in actions)
+            {
+                _actionModifiers.Enqueue(action);
             }
         }
 
@@ -234,19 +249,19 @@ namespace Domivium.Client.Core.Battle
             }
         }
 
-        private void AddTags(IReadOnlyCollection<BattleTag> tags)
+        private void AddTags(IReadOnlyCollection<BattleEffectTag> tags)
         {
             foreach (var tag in tags)
             {
-                _tags.Add(tag);
+                _effectTags.Add(tag);
             }
         }
 
-        private void RemoveTags(IReadOnlyCollection<BattleTag> tags)
+        private void RemoveTags(IReadOnlyCollection<BattleEffectTag> tags)
         {
             foreach (var tag in tags)
             {
-                _tags.Remove(tag);
+                _effectTags.Remove(tag);
             }
         }
 

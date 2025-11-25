@@ -37,13 +37,13 @@ namespace Domivium.Client.Contents.Battle
             {
                 _audioPlayer.PlaySFX(SFXAudioId.Damaged);
                 var param = new DamageTextParams(message.Context.Position, message.Context.Value, 1.6f);
-                _actorSpawner.SpawnAsync(ActorIds.DamageText, param).Forget();
+                _actorSpawner.SpawnAsync(ActorId.DamageText, param).Forget();
             }
 
             if (message.CueId == BattleCueIds.Healed)
             {
                 var param = new HealTextParams(message.Context.Position, message.Context.Value, 1.6f);
-                _actorSpawner.SpawnAsync(ActorIds.HealText, param).Forget();
+                _actorSpawner.SpawnAsync(ActorId.HealText, param).Forget();
             }
         }
     }

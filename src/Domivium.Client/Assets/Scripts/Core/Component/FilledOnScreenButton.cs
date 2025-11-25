@@ -12,7 +12,7 @@ namespace Domivium.Client.Core.Component
         [SerializeField] private Image _cooldownImage;
         [SerializeField] private Color _activeColor = Color.white;
         [SerializeField] private Color _disabledColor = Color.gray1;
-        
+
         private readonly CancellationTokenSource _cts = new();
 
         public async UniTaskVoid SetAsync(float cooldown)

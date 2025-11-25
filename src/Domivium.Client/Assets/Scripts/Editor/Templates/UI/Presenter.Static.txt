@@ -14,7 +14,7 @@ namespace {{NAMESPACE}}
         public {{PRESENTER_NAME}}(
             {{VIEW_NAME}} view,
             IUINavigation navigation,
-            IAudioController audioController)
+            IAudioPlayer audioController)
             : base(view, navigation, audioController) { }
     }
 }

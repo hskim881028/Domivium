@@ -14,7 +14,7 @@ namespace Domivium.Client.Core.Utility
         public static readonly int CharacterMask = 1 << Character;
         public static readonly int PropMask = 1 << Prop;
         public static readonly int MonsterMask = 1 << Monster;
-        
+
         public static readonly int CharacterOrPropMask = CharacterMask | PropMask;
         public static readonly int MonsterOrPropMask = MonsterMask | PropMask;
     }

@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Actors.Contract;
-using Domivium.Client.Contents.Item;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
+using Domivium.Client.Data.Context;
+using Domivium.Client.Data.Item;
 using Domivium.Client.Data.Stat;
 using UnityEngine;
 
@@ -57,5 +58,7 @@ namespace Domivium.Client.Contents.Factory
             var projectileContext = new ProjectileContext(projectileRow);
             return new ProjectileParams(target, sourceStatSet, spawnPosition, direction, projectileContext, abilities);
         }
+
+        public ActorParam CreateProp(int id, Vector2 spawnPosition) => new PropParams(spawnPosition);
     }
 }

@@ -7,7 +7,7 @@
         ClickEnter,
         ClickExit,
         Point,
-        
+
         Move,
         Look,
         LookCanceled,
@@ -15,6 +15,6 @@
         QuickCanceled,
         Inventory,
         Interact,
-        Avoid,
+        Avoid
     }
 }

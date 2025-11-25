@@ -1,3 +1,4 @@
-Id,Type,Rarity,Health,Hunger,Stamina,Sanity,Durability,Weight,MaxWeight,InventoryCapacity,ProjectileCapacity,Attack,Defense,AttackRange,HitRange,DetectionRange,FieldOfView,AngleOfView,MoveSpeed,AttackSpeed,ReloadSpeed,CriticalRate,CriticalDamage
-int,string,string,int,int,int,int,int,int,int,int,int,int,int,percent,percent,percent,percent,percent,percent,percent,percent,percent,percent
-1,Ghost,Common,100,0,0,0,0,0,0,0,5,10,5,300,0,500,0,0,100,100,100,0,0
+Id,Type,Rarity,Health,Hunger,Stamina,Sanity,Durability,Weight,InventoryCapacity,ProjectileCapacity,Attack,Defense,DetectionRange,AttackRange,MoveSpeed,AttackSpeed,ReloadSpeed,ProjectileSpeed,CriticalRate,CriticalDamage
+int,string,string,int,int,int,int,int,int,int,int,int,int,percent,percent,percent,percent,percent,percent,percent,percent
+1,Ghost,Common,100,0,0,0,0,0,0,5,9,4,1000,500,100,100,0,0,0,0
+2,Dummy,Common,100000,0,0,0,0,0,0,5,1,0,1000,500,0,100,200,0,0,0

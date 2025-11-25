@@ -13,11 +13,8 @@ namespace Domivium.Client.Contents.Actors
 {
     public class MonsterPresenter : UnitPresenter<Monster>
     {
-        private const float Offset = 0.2f;
         private BattleTag _tag;
-        private float _movementRange;
         private IBattleSystem _target;
-        private Vector2 _spawnPosition;
 
         public MonsterPresenter(Monster actor, ISystemFactory systemFactory) : base(actor, systemFactory) { }
 
@@ -27,14 +24,6 @@ namespace Domivium.Client.Contents.Actors
 
             var p = param.As<MonsterParams>();
             _target = p.Target;
-
-            var attackRange = BattleSystem.Stat.RateValue(StatId.AttackRange);
-            var detectionRange = BattleSystem.Stat.RateValue(StatId.DetectionRange);
-            _movementRange = detectionRange - attackRange + Offset;
-            _spawnPosition = p.SpawnPosition;
-
-            var attackSpeed = BattleSystem.Stat.RateValue(StatId.AttackSpeed);
-            BattleSystem.SetAbilityCooldown(BattleAbilityIds.Attack, attackSpeed);
         }
 
         protected override void OnIdle()
@@ -55,10 +44,9 @@ namespace Domivium.Client.Contents.Actors
             }
             else
             {
-                if (_tag == BattleTags.Reloading || _tag == BattleTags.Returning) return;
+                if (_tag == BattleTags.Reloading) return;
 
-                var distanceMoved = Vector2.Distance(BattleSystem.Position, _spawnPosition);
-                _tag = distanceMoved > _movementRange ? BattleTags.Returning : BattleTags.Aiming;
+                _tag = BattleTags.Aiming;
             }
         }
 
@@ -97,20 +85,6 @@ namespace Domivium.Client.Contents.Actors
             {
                 var context = BattleAbilityContext.Create(BattleAbilityIds.Reload, BattleSystem);
                 BattleSystem.TryActivateAbility(ref context);
-            }
-
-            if (_tag == BattleTags.Returning)
-            {
-                var remainDist = Vector2.Distance(BattleSystem.Position, _spawnPosition);
-                if (remainDist < Offset)
-                {
-                    StateSystem.Transit(StateTags.Idle);
-                }
-                else
-                {
-                    var context = BattleAbilityContext.Create(BattleAbilityIds.Chase, BattleSystem, _spawnPosition, deltaTime);
-                    BattleSystem.TryActivateAbility(ref context);
-                }
             }
         }
 

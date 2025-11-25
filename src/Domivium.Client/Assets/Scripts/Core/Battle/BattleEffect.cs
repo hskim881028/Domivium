@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Domivium.Client.Core.State;
+using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Stat;
 
@@ -12,13 +14,12 @@ namespace Domivium.Client.Core.Battle
         private readonly List<BattleStatModifier> _statPeriodicModifiers = new();
         private readonly List<BattleGaugeModifier> _gaugeModifiers = new();
         private readonly List<BattleGaugeModifier> _gaugePeriodicModifiers = new();
+        private readonly List<Action> _actionModifiers = new();
+        private readonly List<Action> _actionPeriodicModifiers = new();
+
         private BattleEffectContext _context;
 
         public abstract BattleEffectId Id { get; }
-        protected virtual IReadOnlyCollection<BattleTag> RequiredBattleTags => TagGenerator.EmptyBattleTag;
-        protected virtual IReadOnlyCollection<BattleTag> BlockedBattleTags => TagGenerator.EmptyBattleTag;
-        protected virtual IReadOnlyCollection<StateTag> BlockedStateTags => TagGenerator.DefaultBlockedStateTag;
-        public virtual IReadOnlyCollection<BattleTag> GrantedBattleTags => TagGenerator.EmptyBattleTag;
         public virtual BattleCueId CueId => BattleCueId.None;
         public virtual BattleCueId PeriodicCueId => BattleCueId.None;
         public virtual BattleCueId DeactivateCueId => BattleCueId.None;
@@ -27,21 +28,34 @@ namespace Domivium.Client.Core.Battle
         public IReadOnlyList<BattleStatModifier> StatPeriodicModifiers => _statPeriodicModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugeModifiers => _gaugeModifiers;
         public IReadOnlyList<BattleGaugeModifier> GaugePeriodicModifiers => _gaugePeriodicModifiers;
+        public IReadOnlyList<Action> ActionModifiers => _actionModifiers;
+        public IReadOnlyList<Action> ActionPeriodicModifiers => _actionPeriodicModifiers;
         public float Duration { get; protected set; }
         public float PeriodicInterval { get; protected set; }
 
-        protected BattleEffect(ref BattleEffectContext context)
+        public virtual IReadOnlyCollection<BattleEffectTag> GrantedEffectTags => TagGenerator.EmptyBattleEffectTag;
+        protected virtual IReadOnlyCollection<BattleEffectTag> RequiredEffectTags => TagGenerator.EmptyBattleEffectTag;
+        protected virtual IReadOnlyCollection<BattleEffectTag> BlockedEffectTags => TagGenerator.EmptyBattleEffectTag;
+        protected virtual IReadOnlyCollection<StateTag> BlockedStateTags => TagGenerator.DefaultBlockedStateTag;
+        protected readonly IItemUsageSystemCommand ItemUsage;
+
+        protected BattleEffect(IItemUsageSystemCommand itemUsage, ref BattleEffectContext context)
         {
+            ItemUsage = itemUsage;
             _context = context;
         }
 
-        public void Reset(BattleEffectContext context)
+        public virtual void Reset(BattleEffectContext context)
         {
             _context = context;
             _statModifiers.Clear();
             _statPeriodicModifiers.Clear();
             _gaugeModifiers.Clear();
             _gaugePeriodicModifiers.Clear();
+            _actionModifiers.Clear();
+            _actionPeriodicModifiers.Clear();
+            Duration = 0;
+            PeriodicInterval = 0;
         }
 
         public bool TryActivate() => PassesTagRequirements() && OnActivate();
@@ -68,6 +82,16 @@ namespace Domivium.Client.Core.Battle
             _gaugePeriodicModifiers.Add(new BattleGaugeModifier(id, value, channel));
         }
 
+        protected void AddActionModifier(Action action)
+        {
+            _actionModifiers.Add(action);
+        }
+
+        protected void AddActionPeriodicModifier(Action action)
+        {
+            _actionPeriodicModifiers.Add(action);
+        }
+
         private bool PassesTagRequirements()
         {
             if (BlockedStateTags.Contains(Context.Owner.State))
@@ -75,14 +99,14 @@ namespace Domivium.Client.Core.Battle
                 return false;
             }
 
-            foreach (var tag in BlockedBattleTags)
+            foreach (var tag in BlockedEffectTags)
             {
-                if (Context.Owner.ContainsTag(tag)) return false;
+                if (Context.Owner.ContainsEffectTag(tag)) return false;
             }
 
-            foreach (var tag in RequiredBattleTags)
+            foreach (var tag in RequiredEffectTags)
             {
-                if (!Context.Owner.ContainsTag(tag)) return false;
+                if (!Context.Owner.ContainsEffectTag(tag)) return false;
             }
 
             return true;

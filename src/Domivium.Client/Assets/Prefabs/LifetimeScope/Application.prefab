@@ -54,3 +54,4 @@ MonoBehaviour:
   _stageActorContainer: {fileID: 11400000, guid: a39183a11068bca469e0a18824133f5a, type: 2}
   _stageFieldContainer: {fileID: 11400000, guid: 0f0e72bf89f969c43902648a4ed62923, type: 2}
   _audioContainer: {fileID: 11400000, guid: ef297fc4395cc0346aaadfb19043bed0, type: 2}
+  _spriteContainer: {fileID: 11400000, guid: b724058cf4971a34fa9ec23430108ba4, type: 2}

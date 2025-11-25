@@ -27,5 +27,7 @@ namespace Domivium.Client.Core.Factory
             Vector2 spawnPosition,
             Vector2 direction,
             IReadOnlyList<BattleAbility> abilities);
+
+        public ActorParam CreateProp(int id, Vector2 spawnPosition);
     }
 }

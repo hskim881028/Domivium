@@ -20,6 +20,7 @@ using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Provider;
 using Domivium.Client.Core.Scene;
+using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Data.Cache;
@@ -42,6 +43,7 @@ namespace Domivium.Client.Contents.DI.Scene
         [SerializeField] private StageActorContainer _stageActorContainer;
         [SerializeField] private StageFieldContainer _stageFieldContainer;
         [SerializeField] private AudioContainer _audioContainer;
+        [SerializeField] private SpriteContainer _spriteContainer;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -54,6 +56,7 @@ namespace Domivium.Client.Contents.DI.Scene
             Network(builder, Lifetime.Singleton);
             Input(builder, Lifetime.Singleton);
             Scene(builder, Lifetime.Singleton);
+            Context(builder, Lifetime.Singleton);
 
             Services(builder, Lifetime.Singleton);
             System(builder, Lifetime.Singleton);
@@ -79,7 +82,6 @@ namespace Domivium.Client.Contents.DI.Scene
         {
             var options = builder.RegisterMessagePipe();
             builder.RegisterMessageBroker<SceneMessage>(options);
-            builder.RegisterMessageBroker<SceneUIReadyMessage>(options);
             builder.RegisterMessageBroker<SpawnActorMessage>(options);
             builder.RegisterMessageBroker<BattleCueMessage>(options);
             builder.RegisterMessageBroker<ActorStateMessage>(options);
@@ -89,6 +91,8 @@ namespace Domivium.Client.Contents.DI.Scene
         {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
             builder.Register<ISecureStore, WindowsDpapiSecureStore>(lifetime);
+#elif UNITY_ANDROID
+            builder.Register<ISecureStore, AndroidSecureStore>(lifetime);
 #endif
         }
 
@@ -122,6 +126,11 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<ISceneScopeManager, SceneScopeManager>(lifetime);
         }
 
+        private static void Context(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<IAppContext, AppContext>(lifetime);
+        }
+
         private void Services(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<MasterDbService>(lifetime).WithParameter(_configContainer.MasterDB);
@@ -137,6 +146,9 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<CharacterSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<StageFieldSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<CameraSystem>(lifetime).AsImplementedInterfaces();
+            builder.Register<LootSystem>(lifetime).AsImplementedInterfaces();
+            builder.Register<ItemSystem>(lifetime).AsImplementedInterfaces();
+            builder.Register<SpriteSystem>(lifetime).AsImplementedInterfaces().WithParameter(_spriteContainer.Items());
         }
 
         private void Provider(IContainerBuilder builder, Lifetime lifetime)
