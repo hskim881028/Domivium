@@ -12,7 +12,6 @@ using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI.Navigation;
-using Domivium.Client.Data.Item;
 using MessagePipe;
 using R3;
 using UnityEngine;
@@ -29,9 +28,6 @@ namespace Domivium.Client.Contents.Systems
         private readonly IBattleAbilityFactory _abilityFactory;
         private readonly IActorParamFactory _actorParamFactory;
         private readonly IStageFieldSystemCommand _stageFieldSystemCommand;
-        private readonly IItemSystemCommand _itemSystemCommand;
-        private readonly ICharacterSystemCommand _characterSystemCommand;
-        private readonly ICameraSystemCommand _cameraSystemCommand;
         private readonly ILootSystemCommand _lootSystemCommand;
 
         public LobbySystem(
@@ -43,12 +39,8 @@ namespace Domivium.Client.Contents.Systems
             IBattleAbilityFactory abilityFactory,
             IActorParamFactory actorParamFactory,
             IStageFieldSystemCommand stageFieldSystemCommand,
-            IItemSystemCommand itemSystemCommand,
-            ICharacterSystemCommand characterSystemCommand,
-            ICameraSystemCommand cameraSystemCommand,
             ILootSystemCommand lootSystemCommand,
-            ISubscriber<SceneMessage> sceneSubscriber,
-            ISubscriber<ActorStateMessage> actorStateSubscriber)
+            ISubscriber<SceneMessage> sceneSubscriber)
         {
             _context = context;
             _audioPlayer = audioPlayer;
@@ -59,11 +51,7 @@ namespace Domivium.Client.Contents.Systems
             _abilityFactory = abilityFactory;
             _actorParamFactory = actorParamFactory;
             _stageFieldSystemCommand = stageFieldSystemCommand;
-            _itemSystemCommand = itemSystemCommand;
-            _characterSystemCommand = characterSystemCommand;
-            _cameraSystemCommand = cameraSystemCommand;
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
-            actorStateSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
         }
 
         public async UniTaskVoid RunAsync()
@@ -79,24 +67,9 @@ namespace Domivium.Client.Contents.Systems
 
             var abilities = _abilityFactory.GetAbilities(ActorId.Character);
             var actorParam = _actorParamFactory.CreateLobbyCharacter(1, new Vector2(3, 3), abilities);
-            var character = await _actorSpawner.SpawnAsync(ActorId.Character, actorParam);
-            if (character is not CharacterPresenter characterPresenter)
-            {
-                throw new InvalidOperationException();
-            }
+            await _actorSpawner.SpawnAsync(ActorId.Character, actorParam);
 
-            _characterSystemCommand.Initialize(characterPresenter.BattleSystem);
-            _cameraSystemCommand.Initialize(characterPresenter.Transform);
-            _lootSystemCommand.Initialize(characterPresenter.Transform, new Dictionary<ushort, Vector2>());
-
-            _itemSystemCommand.SetLootCapacity(8);
-            _itemSystemCommand.SetInventoryCapacity(16);
-            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 1, 1));
-            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 2, 1));
-            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 5));
-            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 2, 77));
-            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 4));
-
+            _lootSystemCommand.Initialize(new Dictionary<ushort, Vector2>());
             _uiNavigation.ApplyUILayer(UILayers.Lobby).Forget();
             _context.SetMode(StageMode.Run);
         }
@@ -106,7 +79,7 @@ namespace Domivium.Client.Contents.Systems
             if (_context.Mode.CurrentValue != StageMode.Run) return;
 
             _actorManager.Tick(deltaTime);
-            _lootSystemCommand.Tick();
+            _lootSystemCommand.Tick(deltaTime);
         }
 
         private void OnSceneMessage(SceneMessage message)
@@ -120,14 +93,6 @@ namespace Domivium.Client.Contents.Systems
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private void OnActorStateMessage(ActorStateMessage message)
-        {
-            // if (message.Tag == StateTags.Despawn && message.ActorId == ActorId.Character)
-            // {
-            // _context.SetMode(StageMode.Terminated);
-            // }
         }
     }
 }

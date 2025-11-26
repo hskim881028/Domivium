@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Battle;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Systems;
@@ -17,7 +18,7 @@ namespace Domivium.Client.Contents.UI.Static
 {
     public class StageStaticUIPresenter : StaticUIPresenter<StageStaticUIView, IStageStaticUIMessage>, IStageStaticUIMessage
     {
-        private readonly ICharacterSystem _characterSystem;
+        private IBattleSystem _character;
 
         protected override HashSet<UILayer> Layer => UILayer.Set(UILayers.Stage);
 
@@ -27,11 +28,11 @@ namespace Domivium.Client.Contents.UI.Static
             StageStaticUIView view,
             IUINavigation navigation,
             IAudioPlayer audioPlayer,
-            ICharacterSystem characterSystem,
+            IActorManager actorManager,
             ILootSystem lootSystem)
             : base(view, navigation, audioPlayer)
         {
-            _characterSystem = characterSystem;
+            actorManager.Character.Subscribe(OnChangeCharacter).AddTo(ref DisposableBag);
             lootSystem.OnFind.Subscribe(OnFindProp).AddTo(ref DisposableBag);
         }
 
@@ -39,15 +40,6 @@ namespace Domivium.Client.Contents.UI.Static
         {
             if (!await base.InitializeAsync(token)) return false;
 
-            _characterSystem.Character.OnAppliedEffect.Subscribe(OnAppliedEffect).AddTo(ref DisposableBag);
-            _characterSystem.Character.OnActivateAbility.Subscribe(OnActivateAbility).AddTo(ref DisposableBag);
-            _characterSystem.Character.LookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
-
-            _characterSystem.Character.Gauge.AddListener(StatId.Health, OnHealthChanged);
-            _characterSystem.Character.Gauge.AddListener(StatId.Hunger, OnHungerChanged);
-            _characterSystem.Character.Gauge.AddListener(StatId.Stamina, OnStaminaChanged);
-            _characterSystem.Character.Gauge.AddListener(StatId.Sanity, OnSanityChanged);
-            _characterSystem.Character.Gauge.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityChanged);
             View.SetAvoidButton(Constant.AvoidCooldown);
             View.SetInteractButton(false);
             return true;
@@ -63,7 +55,7 @@ namespace Domivium.Client.Contents.UI.Static
         {
             if (ability.Id == BattleAbilityIds.Reload)
             {
-                var reloadSpeed = _characterSystem.Character.Stat.RateValue(StatId.ReloadSpeed);
+                var reloadSpeed = _character.Stat.RateValue(StatId.ReloadSpeed);
                 View.Reload(reloadSpeed);
             }
             else if (ability.Id == BattleAbilityIds.CancelReload)
@@ -86,8 +78,8 @@ namespace Domivium.Client.Contents.UI.Static
 
         private void SetStatGauge(StatId statId)
         {
-            var cur = _characterSystem.Character.Gauge.Current(statId);
-            var max = _characterSystem.Character.Gauge.Max(statId);
+            var cur = _character.Gauge.Current(statId);
+            var max = _character.Gauge.Max(statId);
             View.SetStatGauge(statId, cur, max);
         }
 
@@ -113,14 +105,31 @@ namespace Domivium.Client.Contents.UI.Static
 
         private void OnProjectileCapacityChanged()
         {
-            var cur = _characterSystem.Character.Gauge.Current(StatId.ProjectileCapacity);
-            var max = _characterSystem.Character.Gauge.Max(StatId.ProjectileCapacity);
+            var cur = _character.Gauge.Current(StatId.ProjectileCapacity);
+            var max = _character.Gauge.Max(StatId.ProjectileCapacity);
             View.SetProjectileCapacity(cur, max);
         }
 
         private void OnFindProp(ushort lootId)
         {
             View.SetInteractButton(lootId > 0);
+        }
+
+        private void OnChangeCharacter(IUnitPresenter character)
+        {
+            if (character == null) return;
+
+            _character = character.BattleSystem;
+
+            _character.OnAppliedEffect.Subscribe(OnAppliedEffect).AddTo(ref DisposableBag);
+            _character.OnActivateAbility.Subscribe(OnActivateAbility).AddTo(ref DisposableBag);
+            _character.LookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
+
+            _character.Gauge.AddListener(StatId.Health, OnHealthChanged);
+            _character.Gauge.AddListener(StatId.Hunger, OnHungerChanged);
+            _character.Gauge.AddListener(StatId.Stamina, OnStaminaChanged);
+            _character.Gauge.AddListener(StatId.Sanity, OnSanityChanged);
+            _character.Gauge.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityChanged);
         }
     }
 }

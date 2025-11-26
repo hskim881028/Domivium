@@ -3,9 +3,8 @@ using UnityEngine;
 
 namespace Domivium.Client.Core.Systems
 {
-    public interface ILootSystemCommand
+    public interface ILootSystemCommand : ITicker
     {
-        public void Initialize(Transform character, IReadOnlyDictionary<ushort, Vector2> stageProps);
-        public void Tick();
+        public void Initialize(IReadOnlyDictionary<ushort, Vector2> stageProps);
     }
 }

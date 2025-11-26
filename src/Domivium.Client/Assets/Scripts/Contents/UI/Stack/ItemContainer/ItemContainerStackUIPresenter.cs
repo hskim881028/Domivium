@@ -4,7 +4,9 @@ using System.Collections.Specialized;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.UI.Contract;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Navigation;
@@ -22,29 +24,29 @@ namespace Domivium.Client.Contents.UI.Stack
     {
         private readonly IItemSystem _itemSystem;
         private readonly ISpriteSystem _spriteSystem;
-        private readonly ICharacterSystem _characterSystem;
         private readonly ICharacterSystemCommand _characterSystemCommand;
         private readonly IItemSystemCommand _itemSystemCommand;
 
         private ItemSlotData _selectedSlot = ItemSlotData.Default;
         private ItemSlotType _openType = ItemSlotType.None;
+        private IBattleSystem _character;
 
         public ItemContainerStackUIPresenter(
             ItemContainerStackUIView view,
             IUINavigation navigation,
             IAudioPlayer audioController,
+            IActorManager actorManager,
             ICameraSystem cameraSystem,
             ISpriteSystem spriteSystem,
-            ICharacterSystem characterSystem,
             IItemSystem itemSystem,
             ICharacterSystemCommand characterSystemCommand,
             IItemSystemCommand itemSystemCommand)
             : base(view, navigation, audioController)
         {
+            actorManager.Character.Subscribe(OnChangeCharacter).AddTo(ref DisposableBag);
             view.SetUICamera(cameraSystem.UICamera);
 
             _spriteSystem = spriteSystem;
-            _characterSystem = characterSystem;
             _itemSystem = itemSystem;
             _itemSystem.FilledInventoryCapacity.Subscribe(View.SetFilledInventoryCapacity).AddTo(ref DisposableBag);
             _itemSystem.InventoryCapacity.Subscribe(View.SetInventoryCapacity).AddTo(ref DisposableBag);
@@ -66,44 +68,6 @@ namespace Domivium.Client.Contents.UI.Stack
             base.OnDispose();
         }
 
-        public override async UniTask<bool> InitializeAsync(CancellationToken token)
-        {
-            if (!await base.InitializeAsync(token)) return false;
-
-            View.SetInventoryCapacity(_itemSystem.InventoryCapacity.CurrentValue);
-            View.SetLootCapacity(_itemSystem.LootCapacity.CurrentValue);
-            foreach (var (index, item) in _itemSystem.Inventory)
-            {
-                SetItem(ItemSlotType.Inventory, index, item);
-            }
-
-            _characterSystem.Character.Stat.AddListener(StatId.Health, OnHealthStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.Hunger, OnHungerStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.Stamina, OnStaminaStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.Sanity, OnSanityStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.Durability, OnDurabilityStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.InventoryCapacity, OnInventoryCapacityStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.Attack, OnAttackStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.Defense, OnDefenseStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.AttackRange, OnAttackRangeStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.MoveSpeed, OnMoveSpeedStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.AttackSpeed, OnAttackSpeedStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.ReloadSpeed, OnReloadSpeedStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.ProjectileSpeed, OnProjectileSpeedStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.CriticalRate, OnCriticalRateStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.CriticalDamage, OnCriticalDamageStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.CriticalDamage, OnCriticalDamageStatChanged);
-            _characterSystem.Character.Stat.AddListener(StatId.Weight, OnWeightStatChanged);
-
-            _characterSystem.Character.Gauge.AddListener(StatId.Health, OnHealthGaugeChanged);
-            _characterSystem.Character.Gauge.AddListener(StatId.Hunger, OnHungerGaugeChanged);
-            _characterSystem.Character.Gauge.AddListener(StatId.Stamina, OnStaminaGaugeChanged);
-            _characterSystem.Character.Gauge.AddListener(StatId.Sanity, OnSanityGaugeChanged);
-            _characterSystem.Character.Gauge.AddListener(StatId.Weight, OnWeightGaugeChanged);
-            return true;
-        }
-
         public override async UniTask ShowAsync(CancellationToken token, UIParam param, bool immediately = false)
         {
             await base.ShowAsync(token, param, immediately);
@@ -115,6 +79,19 @@ namespace Domivium.Client.Contents.UI.Stack
                 _ => _openType
             };
 
+
+            foreach (var (index, item) in _itemSystem.Equipment)
+            {
+                SetItem(ItemSlotType.Equipment, index, item);
+            }
+
+            foreach (var (index, item) in _itemSystem.Inventory)
+            {
+                SetItem(ItemSlotType.Inventory, index, item);
+            }
+
+            View.SetInventoryCapacity(_itemSystem.InventoryCapacity.CurrentValue);
+            View.SetLootCapacity(_itemSystem.LootCapacity.CurrentValue);
             View.SetMoney(0); //temp
             View.SetGem(0); //temp
             View.SetLevel(1); //temp
@@ -322,6 +299,93 @@ namespace Domivium.Client.Contents.UI.Stack
             }
         }
 
+        private void SetGauge(StatId statId)
+        {
+            var current = _character.Gauge.Current(statId);
+            var limit = _character.Stat.Value(statId);
+            View.SetGauge(statId, current, limit);
+        }
+
+        private void SetStat(StatId statId)
+        {
+            if (StatSet.GetDomain(statId) == StatDomain.Value)
+            {
+                View.SetStat(statId, _character.Stat.Value(statId));
+            }
+            else
+            {
+                View.SetStat(statId, _character.Stat.RateValue(statId));
+            }
+        }
+
+        private void SetWeight()
+        {
+            var current = _character.Gauge.Current(StatId.Weight);
+            var limit = _character.Stat.Value(StatId.Weight);
+            View.SetWeight(current, limit);
+        }
+
+        private void OnHealthStatChanged() => SetGauge(StatId.Health);
+
+        private void OnHungerStatChanged() => SetGauge(StatId.Hunger);
+
+        private void OnStaminaStatChanged() => SetGauge(StatId.Stamina);
+
+        private void OnSanityStatChanged() => SetGauge(StatId.Hunger);
+        private void OnDurabilityStatChanged() { }
+        private void OnInventoryCapacityStatChanged() { }
+        private void OnProjectileCapacityStatChanged() => SetStat(StatId.ProjectileCapacity);
+        private void OnAttackStatChanged() => SetStat(StatId.Attack);
+        private void OnDefenseStatChanged() => SetStat(StatId.Defense);
+        private void OnAttackRangeStatChanged() => SetStat(StatId.AttackRange);
+        private void OnMoveSpeedStatChanged() => SetStat(StatId.MoveSpeed);
+        private void OnAttackSpeedStatChanged() => SetStat(StatId.AttackSpeed);
+        private void OnReloadSpeedStatChanged() => SetStat(StatId.ReloadSpeed);
+        private void OnProjectileSpeedStatChanged() => SetStat(StatId.ProjectileSpeed);
+        private void OnCriticalRateStatChanged() => SetStat(StatId.CriticalRate);
+        private void OnCriticalDamageStatChanged() => SetStat(StatId.CriticalDamage);
+        private void OnWeightStatChanged() => SetWeight();
+
+        private void OnHealthGaugeChanged() => SetGauge(StatId.Health);
+
+        private void OnHungerGaugeChanged() => SetGauge(StatId.Hunger);
+
+        private void OnStaminaGaugeChanged() => SetGauge(StatId.Stamina);
+
+        private void OnSanityGaugeChanged() => SetGauge(StatId.Sanity);
+
+        private void OnWeightGaugeChanged() => SetWeight();
+
+        private void OnChangeCharacter(IUnitPresenter character)
+        {
+            if (character == null) return;
+
+            _character = character.BattleSystem;
+            _character.Stat.AddListener(StatId.Health, OnHealthStatChanged);
+            _character.Stat.AddListener(StatId.Hunger, OnHungerStatChanged);
+            _character.Stat.AddListener(StatId.Stamina, OnStaminaStatChanged);
+            _character.Stat.AddListener(StatId.Sanity, OnSanityStatChanged);
+            _character.Stat.AddListener(StatId.Durability, OnDurabilityStatChanged);
+            _character.Stat.AddListener(StatId.InventoryCapacity, OnInventoryCapacityStatChanged);
+            _character.Stat.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityStatChanged);
+            _character.Stat.AddListener(StatId.Attack, OnAttackStatChanged);
+            _character.Stat.AddListener(StatId.Defense, OnDefenseStatChanged);
+            _character.Stat.AddListener(StatId.AttackRange, OnAttackRangeStatChanged);
+            _character.Stat.AddListener(StatId.MoveSpeed, OnMoveSpeedStatChanged);
+            _character.Stat.AddListener(StatId.AttackSpeed, OnAttackSpeedStatChanged);
+            _character.Stat.AddListener(StatId.ReloadSpeed, OnReloadSpeedStatChanged);
+            _character.Stat.AddListener(StatId.ProjectileSpeed, OnProjectileSpeedStatChanged);
+            _character.Stat.AddListener(StatId.CriticalRate, OnCriticalRateStatChanged);
+            _character.Stat.AddListener(StatId.CriticalDamage, OnCriticalDamageStatChanged);
+            _character.Stat.AddListener(StatId.CriticalDamage, OnCriticalDamageStatChanged);
+            _character.Stat.AddListener(StatId.Weight, OnWeightStatChanged);
+            _character.Gauge.AddListener(StatId.Health, OnHealthGaugeChanged);
+            _character.Gauge.AddListener(StatId.Hunger, OnHungerGaugeChanged);
+            _character.Gauge.AddListener(StatId.Stamina, OnStaminaGaugeChanged);
+            _character.Gauge.AddListener(StatId.Sanity, OnSanityGaugeChanged);
+            _character.Gauge.AddListener(StatId.Weight, OnWeightGaugeChanged);
+        }
+
         private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemData>> e)
         {
             switch (e.Action)
@@ -336,6 +400,7 @@ namespace Domivium.Client.Contents.UI.Stack
                     SetItem(ItemSlotType.Equipment, e.NewItem.Key, e.NewItem.Value);
                     break;
                 case NotifyCollectionChangedAction.Reset:
+                    break;
                 case NotifyCollectionChangedAction.Move:
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -376,67 +441,11 @@ namespace Domivium.Client.Contents.UI.Stack
                     SetItem(ItemSlotType.Loot, e.NewItem.Key, e.NewItem.Value);
                     break;
                 case NotifyCollectionChangedAction.Reset:
+                    break;
                 case NotifyCollectionChangedAction.Move:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private void OnHealthStatChanged() => SetGauge(StatId.Health);
-
-        private void OnHungerStatChanged() => SetGauge(StatId.Hunger);
-
-        private void OnStaminaStatChanged() => SetGauge(StatId.Stamina);
-
-        private void OnSanityStatChanged() => SetGauge(StatId.Hunger);
-        private void OnDurabilityStatChanged() { }
-        private void OnInventoryCapacityStatChanged() { }
-        private void OnProjectileCapacityStatChanged() => SetStat(StatId.ProjectileCapacity);
-        private void OnAttackStatChanged() => SetStat(StatId.Attack);
-        private void OnDefenseStatChanged() => SetStat(StatId.Defense);
-        private void OnAttackRangeStatChanged() => SetStat(StatId.AttackRange);
-        private void OnMoveSpeedStatChanged() => SetStat(StatId.MoveSpeed);
-        private void OnAttackSpeedStatChanged() => SetStat(StatId.AttackSpeed);
-        private void OnReloadSpeedStatChanged() => SetStat(StatId.ReloadSpeed);
-        private void OnProjectileSpeedStatChanged() => SetStat(StatId.ProjectileSpeed);
-        private void OnCriticalRateStatChanged() => SetStat(StatId.CriticalRate);
-        private void OnCriticalDamageStatChanged() => SetStat(StatId.CriticalDamage);
-        private void OnWeightStatChanged() => SetWight();
-
-        private void OnHealthGaugeChanged() => SetGauge(StatId.Health);
-
-        private void OnHungerGaugeChanged() => SetGauge(StatId.Hunger);
-
-        private void OnStaminaGaugeChanged() => SetGauge(StatId.Stamina);
-
-        private void OnSanityGaugeChanged() => SetGauge(StatId.Sanity);
-
-        private void OnWeightGaugeChanged() => SetWight();
-
-        private void SetGauge(StatId statId)
-        {
-            var current = _characterSystem.Character.Gauge.Current(statId);
-            var limit = _characterSystem.Character.Stat.Value(statId);
-            View.SetGauge(statId, current, limit);
-        }
-
-        private void SetStat(StatId statId)
-        {
-            if (StatSet.GetDomain(statId) == StatDomain.Value)
-            {
-                View.SetStat(statId, _characterSystem.Character.Stat.Value(statId));
-            }
-            else
-            {
-                View.SetStat(statId, _characterSystem.Character.Stat.RateValue(statId));
-            }
-        }
-
-        private void SetWight()
-        {
-            var current = _characterSystem.Character.Gauge.Current(StatId.Weight);
-            var limit = _characterSystem.Character.Stat.Value(StatId.Weight);
-            View.SetWeight(current, limit);
         }
     }
 }

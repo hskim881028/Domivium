@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
+using Domivium.Client.Contents.State;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
@@ -82,6 +83,8 @@ namespace Domivium.Client.Contents.Actors
             {
                 BattleSystem.GrantAbility(ability);
             }
+
+            StateSystem.Transit(StateTags.Idle);
         }
 
         #region Stat

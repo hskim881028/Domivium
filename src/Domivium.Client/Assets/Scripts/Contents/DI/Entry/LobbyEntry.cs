@@ -20,7 +20,6 @@ namespace Domivium.Client.Contents.DI.Entry
         protected override void OnStart()
         {
             _lobbySystemCommand.RunAsync().Forget();
-            // UINavigation.ApplyUILayer(UILayers.Lobby).Forget();
         }
 
         public void Tick()

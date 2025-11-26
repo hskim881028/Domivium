@@ -1,7 +1,5 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.DI;
-using Domivium.Client.Contents.UI;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Input;
@@ -11,32 +9,29 @@ using Domivium.Client.Core.UI.Navigation;
 
 namespace Domivium.Client.Contents.Input.Consumer
 {
-    public sealed class StackUIInputConsumer : Disposable, IInputConsumer
+    public sealed class StackUIInputConsumer : InputConsumer
     {
-        private readonly IAppContext _appContext;
         private readonly InputEventSystem _inputEventSystem;
-        private readonly IUINavigation _uiNavigation;
 
-        public InputPriority Priority => InputPriorities.StackUI;
+        public override InputPriority Priority => InputPriorities.StackUI;
 
         public StackUIInputConsumer(
             IAppContext appContext,
-            InputEventSystem inputEventSystem,
-            IUINavigation uiNavigation)
+            IUINavigation uiNavigation,
+            InputEventSystem inputEventSystem)
+            : base(appContext, uiNavigation)
         {
-            _appContext = appContext;
             _inputEventSystem = inputEventSystem;
-            _uiNavigation = uiNavigation;
         }
 
-        public bool TryHandle(InputMessage message)
+        public override bool TryHandle(InputMessage message)
         {
             switch (message.Type)
             {
                 case InputMessageType.Submit:
-                    return _uiNavigation.HasOpenStackUI;
+                    return UINavigation.HasOpenStackUI;
                 case InputMessageType.Cancel:
-                    if (_uiNavigation.IsRunning || !_uiNavigation.HasOpenStackUI) return false;
+                    if (UINavigation.IsRunning || !UINavigation.HasOpenStackUI) return false;
 
                     HideStackUIAsync().Forget();
                     return true;
@@ -60,25 +55,11 @@ namespace Domivium.Client.Contents.Input.Consumer
 
         private async UniTaskVoid HideStackUIAsync()
         {
-            await _uiNavigation.HideStackUIAsync(UIResult.Close);
+            await UINavigation.HideStackUIAsync(UIResult.Close);
 
-            if (!_uiNavigation.HasOpenStackUI)
+            if (!UINavigation.HasOpenStackUI)
             {
-                var layer = UILayers.HideAll;
-                if (_appContext.Scene.CurrentValue == SceneScopeIds.Title)
-                {
-                    layer = UILayers.Title;
-                }
-                else if (_appContext.Scene.CurrentValue == SceneScopeIds.Lobby)
-                {
-                    layer = UILayers.Lobby;
-                }
-                else if (_appContext.Scene.CurrentValue == SceneScopeIds.Stage)
-                {
-                    layer = UILayers.Stage;
-                }
-
-                await _uiNavigation.ApplyUILayer(layer);
+                await ApplyUILayer();
             }
         }
     }

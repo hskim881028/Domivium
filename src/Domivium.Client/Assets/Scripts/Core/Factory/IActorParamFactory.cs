@@ -13,7 +13,7 @@ namespace Domivium.Client.Core.Factory
             int id,
             Vector2 spawnPosition,
             IReadOnlyList<BattleAbility> abilities);
-        
+
         public ActorParam CreateCharacter(
             int id,
             Vector2 spawnPosition,

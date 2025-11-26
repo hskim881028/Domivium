@@ -49,6 +49,13 @@ namespace Domivium.Client.Contents.Actors
         {
             await base.SpawnAsync(token, param);
             Actor.SetSight(param is not LobbyCharacterParams);
+            foreach (var (_, item) in _itemSystem.Equipment)
+            {
+                ApplyStat(item);
+            }
+            OnLoadedProjectile(_itemSystem.LoadedProjectile.CurrentValue);
+            OnTotalProjectile(_itemSystem.TotalProjectile.CurrentValue);
+            TotalWeight(_itemSystem.TotalWeight.CurrentValue);
         }
 
         protected override void OnDispose()

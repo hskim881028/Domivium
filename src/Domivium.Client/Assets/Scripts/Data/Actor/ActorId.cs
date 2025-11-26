@@ -10,7 +10,7 @@ namespace Domivium.Client.Core.Actors
         public static ActorId Monster = new(2);
         public static ActorId Projectile = new(3);
         public static ActorId Prop = new(4);
-        
+
         public static ActorId LobbyField = new(10);
         public static ActorId StageField = new(11);
 

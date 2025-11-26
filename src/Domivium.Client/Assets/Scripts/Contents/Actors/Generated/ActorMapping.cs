@@ -19,7 +19,7 @@ namespace Domivium.Client.Contents.Actors.Generated
 
             // VFX
             { ActorId.DamageText, (typeof(DamageTextPresenter), typeof(DamageText)) },
-            { ActorId.HealText, (typeof(HealTextPresenter), typeof(HealText)) },
+            { ActorId.HealText, (typeof(HealTextPresenter), typeof(HealText)) }
         };
     }
 }

@@ -1,21 +1,28 @@
 ﻿using System;
+using Domivium.Client.Core;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Systems;
+using Domivium.Client.Core.UI.Navigation;
 
 namespace Domivium.Client.Contents.Input.Consumer
 {
-    public class ApplicationInputConsumer : IInputConsumer
+    public class ApplicationInputConsumer : InputConsumer
     {
         private readonly IPointerSystemCommand _pointerSystemCommand;
-        public InputPriority Priority => InputPriorities.Application;
 
-        public ApplicationInputConsumer(IPointerSystemCommand pointerSystemCommand)
+        public override InputPriority Priority => InputPriorities.Application;
+
+        public ApplicationInputConsumer(
+            IAppContext appContext,
+            IUINavigation uiNavigation,
+            IPointerSystemCommand pointerSystemCommand)
+            : base(appContext, uiNavigation)
         {
             _pointerSystemCommand = pointerSystemCommand;
         }
 
-        public bool TryHandle(InputMessage message)
+        public override bool TryHandle(InputMessage message)
         {
             switch (message.Type)
             {

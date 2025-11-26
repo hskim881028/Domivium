@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Systems;
@@ -59,9 +60,21 @@ namespace Domivium.Client.Contents.Systems
 
         protected override void OnDispose()
         {
+            _loot.Clear();
+            _equipment.Clear();
+            _inventory.Clear();
+            _filledInventoryCapacity.Value = 0;
+            _inventoryCapacity.Value = 0;
+            _filledLootCapacity.Value = 0;
+            _lootCapacity.Value = 0;
+            _loadedProjectile.Value = 0;
+            _totalProjectile.Value = 0;
+            _totalWeight.Value = 0;
+
             _equipment.CollectionChanged -= OnChangedEquipment;
             _inventory.CollectionChanged -= OnChangedInventory;
             _loot.CollectionChanged -= OnChangedLoot;
+
             base.OnDispose();
         }
 
@@ -131,6 +144,19 @@ namespace Domivium.Client.Contents.Systems
                 default:
                     throw new ArgumentOutOfRangeException(nameof(slotType), slotType, null);
             }
+        }
+
+        public UniTask RunAsync()
+        {
+            SetLootCapacity(8);
+            SetInventoryCapacity(16);
+            Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 1, 1));
+            Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 2, 1));
+            Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 5));
+            Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 2, 77));
+            Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 4));
+
+            return UniTask.CompletedTask;
         }
 
         public void Equip(ItemSlotData fromSlot, ItemSlotData toSlot)
@@ -494,16 +520,9 @@ namespace Domivium.Client.Contents.Systems
             {
                 case SceneMessageType.Unload:
                 case SceneMessageType.Load:
-                    _equipment.Clear();
-                    _inventory.Clear();
                     _loot.Clear();
-                    _filledInventoryCapacity.Value = 0;
-                    _inventoryCapacity.Value = 0;
-                    _filledLootCapacity.Value = 0;
-                    _lootCapacity.Value = 0;
+                    _totalProjectile.Value += _loadedProjectile.Value;
                     _loadedProjectile.Value = 0;
-                    _totalProjectile.Value = 0;
-                    _totalWeight.Value = 0;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

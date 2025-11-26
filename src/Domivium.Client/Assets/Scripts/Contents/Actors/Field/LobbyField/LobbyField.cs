@@ -2,8 +2,5 @@
 
 namespace Domivium.Client.Contents.Actors
 {
-    public class LobbyField : Field
-    {
-        
-    }
+    public class LobbyField : Field { }
 }
