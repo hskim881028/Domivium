@@ -15,6 +15,7 @@ public class Disposable : IDisposable
     {
         if (_isDisposed) return;
 
+        this.Log();
         _isDisposed = true;
         OnDispose();
         DisposableBag.Dispose();

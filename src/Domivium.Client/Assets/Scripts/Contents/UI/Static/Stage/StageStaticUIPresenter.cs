@@ -18,7 +18,6 @@ namespace Domivium.Client.Contents.UI.Static
     public class StageStaticUIPresenter : StaticUIPresenter<StageStaticUIView, IStageStaticUIMessage>, IStageStaticUIMessage
     {
         private readonly ICharacterSystem _characterSystem;
-        private readonly ICameraSystem _cameraSystem;
 
         protected override HashSet<UILayer> Layer => UILayer.Set(UILayers.Stage);
 
@@ -43,7 +42,6 @@ namespace Domivium.Client.Contents.UI.Static
             _characterSystem.Character.OnAppliedEffect.Subscribe(OnAppliedEffect).AddTo(ref DisposableBag);
             _characterSystem.Character.OnActivateAbility.Subscribe(OnActivateAbility).AddTo(ref DisposableBag);
             _characterSystem.Character.LookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
-            // _characterSystem.Character.Stat.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityChanged); // 무기 장착여부
 
             _characterSystem.Character.Gauge.AddListener(StatId.Health, OnHealthChanged);
             _characterSystem.Character.Gauge.AddListener(StatId.Hunger, OnHungerChanged);
@@ -86,32 +84,31 @@ namespace Domivium.Client.Contents.UI.Static
             View.SetAttackButton(value.sqrMagnitude > Constant.CanAttackRange);
         }
 
+        private void SetStatGauge(StatId statId)
+        {
+            var cur = _characterSystem.Character.Gauge.Current(statId);
+            var max = _characterSystem.Character.Gauge.Max(statId);
+            View.SetStatGauge(statId, cur, max);
+        }
+
         private void OnHealthChanged()
         {
-            var cur = _characterSystem.Character.Gauge.Current(StatId.Health);
-            var max = _characterSystem.Character.Stat.Value(StatId.Health);
-            View.SetHealth(cur, max);
+            SetStatGauge(StatId.Health);
         }
 
         private void OnHungerChanged()
         {
-            var cur = _characterSystem.Character.Gauge.Current(StatId.Hunger);
-            var max = _characterSystem.Character.Stat.Value(StatId.Hunger);
-            View.SetHunger(cur, max);
+            SetStatGauge(StatId.Hunger);
         }
 
         private void OnStaminaChanged()
         {
-            var cur = _characterSystem.Character.Gauge.Current(StatId.Stamina);
-            var max = _characterSystem.Character.Stat.Value(StatId.Stamina);
-            View.SetStamina(cur, max);
+            SetStatGauge(StatId.Stamina);
         }
 
         private void OnSanityChanged()
         {
-            var cur = _characterSystem.Character.Gauge.Current(StatId.Sanity);
-            var max = _characterSystem.Character.Stat.Value(StatId.Sanity);
-            View.SetSanity(cur, max);
+            SetStatGauge(StatId.Sanity);
         }
 
         private void OnProjectileCapacityChanged()

@@ -28,10 +28,6 @@ namespace Domivium.Client.Contents.Actors
 
         public virtual void Die() { }
 
-        public virtual void StartBattle(Vector3 offset, Vector3 target) { }
-
-        public virtual void Battle(Vector3 target) { }
-
         public void SetFlip(bool value)
         {
             foreach (var r in _renderers)

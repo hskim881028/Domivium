@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Audio.Generated;
-using Domivium.Client.Contents.State;
 using Domivium.Client.Contents.UI;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace Domivium.Client.Contents.Systems
 {
-    public sealed class StageSystem : Disposable, IStageSystem, IStageSystemCommand
+    public class LobbySystem : Disposable, ILobbySystem, ILobbySystemCommand
     {
         private readonly IAppContext _context;
         private readonly IAudioPlayer _audioPlayer;
@@ -34,7 +34,7 @@ namespace Domivium.Client.Contents.Systems
         private readonly ICameraSystemCommand _cameraSystemCommand;
         private readonly ILootSystemCommand _lootSystemCommand;
 
-        public StageSystem(
+        public LobbySystem(
             IAppContext context,
             IAudioPlayer audioPlayer,
             IUINavigation uiNavigation,
@@ -66,19 +66,19 @@ namespace Domivium.Client.Contents.Systems
             actorStateSubscriber.Subscribe(OnActorStateMessage).AddTo(ref DisposableBag);
         }
 
-        public async UniTaskVoid RunAsync(int stageId)
+        public async UniTaskVoid RunAsync()
         {
             _audioPlayer.PlayBGM(BGMAudioId.Stage);
-            var stageField = await _actorSpawner.SpawnAsync(ActorId.StageField, new ActorParam());
-            if (stageField is not StageFieldPresenter stageFieldPresenter)
+            var field = await _actorSpawner.SpawnAsync(ActorId.LobbyField, new ActorParam());
+            if (field is not LobbyFieldPresenter lobbyFieldPresenter)
             {
                 throw new InvalidOperationException();
             }
-            _stageFieldSystemCommand.InitializeAsync(stageFieldPresenter.ColliderGrid);
 
+            _stageFieldSystemCommand.InitializeAsync(lobbyFieldPresenter.ColliderGrid);
 
             var abilities = _abilityFactory.GetAbilities(ActorId.Character);
-            var actorParam = _actorParamFactory.CreateCharacter(1, new Vector2(7, 5), abilities);
+            var actorParam = _actorParamFactory.CreateLobbyCharacter(1, new Vector2(3, 3), abilities);
             var character = await _actorSpawner.SpawnAsync(ActorId.Character, actorParam);
             if (character is not CharacterPresenter characterPresenter)
             {
@@ -87,24 +87,17 @@ namespace Domivium.Client.Contents.Systems
 
             _characterSystemCommand.Initialize(characterPresenter.BattleSystem);
             _cameraSystemCommand.Initialize(characterPresenter.Transform);
-            _lootSystemCommand.Initialize(characterPresenter.Transform, stageFieldPresenter.StageProp);
+            _lootSystemCommand.Initialize(characterPresenter.Transform, new Dictionary<ushort, Vector2>());
 
-            // _itemSystemCommand.SetLootCapacity(8);
-            // _itemSystemCommand.SetInventoryCapacity(16);
-            // _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 1, 1));
-            // _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 2, 1));
-            // _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 5));
-            // _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 2, 77));
-            // _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 4));
+            _itemSystemCommand.SetLootCapacity(8);
+            _itemSystemCommand.SetInventoryCapacity(16);
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 1, 1));
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 2, 1));
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 5));
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 2, 77));
+            _itemSystemCommand.Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 4));
 
-            var monsterAbilities = _abilityFactory.GetAbilities(ActorId.Monster);
-            var monsterParam = _actorParamFactory.CreateMonster(1, new Vector2(24, 9), monsterAbilities, characterPresenter.BattleSystem);
-            await _actorSpawner.SpawnAsync(ActorId.Monster, monsterParam);
-
-            var dummy = _actorParamFactory.CreateMonster(2, new Vector2(10, 6), monsterAbilities, characterPresenter.BattleSystem);
-            await _actorSpawner.SpawnAsync(ActorId.Monster, dummy);
-
-            _uiNavigation.ApplyUILayer(UILayers.Stage).Forget();
+            _uiNavigation.ApplyUILayer(UILayers.Lobby).Forget();
             _context.SetMode(StageMode.Run);
         }
 
@@ -131,10 +124,10 @@ namespace Domivium.Client.Contents.Systems
 
         private void OnActorStateMessage(ActorStateMessage message)
         {
-            if (message.Tag == StateTags.Despawn && message.ActorId == ActorId.Character)
-            {
-                _context.SetMode(StageMode.Terminated);
-            }
+            // if (message.Tag == StateTags.Despawn && message.ActorId == ActorId.Character)
+            // {
+            // _context.SetMode(StageMode.Terminated);
+            // }
         }
     }
 }

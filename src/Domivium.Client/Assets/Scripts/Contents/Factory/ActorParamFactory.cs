@@ -7,7 +7,6 @@ using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Data.Context;
-using Domivium.Client.Data.Item;
 using Domivium.Client.Data.Stat;
 using UnityEngine;
 
@@ -22,6 +21,13 @@ namespace Domivium.Client.Contents.Factory
             _masterDbService = masterDbService;
         }
 
+        public ActorParam CreateLobbyCharacter(int id, Vector2 spawnPosition, IReadOnlyList<BattleAbility> abilities)
+        {
+            var characterRow = _masterDbService.DB.CharacterRowTable.FindById(id);
+            var unit = new UnitContext(characterRow);
+            return new LobbyCharacterParams(spawnPosition, unit, abilities);
+        }
+
         public ActorParam CreateCharacter(
             int id,
             Vector2 spawnPosition,
@@ -29,10 +35,7 @@ namespace Domivium.Client.Contents.Factory
         {
             var characterRow = _masterDbService.DB.CharacterRowTable.FindById(id);
             var unit = new UnitContext(characterRow);
-
-            var weaponRow = _masterDbService.DB.WeaponRowTable.FindById(id);
-            var weapon = new ItemContext(weaponRow);
-            return new CharacterParams(spawnPosition, unit, weapon, abilities);
+            return new CharacterParams(spawnPosition, unit, abilities);
         }
 
         public ActorParam CreateMonster(

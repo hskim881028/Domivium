@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.State;
+using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Systems;
@@ -39,6 +43,12 @@ namespace Domivium.Client.Contents.Actors
             characterSystem.OnTurn.Subscribe(OnTurn).AddTo(ref DisposableBag);
             characterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
             characterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
+        }
+
+        public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
+        {
+            await base.SpawnAsync(token, param);
+            Actor.SetSight(param is not LobbyCharacterParams);
         }
 
         protected override void OnDispose()

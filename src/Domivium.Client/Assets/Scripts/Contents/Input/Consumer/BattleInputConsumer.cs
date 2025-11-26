@@ -49,7 +49,15 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.Cancel:
                     if (_uiNavigation.HasOpenStackUI) return false;
 
-                    _sceneService.Load(SceneScopeIds.Lobby);
+                    if (_appContext.Scene.CurrentValue == SceneScopeIds.Lobby)
+                    {
+                        _sceneService.Load(SceneScopeIds.Stage);
+                    }
+                    else if (_appContext.Scene.CurrentValue == SceneScopeIds.Stage)
+                    {
+                        _sceneService.Load(SceneScopeIds.Lobby);
+                    }
+
                     return true;
                 case InputMessageType.ClickEnter:
                 case InputMessageType.ClickExit:

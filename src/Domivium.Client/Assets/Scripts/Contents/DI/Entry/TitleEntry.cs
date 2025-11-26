@@ -38,19 +38,10 @@ namespace Domivium.Client.Contents.DI.Entry
         protected override void OnStart()
         {
             UINavigation.ApplyUILayer(UILayers.Title).Forget();
-            if (AppEnv.LocalMode)
-            {
-                EnterLobby();
-            }
-            else
+            if (!AppEnv.LocalMode)
             {
                 Connect();
             }
-        }
-
-        private void EnterLobby()
-        {
-            _sceneService.Load(SceneScopeIds.Lobby);
         }
 
         private void Connect()
@@ -117,7 +108,7 @@ namespace Domivium.Client.Contents.DI.Entry
             networkService.AddFilter(_authenticationClientFilter);
             _tokenCache.Update(token.AccessToken, token.RefreshToken, token.AccessTokenLifetimeSeconds, token.RefreshTokenLifetimeSeconds);
 
-            EnterLobby();
+            // EnterLobby();
         }
     }
 }

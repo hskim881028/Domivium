@@ -13,6 +13,7 @@ namespace Domivium.Client.Contents.Actors
     {
         [SerializeField] private ParticleSystem _particleSystem;
         [SerializeField] private LineRenderer _lineRenderer;
+        [SerializeField] private GameObject _sight;
 
         private int _layerMask;
 
@@ -31,6 +32,11 @@ namespace Domivium.Client.Contents.Actors
             var p = param.As<CharacterParams>();
             // var color = p.PawnContext.PawnType.ToColor();
             _layerMask = Id == ActorId.Character ? Layer.MonsterOrPropMask : Layer.CharacterOrPropMask;
+        }
+
+        public void SetSight(bool value)
+        {
+            _sight.SetActive(value);
         }
 
         public void SetAim(Vector2 direction, float range)
