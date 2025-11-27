@@ -11,6 +11,7 @@ namespace Domivium.Client.Contents.Input.Composition
         private readonly SystemUIInputConsumer _systemUIInputConsumer;
         private readonly StaticUIInputConsumer _staticUIInputConsumer;
         private readonly StackUIInputConsumer _stackUIInputConsumer;
+        private readonly BattleInputConsumer _battleInputConsumer;
 
         public ApplicationInputComposition(
             InputRouter router,
@@ -18,16 +19,19 @@ namespace Domivium.Client.Contents.Input.Composition
             ApplicationInputConsumer applicationInputConsumer,
             SystemUIInputConsumer systemUIInputConsumer,
             StaticUIInputConsumer staticUIInputConsumer,
-            StackUIInputConsumer stackUIInputConsumer) : base(router, subscriber)
+            StackUIInputConsumer stackUIInputConsumer,
+            BattleInputConsumer battleInputConsumer) : base(router, subscriber)
         {
             _applicationInputConsumer = applicationInputConsumer;
             _systemUIInputConsumer = systemUIInputConsumer;
             _staticUIInputConsumer = staticUIInputConsumer;
             _stackUIInputConsumer = stackUIInputConsumer;
+            _battleInputConsumer = battleInputConsumer;
             Router.Register(_applicationInputConsumer);
             Router.Register(_systemUIInputConsumer);
             Router.Register(_staticUIInputConsumer);
             Router.Register(_stackUIInputConsumer);
+            Router.Register(_battleInputConsumer);
             Subscribe();
         }
 
@@ -37,6 +41,7 @@ namespace Domivium.Client.Contents.Input.Composition
             Router.Unregister(_systemUIInputConsumer);
             Router.Unregister(_staticUIInputConsumer);
             Router.Unregister(_stackUIInputConsumer);
+            Router.Unregister(_battleInputConsumer);
             base.OnDispose();
         }
     }

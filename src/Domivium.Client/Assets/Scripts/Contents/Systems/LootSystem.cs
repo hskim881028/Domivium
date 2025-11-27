@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Systems;
 using R3;
 using UnityEngine;
@@ -8,23 +9,25 @@ namespace Domivium.Client.Contents.Systems
     public sealed class LootSystem : Disposable, ILootSystem, ILootSystemCommand
     {
         private const float DetectRange = 1;
-
-        private readonly ReactiveCommand<ushort> _onFind = new();
         private Transform _character;
         private IReadOnlyDictionary<ushort, Vector2> _stageProps;
         private ushort _lootId;
 
-        // todo: 첫 세팅시키기.
+        private readonly ReactiveCommand<ushort> _onFind = new();
 
         public ReactiveCommand<ushort> OnFind => _onFind;
 
-        public void Initialize(Transform character, IReadOnlyDictionary<ushort, Vector2> stageProps)
+        public LootSystem(IActorManager actorManager)
         {
-            _character = character;
+            actorManager.Character.Subscribe(OnChangeCharacter).AddTo(ref DisposableBag);
+        }
+
+        public void Initialize(IReadOnlyDictionary<ushort, Vector2> stageProps)
+        {
             _stageProps = stageProps;
         }
 
-        public void Tick()
+        public void Tick(float deltaTime)
         {
             var propId = FindNearestProp();
             if (_lootId == propId) return;
@@ -48,6 +51,13 @@ namespace Domivium.Client.Contents.Systems
             }
 
             return lootId;
+        }
+
+        private void OnChangeCharacter(IUnitPresenter character)
+        {
+            if (character == null) return;
+
+            _character = character.Transform;
         }
     }
 }

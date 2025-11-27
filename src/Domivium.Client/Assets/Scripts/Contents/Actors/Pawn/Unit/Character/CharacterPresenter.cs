@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.State;
+using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Systems;
@@ -39,6 +43,21 @@ namespace Domivium.Client.Contents.Actors
             characterSystem.OnTurn.Subscribe(OnTurn).AddTo(ref DisposableBag);
             characterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
             characterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
+        }
+
+        public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
+        {
+            await base.SpawnAsync(token, param);
+            Actor.SetSight(param is not LobbyCharacterParams);
+
+            foreach (var (_, item) in _itemSystem.Equipment)
+            {
+                ApplyStat(item);
+            }
+
+            OnLoadedProjectile(_itemSystem.LoadedProjectile.CurrentValue);
+            OnTotalProjectile(_itemSystem.TotalProjectile.CurrentValue);
+            TotalWeight(_itemSystem.TotalWeight.CurrentValue);
         }
 
         protected override void OnDispose()
@@ -130,7 +149,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.TryActivateAbility(ref context);
         }
 
-        private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemData>> e)
+        private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
         {
             switch (e.Action)
             {
@@ -152,7 +171,7 @@ namespace Domivium.Client.Contents.Actors
             }
         }
 
-        private void ApplyStat(ItemData item, bool unequip = false)
+        private void ApplyStat(ItemEntity item, bool unequip = false)
         {
             var mul = unequip ? -1 : 1;
             switch (item.Type)
@@ -182,7 +201,7 @@ namespace Domivium.Client.Contents.Actors
             }
         }
 
-        private void ApplyWeaponStat(ItemData item, int mul)
+        private void ApplyWeaponStat(ItemEntity item, int mul)
         {
             if (!_masterDbService.DB.WeaponRowTable.TryFindById(item.Id, out var wp)) return;
 
@@ -195,7 +214,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Stat.Apply(StatId.CriticalDamage, wp.CriticalDamage * mul, StatChannel.Add);
         }
 
-        private void ApplyProjectileStat(ItemData item, int mul)
+        private void ApplyProjectileStat(ItemEntity item, int mul)
         {
             if (!_masterDbService.DB.ProjectileRowTable.TryFindById(item.Id, out var proj)) return;
 

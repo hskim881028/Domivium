@@ -9,6 +9,11 @@ namespace Domivium.Client.Core.Factory
 {
     public interface IActorParamFactory
     {
+        public ActorParam CreateLobbyCharacter(
+            int id,
+            Vector2 spawnPosition,
+            IReadOnlyList<BattleAbility> abilities);
+
         public ActorParam CreateCharacter(
             int id,
             Vector2 spawnPosition,

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: StageActorContainer
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.DI.Container.StageActorContainer
   _actor:
-  - {fileID: 7482531951027177798, guid: 3ca152df8282c48409b9e0802031bfb7, type: 3}
   - {fileID: 4155594537892242946, guid: 44caba42cdbefd747b50055f934d8a21, type: 3}
   - {fileID: 2691786579798043752, guid: dec1fdae6ed502048bfa5de61e7b8424, type: 3}
   - {fileID: 2415892617158546230, guid: 9f1f3008bb4ca344e93c0e25eaaf6473, type: 3}
+  - {fileID: 5443619390863851661, guid: b5019fc9c3baf2746b8ea61ad7ffa123, type: 3}
+  - {fileID: 619713572154369773, guid: ea618c5dc3182864a93717b957de0f84, type: 3}
+  - {fileID: 7482531951027177798, guid: 3ca152df8282c48409b9e0802031bfb7, type: 3}
   - {fileID: 54636237574995573, guid: e254bbc571489ae41a2dd00553a7ee70, type: 3}
   - {fileID: 691908857281986180, guid: 4148cb5bf55a27d4787210b49b82106d, type: 3}
-  - {fileID: 5443619390863851661, guid: b5019fc9c3baf2746b8ea61ad7ffa123, type: 3}

@@ -1,22 +1,24 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.DI;
-using Domivium.Client.Contents.Services;
-using Domivium.Client.Core;
+using Domivium.Client.Contents.Battle;
+using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
+using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI;
+using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.Presenter;
-using Domivium.Client.Core.Utility;
-using Domivium.Shared.Request;
-using Domivium.Shared.Services;
+using Domivium.Client.Data.Stat;
+using R3;
+using UnityEngine;
 
 namespace Domivium.Client.Contents.UI.Static
 {
     public class LobbyStaticUIPresenter : StaticUIPresenter<LobbyStaticUIView, ILobbyStaticUIMessage>, ILobbyStaticUIMessage
     {
-        private readonly NetworkService _networkService;
-        private readonly SceneService _sceneService;
+        private IBattleSystem _character;
 
         protected override HashSet<UILayer> Layer => UILayer.Set(UILayers.Lobby);
         public override UIPriority Priority => UIPriorities.Lobby;
@@ -25,33 +27,71 @@ namespace Domivium.Client.Contents.UI.Static
             LobbyStaticUIView view,
             IUINavigation navigation,
             IAudioPlayer audioPlayer,
-            NetworkService networkService,
-            SceneService sceneService) : base(view, navigation, audioPlayer)
+            IActorManager actorManager,
+            ILootSystem lootSystem) : base(view, navigation, audioPlayer)
         {
-            _networkService = networkService;
-            _sceneService = sceneService;
+            actorManager.Character.Subscribe(OnChangeCharacter).AddTo(ref DisposableBag);
+            lootSystem.OnFind.Subscribe(OnFindProp).AddTo(ref DisposableBag);
         }
 
-        public void Next()
+        public override async UniTask<bool> InitializeAsync(CancellationToken token)
         {
-            this.Log($"[AppEnv.LocalMode] : {AppEnv.LocalMode}");
-            if (AppEnv.LocalMode)
+            if (!await base.InitializeAsync(token)) return false;
+
+            View.SetAvoidButton(Constant.AvoidCooldown);
+            View.SetInteractButton(false);
+            return true;
+        }
+
+        public override async UniTask ShowAsync(CancellationToken token, UIParam param, bool immediately = false)
+        {
+            await base.ShowAsync(token, param, immediately);
+            OnProjectileCapacityChanged();
+        }
+
+        private void OnActivateAbility(BattleAbilitySpec ability)
+        {
+            if (ability.Id == BattleAbilityIds.Reload)
             {
-                _sceneService.Load(SceneScopeIds.Stage);
+                var reloadSpeed = _character.Stat.RateValue(StatId.ReloadSpeed);
+                View.Reload(reloadSpeed);
             }
-            else
+            else if (ability.Id == BattleAbilityIds.CancelReload)
             {
-                GetCharacterAsync().Forget();
+                View.CancelReload();
+            }
+
+            else if (ability.Id == BattleAbilityIds.Avoid)
+            {
+                View.SetAvoidButton(ability.Cooldown);
             }
         }
 
-        private async UniTaskVoid GetCharacterAsync()
+        private void OnLookAt(Vector2 value)
         {
-            var characterService = _networkService.CreateService<ICharacterService>();
-            var response = await characterService.Value.GetCharactersAsync(new GetCharactersRequest());
-            if (!_networkService.HandleResponse(response)) return;
+            View.SetAttackButton(value.sqrMagnitude > Constant.CanAttackRange);
+        }
 
-            this.Log($"{response.Message}");
+        private void OnProjectileCapacityChanged()
+        {
+            var cur = _character.Gauge.Current(StatId.ProjectileCapacity);
+            var max = _character.Gauge.Max(StatId.ProjectileCapacity);
+            View.SetProjectileCapacity(cur, max);
+        }
+
+        private void OnFindProp(ushort lootId)
+        {
+            View.SetInteractButton(lootId > 0);
+        }
+
+        private void OnChangeCharacter(IUnitPresenter character)
+        {
+            if (character == null) return;
+
+            _character = character.BattleSystem;
+            _character.OnActivateAbility.Subscribe(OnActivateAbility).AddTo(ref DisposableBag);
+            _character.LookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
+            _character.Gauge.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityChanged);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Domivium.Client.Contents.Battle;
+using Domivium.Client.Core;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Systems;
 using R3;
@@ -11,15 +12,13 @@ namespace Domivium.Client.Contents.Systems
         private readonly ReactiveProperty<Vector2> _direction = new();
         private readonly ReactiveProperty<Vector2> _lookAt = new();
 
-        public IBattleSystem Character { get; private set; }
         public ReactiveCommand<BattleTag> OnBattleTag { get; } = new();
         public ReadOnlyReactiveProperty<Vector2> OnTurn => _direction;
         public ReadOnlyReactiveProperty<Vector2> OnLookAt => _lookAt;
 
-        public void Initialize(IBattleSystem character)
+        public CharacterSystem(IAppContext appContext)
         {
-            Character = character;
-            _lookAt.Value = Vector2.one * 0.1f;
+            appContext.Mode.Subscribe(OnChangeMode).AddTo(ref DisposableBag);
         }
 
         public void Stop()
@@ -63,6 +62,14 @@ namespace Domivium.Client.Contents.Systems
         {
             OnBattleTag.Execute(BattleTags.Avoid);
             return true;
+        }
+
+        private void OnChangeMode(StageMode mode)
+        {
+            if (mode == StageMode.Run)
+            {
+                Stop();
+            }
         }
     }
 }

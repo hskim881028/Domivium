@@ -25,10 +25,14 @@ namespace Domivium.Client.Contents.Actors.Contract
         UnitContext UnitContext,
         IReadOnlyList<BattleAbility> Abilities) : PawnParams(SpawnPosition);
 
+    public record LobbyCharacterParams(
+        Vector2 SpawnPosition,
+        UnitContext UnitContext,
+        IReadOnlyList<BattleAbility> Abilities) : CharacterParams(SpawnPosition, UnitContext, Abilities);
+
     public record CharacterParams(
         Vector2 SpawnPosition,
         UnitContext UnitContext,
-        ItemContext WeaponContext,
         IReadOnlyList<BattleAbility> Abilities) : UnitParams(SpawnPosition, UnitContext, Abilities);
 
     public record MonsterParams(

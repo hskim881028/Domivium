@@ -1,22 +1,28 @@
 ﻿using System;
+using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
+using Domivium.Client.Core.UI.Navigation;
 
 namespace Domivium.Client.Contents.Input.Consumer
 {
-    public sealed class StaticUIInputConsumer : IInputConsumer
+    public sealed class StaticUIInputConsumer : InputConsumer
     {
         private readonly InputEventSystem _inputEventSystem;
 
-        public InputPriority Priority => InputPriorities.StackUI;
+        public override InputPriority Priority => InputPriorities.StackUI;
 
-        public StaticUIInputConsumer(InputEventSystem inputEventSystem)
+        public StaticUIInputConsumer(
+            IAppContext appContext,
+            IUINavigation uiNavigation,
+            InputEventSystem inputEventSystem)
+            : base(appContext, uiNavigation)
         {
             _inputEventSystem = inputEventSystem;
         }
 
-        public bool TryHandle(InputMessage message)
+        public override bool TryHandle(InputMessage message)
         {
             switch (message.Type)
             {

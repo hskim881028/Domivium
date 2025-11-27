@@ -14,7 +14,6 @@ namespace Domivium.Client.Contents.DI.Entry
 
         public StageEntry(
             IUINavigation uiNavigation,
-            IInputComposition inputComposition,
             IBattleEffectPool effectPool,
             IBattleCuePlayer cuePlayer,
             IStageSystemCommand stageSystemCommand) : base(uiNavigation)

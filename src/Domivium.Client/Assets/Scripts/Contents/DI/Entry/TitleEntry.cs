@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI;
 using Domivium.Client.Core;
+using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Data.Cache;
 using Domivium.Client.Network.ClientFilters;
@@ -21,36 +22,40 @@ namespace Domivium.Client.Contents.DI.Entry
         private readonly NetworkService _networkService;
         private readonly AuthenticationTokenCache _tokenCache;
         private readonly AuthenticationClientFilter _authenticationClientFilter;
+        private readonly IItemSystemCommand _itemSystemCommand;
 
         public TitleEntry(
             IUINavigation uiNavigation,
             SceneService sceneService,
             NetworkService networkService,
             AuthenticationTokenCache tokenCache,
-            AuthenticationClientFilter authenticationClientFilter) : base(uiNavigation)
+            AuthenticationClientFilter authenticationClientFilter,
+            IItemSystemCommand itemSystemCommand) : base(uiNavigation)
         {
             _sceneService = sceneService;
             _networkService = networkService;
             _tokenCache = tokenCache;
             _authenticationClientFilter = authenticationClientFilter;
+            _itemSystemCommand = itemSystemCommand;
         }
 
         protected override void OnStart()
         {
-            UINavigation.ApplyUILayer(UILayers.Title).Forget();
-            if (AppEnv.LocalMode)
-            {
-                EnterLobby();
-            }
-            else
+            StartAsync().Forget();
+        }
+
+        private async UniTaskVoid StartAsync()
+        {
+            if (!AppEnv.LocalMode) //todo: 수정 필요
             {
                 Connect();
             }
-        }
+            else
+            {
+                await _itemSystemCommand.RunAsync();
+            }
 
-        private void EnterLobby()
-        {
-            _sceneService.Load(SceneScopeIds.Lobby);
+            await UINavigation.ApplyUILayer(UILayers.Title);
         }
 
         private void Connect()
@@ -117,7 +122,7 @@ namespace Domivium.Client.Contents.DI.Entry
             networkService.AddFilter(_authenticationClientFilter);
             _tokenCache.Update(token.AccessToken, token.RefreshToken, token.AccessTokenLifetimeSeconds, token.RefreshTokenLifetimeSeconds);
 
-            EnterLobby();
+            // EnterLobby();
         }
     }
 }

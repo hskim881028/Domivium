@@ -28,7 +28,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
 
         public ItemSlot GetSlot(int index) => _slots[index];
 
-        public bool TryGetSlot(Vector2 position, out ItemSlotData selectedSlot)
+        public bool TryGetSlot(Vector2 position, out ItemSlotEntry selectedSlot)
         {
             selectedSlot = default;
 

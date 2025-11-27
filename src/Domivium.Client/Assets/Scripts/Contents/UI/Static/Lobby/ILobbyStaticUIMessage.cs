@@ -2,8 +2,5 @@
 
 namespace Domivium.Client.Contents.UI.Static
 {
-    public interface ILobbyStaticUIMessage : IUIMessage
-    {
-        public void Next();
-    }
+    public interface ILobbyStaticUIMessage : IUIMessage { }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
@@ -17,6 +16,9 @@ namespace Domivium.Client.Contents.Actors
         private readonly Dictionary<ushort, ActorId> _pendingRemove = new();
         private readonly Dictionary<ushort, Action<ushort>> _awaitDespawn = new();
         private readonly List<ActorBucket> _bucketSnapshot = new(32);
+        private readonly ReactiveProperty<IUnitPresenter> _character = new();
+
+        public ReadOnlyReactiveProperty<IUnitPresenter> Character => _character;
 
         public ActorManager(
             ISubscriber<SceneMessage> sceneSubscriber,
@@ -65,12 +67,6 @@ namespace Domivium.Client.Contents.Actors
         {
             pawn = null;
             return _buckets.TryGetValue(actorId, out var bucket) && bucket.TryGetPawn(uid, out pawn);
-        }
-
-        public bool GetCharacter(out IBattleSystem pawn)
-        {
-            pawn = null;
-            return _buckets.TryGetValue(ActorId.Character, out var bucket) && bucket.TryGetFirstPawn(out pawn);
         }
 
         public int GetPawns(ActorId actorId, List<IBattleSystem> buffer) => !_buckets.TryGetValue(actorId, out var bucket) ? 0 : bucket.CollectPawns(buffer);
@@ -137,10 +133,12 @@ namespace Domivium.Client.Contents.Actors
                 bucket.Terminate();
             }
 
+            _character.Value = null;
             _buckets.Clear();
             _index.Clear();
             _pendingRemove.Clear();
             _awaitDespawn.Clear();
+            _bucketSnapshot.Clear();
         }
 
         private void OnSceneMessage(SceneMessage message)
@@ -149,7 +147,6 @@ namespace Domivium.Client.Contents.Actors
             {
                 case SceneMessageType.Unload:
                     TerminateAll();
-                    _bucketSnapshot.Clear();
                     break;
                 case SceneMessageType.Load:
                     break;
@@ -160,6 +157,11 @@ namespace Domivium.Client.Contents.Actors
 
         private void OnSpawnActorMessage(SpawnActorMessage message)
         {
+            if (message.Presenter is CharacterPresenter character)
+            {
+                _character.Value = character;
+            }
+
             if (!_index.TryAdd(message.Uid, (message.ActorId, message.OnDespawn)))
             {
                 throw new InvalidOperationException($"Actor already exists: {message.Uid}");

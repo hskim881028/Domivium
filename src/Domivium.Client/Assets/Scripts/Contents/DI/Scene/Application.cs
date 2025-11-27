@@ -118,6 +118,7 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<SystemUIInputConsumer>(lifetime);
             builder.Register<StaticUIInputConsumer>(lifetime);
             builder.Register<StackUIInputConsumer>(lifetime);
+            builder.Register<BattleInputConsumer>(lifetime);
             builder.Register<IInputComposition, ApplicationInputComposition>(Lifetime.Singleton);
         }
 
@@ -134,6 +135,7 @@ namespace Domivium.Client.Contents.DI.Scene
         private void Services(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<MasterDbService>(lifetime).WithParameter(_configContainer.MasterDB);
+            builder.Register<LocalDataService>(lifetime);
             builder.Register<NetworkService>(lifetime);
             builder.Register<SceneService>(lifetime);
             builder.Register<EnvironmentService>(lifetime);
@@ -141,9 +143,11 @@ namespace Domivium.Client.Contents.DI.Scene
 
         private void System(IContainerBuilder builder, Lifetime lifetime)
         {
+            builder.Register<LobbySystem>(lifetime).AsImplementedInterfaces();
             builder.Register<StageSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<PointerSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<CharacterSystem>(lifetime).AsImplementedInterfaces();
+            builder.Register<LobbyFieldSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<StageFieldSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<CameraSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<LootSystem>(lifetime).AsImplementedInterfaces();
