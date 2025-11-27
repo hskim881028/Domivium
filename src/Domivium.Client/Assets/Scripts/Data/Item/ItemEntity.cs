@@ -2,18 +2,18 @@
 
 namespace Domivium.Client.Data.Item
 {
-    public struct ItemData
+    public struct ItemEntity
     {
+        public Guid Guid { get; }
         public ItemType Type { get; }
-
         public int Id { get; }
-
         public int Count { get; private set; }
 
         public bool IsStackable => Type is ItemType.Projectile or ItemType.Food or ItemType.Potion;
 
-        public ItemData(ItemType type, int id, int count)
+        public ItemEntity(Guid guid, ItemType type, int id, int count)
         {
+            Guid = guid;
             Id = id;
             Type = type;
             Count = count;
@@ -34,7 +34,7 @@ namespace Domivium.Client.Data.Item
             Count += value;
         }
 
-        public ItemData Remove(int value)
+        public ItemEntity Remove(int value)
         {
             if (!IsStackable)
             {
@@ -47,10 +47,10 @@ namespace Domivium.Client.Data.Item
             }
 
             Count -= value;
-            return new ItemData(Type, Id, Count);
+            return new ItemEntity(Guid, Type, Id, Count);
         }
 
-        public ItemData Split(int value)
+        public ItemEntity Split(int value)
         {
             if (!IsStackable)
             {
@@ -63,9 +63,9 @@ namespace Domivium.Client.Data.Item
             }
 
             Count -= value;
-            return new ItemData(Type, Id, value);
+            return new ItemEntity(Guid.NewGuid(), Type, Id, value);
         }
 
-        public bool CanMerge(ItemData other) => IsStackable && other.IsStackable && Id == other.Id && Type == other.Type;
+        public bool CanMerge(ItemEntity other) => IsStackable && other.IsStackable && Id == other.Id && Type == other.Type;
     }
 }

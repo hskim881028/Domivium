@@ -14,9 +14,9 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         [SerializeField] private Button _confirmButton;
         [SerializeField] private Button _cancelButton;
 
-        private ItemSlotData _slot;
+        private ItemSlotEntry _slot;
 
-        public Action<ItemSlotData, int> Split { get; set; }
+        public Action<ItemSlotEntry, int> Split { get; set; }
 
         private void Awake()
         {
@@ -25,7 +25,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
             _slider.onValueChanged.AddListener(OnValueChanged);
         }
 
-        public void Show(ItemSlotData slot, int itemCount)
+        public void Show(ItemSlotEntry slot, int itemCount)
         {
             _slot = slot;
             _slider.minValue = 0;
@@ -40,7 +40,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         public void Hide()
         {
             gameObject.SetActive(false);
-            _slot = ItemSlotData.Default;
+            _slot = ItemSlotEntry.Default;
         }
 
         private void Confirm()

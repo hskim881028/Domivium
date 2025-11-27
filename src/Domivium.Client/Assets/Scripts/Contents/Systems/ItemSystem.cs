@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.DI;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Systems;
@@ -19,96 +20,64 @@ namespace Domivium.Client.Contents.Systems
         private const int EquipmentCapacity = 7;
         private const int ProjectileIndex = 4;
 
+        private readonly LocalDataService _localDataService;
         private readonly MasterDbService _masterDbService;
-        private readonly ObservableDictionary<int, ItemData> _equipment = new();
-        private readonly ObservableDictionary<int, ItemData> _inventory = new();
-        private readonly ObservableDictionary<int, ItemData> _loot = new();
-
-        private readonly ReactiveProperty<int> _filledInventoryCapacity = new();
-        private readonly ReactiveProperty<int> _inventoryCapacity = new();
-        private readonly ReactiveProperty<int> _filledLootCapacity = new();
-        private readonly ReactiveProperty<int> _lootCapacity = new();
-
-        private readonly ReactiveProperty<int> _loadedProjectile = new();
-        private readonly ReactiveProperty<int> _totalProjectile = new();
-
-        private readonly ReactiveProperty<int> _totalWeight = new();
         private readonly Dictionary<(ItemType, int), int> _weightCache = new();
+        private Items _items = new();
 
-        public IReadOnlyObservableDictionary<int, ItemData> Equipment => _equipment;
-        public IReadOnlyObservableDictionary<int, ItemData> Inventory => _inventory;
-        public IReadOnlyObservableDictionary<int, ItemData> Loot => _loot;
-        public ReadOnlyReactiveProperty<int> FilledInventoryCapacity => _filledInventoryCapacity;
-        public ReadOnlyReactiveProperty<int> InventoryCapacity => _inventoryCapacity;
-        public ReadOnlyReactiveProperty<int> FilledLootCapacity => _filledLootCapacity;
-        public ReadOnlyReactiveProperty<int> LootCapacity => _lootCapacity;
-        public ReadOnlyReactiveProperty<int> LoadedProjectile => _loadedProjectile;
-        public ReadOnlyReactiveProperty<int> TotalProjectile => _totalProjectile;
-        public ReadOnlyReactiveProperty<int> TotalWeight => _totalWeight;
+        public IReadOnlyObservableDictionary<int, ItemEntity> Equipment => _items.Equipment;
+        public IReadOnlyObservableDictionary<int, ItemEntity> Inventory => _items.Inventory;
+        public IReadOnlyObservableDictionary<int, ItemEntity> Storage => _items.Storage;
+        public IReadOnlyObservableDictionary<int, ItemEntity> Loot => _items.Loot;
+
+        public ReadOnlyReactiveProperty<int> InventoryCapacity => _items.InventoryCapacity;
+        public ReadOnlyReactiveProperty<int> StorageCapacity => _items.StorageCapacity;
+        public ReadOnlyReactiveProperty<int> LootCapacity => _items.LootCapacity;
+
+        public ReadOnlyReactiveProperty<int> FilledInventoryCapacity => _items.FilledInventoryCapacity;
+        public ReadOnlyReactiveProperty<int> FilledStorageCapacity => _items.FilledStorageCapacity;
+        public ReadOnlyReactiveProperty<int> FilledLootCapacity => _items.FilledLootCapacity;
+
+        public ReadOnlyReactiveProperty<int> LoadedProjectile => _items.LoadedProjectile;
+        public ReadOnlyReactiveProperty<int> TotalProjectile => _items.TotalProjectile;
+
+        public ReadOnlyReactiveProperty<int> TotalWeight => _items.TotalWeight;
 
         public ItemSystem(
             MasterDbService masterDbService,
+            LocalDataService localDataService,
             ISubscriber<SceneMessage> sceneSubscriber)
         {
             _masterDbService = masterDbService;
+            _localDataService = localDataService;
+            _items.Equipment.CollectionChanged += OnChangedEquipment;
+            _items.Inventory.CollectionChanged += OnChangedInventory;
+            _items.Loot.CollectionChanged += OnChangedLoot;
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
-
-            _equipment.CollectionChanged += OnChangedEquipment;
-            _inventory.CollectionChanged += OnChangedInventory;
-            _loot.CollectionChanged += OnChangedLoot;
         }
 
         protected override void OnDispose()
         {
-            _loot.Clear();
-            _equipment.Clear();
-            _inventory.Clear();
-            _filledInventoryCapacity.Value = 0;
-            _inventoryCapacity.Value = 0;
-            _filledLootCapacity.Value = 0;
-            _lootCapacity.Value = 0;
-            _loadedProjectile.Value = 0;
-            _totalProjectile.Value = 0;
-            _totalWeight.Value = 0;
+            _localDataService.Save(_items);
 
-            _equipment.CollectionChanged -= OnChangedEquipment;
-            _inventory.CollectionChanged -= OnChangedInventory;
-            _loot.CollectionChanged -= OnChangedLoot;
+            _items.Equipment.CollectionChanged -= OnChangedEquipment;
+            _items.Inventory.CollectionChanged -= OnChangedInventory;
+            _items.Loot.CollectionChanged -= OnChangedLoot;
+            _items.Clear();
 
             base.OnDispose();
         }
 
-        public ItemContext GetItemContext(ItemType itemType, int itemId)
-        {
-            switch (itemType)
-            {
-                case ItemType.Weapon:
-                    return new ItemContext(_masterDbService.DB.WeaponRowTable.FindById(itemId));
-                case ItemType.Projectile:
-                    return new ItemContext(_masterDbService.DB.ProjectileRowTable.FindById(itemId));
-                case ItemType.Helmet:
-                case ItemType.Necklace:
-                case ItemType.Backpack:
-                case ItemType.Armor:
-                case ItemType.Ring:
-                case ItemType.Food:
-                case ItemType.Potion:
-                case ItemType.None:
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(itemType), itemType, null);
-            }
-        }
-
-        public bool TryGetItem(ItemSlotData slot, out ItemData item)
+        public bool TryGetItem(ItemSlotEntry slot, out ItemEntity item)
         {
             switch (slot.Type)
             {
                 case ItemSlotType.Equipment:
-                    return _equipment.TryGetValue(slot.Index, out item);
+                    return _items.Equipment.TryGetValue(slot.Index, out item);
                 case ItemSlotType.Inventory:
-                    return _inventory.TryGetValue(slot.Index, out item);
+                    return _items.Inventory.TryGetValue(slot.Index, out item);
                 case ItemSlotType.Loot:
-                    return _loot.TryGetValue(slot.Index, out item);
+                    return _items.Loot.TryGetValue(slot.Index, out item);
                 case ItemSlotType.None:
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -121,9 +90,9 @@ namespace Domivium.Client.Contents.Systems
             switch (slotType)
             {
                 case ItemSlotType.Inventory:
-                    for (var i = 0; i < _inventoryCapacity.CurrentValue; i++)
+                    for (var i = 0; i < _items.InventoryCapacity.CurrentValue; i++)
                     {
-                        if (_inventory.ContainsKey(i)) continue;
+                        if (_items.Inventory.ContainsKey(i)) continue;
 
                         slotIndex = i;
                         return true;
@@ -131,9 +100,9 @@ namespace Domivium.Client.Contents.Systems
                     return false;
 
                 case ItemSlotType.Loot:
-                    for (var i = 0; i < _lootCapacity.CurrentValue; i++)
+                    for (var i = 0; i < _items.LootCapacity.CurrentValue; i++)
                     {
-                        if (_loot.ContainsKey(i)) continue;
+                        if (_items.Loot.ContainsKey(i)) continue;
 
                         slotIndex = i;
                         return true;
@@ -148,18 +117,19 @@ namespace Domivium.Client.Contents.Systems
 
         public UniTask RunAsync()
         {
+            if (_localDataService.Load(ref _items)) return UniTask.CompletedTask;
+
             SetLootCapacity(8);
             SetInventoryCapacity(16);
-            Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 1, 1));
-            Add(ItemSlotType.Inventory, new ItemData(ItemType.Weapon, 2, 1));
-            Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 5));
-            Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 2, 77));
-            Add(ItemSlotType.Inventory, new ItemData(ItemType.Projectile, 1, 4));
-
+            Add(ItemSlotType.Inventory, new ItemEntity(Guid.NewGuid(), ItemType.Weapon, 1, 1));
+            Add(ItemSlotType.Inventory, new ItemEntity(Guid.NewGuid(), ItemType.Weapon, 2, 1));
+            Add(ItemSlotType.Inventory, new ItemEntity(Guid.NewGuid(), ItemType.Projectile, 1, 5));
+            Add(ItemSlotType.Inventory, new ItemEntity(Guid.NewGuid(), ItemType.Projectile, 2, 77));
+            Add(ItemSlotType.Inventory, new ItemEntity(Guid.NewGuid(), ItemType.Projectile, 1, 4));
             return UniTask.CompletedTask;
         }
 
-        public void Equip(ItemSlotData fromSlot, ItemSlotData toSlot)
+        public void Equip(ItemSlotEntry fromSlot, ItemSlotEntry toSlot)
         {
             if (!IsValid(fromSlot) || !IsValid(toSlot)) return;
 
@@ -182,7 +152,7 @@ namespace Domivium.Client.Contents.Systems
             }
         }
 
-        public void Unequip(ItemSlotData fromSlot, ItemSlotData toSlot)
+        public void Unequip(ItemSlotEntry fromSlot, ItemSlotEntry toSlot)
         {
             if (!IsValid(fromSlot) || !IsValid(toSlot)) return;
 
@@ -206,39 +176,39 @@ namespace Domivium.Client.Contents.Systems
 
         public void SetInventoryCapacity(int capacity)
         {
-            _inventoryCapacity.Value = capacity;
+            _items.InventoryCapacity.Value = capacity;
             // todo: capacity보다 큰 인덱스 아이템은 자동 정리?
             // var removeList = new List<int>();
-            // foreach (var (index, _) in _inventory)
+            // foreach (var (index, _) in _items.Inventory)
             // {
             //     if (index >= capacity) removeList.Add(index);
             // }
             // foreach (var index in removeList)
             // {
-            //     _inventory.Remove(index);
+            //     _items.Inventory.Remove(index);
             // }
         }
 
         public void SetLootCapacity(int capacity)
         {
-            _lootCapacity.Value = capacity;
+            _items.LootCapacity.Value = capacity;
         }
 
-        public void Add(ItemSlotType slotType, ItemData item) // Except Equipment
+        public void Add(ItemSlotType slotType, ItemEntity item) // Except Equipment
         {
             if (!TryGetEmptySlotIndex(slotType, out var newSlotIndex)) return;
 
-            SetInternal(new ItemSlotData(slotType, newSlotIndex), item);
+            SetInternal(new ItemSlotEntry(slotType, newSlotIndex), item);
         }
 
-        public void Set(ItemSlotData slot, ItemData item)
+        public void Set(ItemSlotEntry slot, ItemEntity item)
         {
             if (!IsValid(slot)) return;
 
             SetInternal(slot, item);
         }
 
-        public void SwapOrMerge(ItemSlotData fromSlot, ItemSlotData toSlot)
+        public void SwapOrMerge(ItemSlotEntry fromSlot, ItemSlotEntry toSlot)
         {
             if (!IsValid(fromSlot) || !IsValid(toSlot)) return;
 
@@ -266,7 +236,7 @@ namespace Domivium.Client.Contents.Systems
             }
         }
 
-        public void SplitStack(ItemSlotData slot, int amount) // Only working in same slot type
+        public void SplitStack(ItemSlotEntry slot, int amount) // Only working in same slot type
         {
             if (!IsValid(slot)) return;
 
@@ -280,21 +250,21 @@ namespace Domivium.Client.Contents.Systems
 
             var newItem = item.Split(amount);
             SetInternal(slot, item);
-            SetInternal(new ItemSlotData(slot.Type, newSlotIndex), newItem);
+            SetInternal(new ItemSlotEntry(slot.Type, newSlotIndex), newItem);
         }
 
-        public void Remove(ItemSlotData slot)
+        public void Remove(ItemSlotEntry slot)
         {
             switch (slot.Type)
             {
                 case ItemSlotType.Equipment:
-                    Unequip(slot);
+                    _items.Equipment.Remove(slot.Index);
                     break;
                 case ItemSlotType.Inventory:
-                    _inventory.Remove(slot.Index);
+                    _items.Inventory.Remove(slot.Index);
                     break;
                 case ItemSlotType.Loot:
-                    _loot.Remove(slot.Index);
+                    _items.Loot.Remove(slot.Index);
                     break;
                 case ItemSlotType.None:
                 default:
@@ -304,15 +274,15 @@ namespace Domivium.Client.Contents.Systems
 
         public bool UseProjectile()
         {
-            if (!_equipment.ContainsKey(ProjectileIndex)) return false;
+            if (!_items.Equipment.ContainsKey(ProjectileIndex)) return false;
 
-            _equipment[ProjectileIndex] = _equipment[ProjectileIndex].Remove(1);
-            if (_equipment[ProjectileIndex].Count <= 0)
+            _items.Equipment[ProjectileIndex] = _items.Equipment[ProjectileIndex].Remove(1);
+            if (_items.Equipment[ProjectileIndex].Count <= 0)
             {
-                _equipment.Remove(ProjectileIndex);
+                _items.Equipment.Remove(ProjectileIndex);
             }
 
-            _loadedProjectile.Value -= 1;
+            _items.LoadedProjectile.Value -= 1;
             return true;
         }
 
@@ -320,24 +290,24 @@ namespace Domivium.Client.Contents.Systems
         {
             if (capacity <= 0) return;
 
-            var need = capacity - _loadedProjectile.Value;
-            var refill = _totalProjectile.CurrentValue < need ? _totalProjectile.CurrentValue : need;
-            _totalProjectile.Value -= refill;
-            _loadedProjectile.Value += refill;
+            var need = capacity - _items.LoadedProjectile.Value;
+            var refill = _items.TotalProjectile.CurrentValue < need ? _items.TotalProjectile.CurrentValue : need;
+            _items.TotalProjectile.Value -= refill;
+            _items.LoadedProjectile.Value += refill;
         }
 
-        private void SetInternal(ItemSlotData slot, ItemData item)
+        private void SetInternal(ItemSlotEntry slot, ItemEntity item)
         {
             switch (slot.Type)
             {
                 case ItemSlotType.Equipment:
-                    Equip(slot, item);
+                    _items.Equipment[slot.Index] = item;
                     break;
                 case ItemSlotType.Inventory:
-                    _inventory[slot.Index] = item;
+                    _items.Inventory[slot.Index] = item;
                     break;
                 case ItemSlotType.Loot:
-                    _loot[slot.Index] = item;
+                    _items.Loot[slot.Index] = item;
                     break;
                 case ItemSlotType.None:
                 default:
@@ -345,24 +315,24 @@ namespace Domivium.Client.Contents.Systems
             }
         }
 
-        private void Merge(ItemSlotData slot, int count)
+        private void Merge(ItemSlotEntry slot, int count)
         {
             switch (slot.Type)
             {
                 case ItemSlotType.Equipment:
-                    var equipmentItem = _equipment[slot.Index];
+                    var equipmentItem = _items.Equipment[slot.Index];
                     equipmentItem.Add(count);
-                    _equipment[slot.Index] = equipmentItem;
+                    _items.Equipment[slot.Index] = equipmentItem;
                     break;
                 case ItemSlotType.Inventory:
-                    var inventoryItem = _inventory[slot.Index];
+                    var inventoryItem = _items.Inventory[slot.Index];
                     inventoryItem.Add(count);
-                    _inventory[slot.Index] = inventoryItem;
+                    _items.Inventory[slot.Index] = inventoryItem;
                     break;
                 case ItemSlotType.Loot:
-                    var lootItem = _loot[slot.Index];
+                    var lootItem = _items.Loot[slot.Index];
                     lootItem.Add(count);
-                    _loot[slot.Index] = lootItem;
+                    _items.Loot[slot.Index] = lootItem;
                     break;
                 case ItemSlotType.None:
                 default:
@@ -370,112 +340,94 @@ namespace Domivium.Client.Contents.Systems
             }
         }
 
-        private bool IsValid(ItemSlotData slot)
+        private bool IsValid(ItemSlotEntry slot)
         {
             switch (slot.Type)
             {
                 case ItemSlotType.Equipment:
                     return slot.Index >= 0 && slot.Index < EquipmentCapacity;
                 case ItemSlotType.Inventory:
-                    return slot.Index >= 0 && slot.Index < _inventoryCapacity.CurrentValue;
+                    return slot.Index >= 0 && slot.Index < _items.InventoryCapacity.CurrentValue;
                 case ItemSlotType.Loot:
-                    return slot.Index >= 0 && slot.Index < _lootCapacity.CurrentValue;
+                    return slot.Index >= 0 && slot.Index < _items.LootCapacity.CurrentValue;
                 case ItemSlotType.None:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private void Equip(ItemSlotData slot, ItemData item)
-        {
-            switch (item.Type)
-            {
-                case ItemType.Weapon:
-                    _totalProjectile.Value += _loadedProjectile.Value;
-                    _loadedProjectile.Value = 0;
-                    break;
-                case ItemType.Projectile:
-                    _totalProjectile.Value = item.Count;
-                    _loadedProjectile.Value = 0;
-                    break;
-                case ItemType.Helmet:
-                case ItemType.Necklace:
-                case ItemType.Backpack:
-                case ItemType.Armor:
-                case ItemType.Ring:
-                case ItemType.Food:
-                case ItemType.Potion:
-                    break;
-                case ItemType.None:
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            _equipment[slot.Index] = item;
-        }
-
-        private void Unequip(ItemSlotData slot)
-        {
-            var item = _equipment[slot.Index];
-            switch (item.Type)
-            {
-                case ItemType.Weapon:
-                    _totalProjectile.Value += _loadedProjectile.CurrentValue;
-                    _loadedProjectile.Value = 0;
-                    break;
-                case ItemType.Projectile:
-                    _totalProjectile.Value = 0;
-                    _loadedProjectile.Value = 0;
-                    break;
-                case ItemType.Helmet:
-                case ItemType.Necklace:
-                case ItemType.Backpack:
-                case ItemType.Armor:
-                case ItemType.Ring:
-                case ItemType.Food:
-                case ItemType.Potion:
-                    break;
-                case ItemType.None:
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            _equipment.Remove(slot.Index);
-        }
-
-        private int GetWeight(ItemData item)
+        private int GetTotalWeight(ItemEntity item)
         {
             var key = (item.Type, item.Id);
-            if (_weightCache.TryGetValue(key, out var weight)) return weight;
+            if (_weightCache.TryGetValue(key, out var weight)) return weight * item.Count;
 
             var context = GetItemContext(item.Type, item.Id);
             _weightCache[key] = context.Weight;
-            return context.Weight;
+            return context.Weight * item.Count;
         }
 
-        private void AddWeight(ItemData item)
+        public ItemContext GetItemContext(ItemType itemType, int itemId)
         {
-            _totalWeight.Value += item.Count * GetWeight(item);
+            switch (itemType)
+            {
+                case ItemType.Weapon:
+                    return new ItemContext(_masterDbService.DB.WeaponRowTable.FindById(itemId));
+                case ItemType.Projectile:
+                    return new ItemContext(_masterDbService.DB.ProjectileRowTable.FindById(itemId));
+                case ItemType.Helmet:
+                case ItemType.Necklace:
+                case ItemType.Backpack:
+                case ItemType.Armor:
+                case ItemType.Ring:
+                case ItemType.Food:
+                case ItemType.Potion:
+                case ItemType.None:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(itemType), itemType, null);
+            }
         }
 
-        private void SubtractWeight(ItemData item)
+        private void UpdateProjectile(ItemEntity item, bool unequip = false)
         {
-            _totalWeight.Value -= item.Count * GetWeight(item);
+            switch (item.Type)
+            {
+                case ItemType.Weapon:
+                    _items.TotalProjectile.Value += _items.LoadedProjectile.Value;
+                    _items.LoadedProjectile.Value = 0;
+                    break;
+                case ItemType.Projectile:
+                    _items.TotalProjectile.Value = unequip ? 0 : item.Count;
+                    _items.LoadedProjectile.Value = 0;
+                    break;
+                case ItemType.Helmet:
+                case ItemType.Necklace:
+                case ItemType.Backpack:
+                case ItemType.Armor:
+                case ItemType.Ring:
+                case ItemType.Food:
+                case ItemType.Potion:
+                    break;
+                case ItemType.None:
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
-        private void OnChangedInventory(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemData>> e)
+        private void OnChangedInventory(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
         {
+            var newItem = e.NewItem.Value;
+            var oldItem = e.OldItem.Value;
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    AddWeight(e.NewItem.Value);
+                    _items.TotalWeight.Value += GetTotalWeight(newItem);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    SubtractWeight(e.OldItem.Value);
+                    _items.TotalWeight.Value -= GetTotalWeight(oldItem);
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    SubtractWeight(e.OldItem.Value);
-                    AddWeight(e.NewItem.Value);
+                    _items.TotalWeight.Value -= GetTotalWeight(oldItem);
+                    _items.TotalWeight.Value += GetTotalWeight(newItem);
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     break;
@@ -484,22 +436,31 @@ namespace Domivium.Client.Contents.Systems
                     throw new ArgumentOutOfRangeException();
             }
 
-            _filledInventoryCapacity.Value = _inventory.Count;
+            _items.FilledInventoryCapacity.Value = _items.Inventory.Count;
         }
 
-        private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemData>> e)
+        private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
         {
+            var newItem = e.NewItem.Value;
+            var oldItem = e.OldItem.Value;
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    AddWeight(e.NewItem.Value);
+                    _items.TotalWeight.Value += GetTotalWeight(newItem);
+                    UpdateProjectile(newItem);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    SubtractWeight(e.OldItem.Value);
+                    _items.TotalWeight.Value -= GetTotalWeight(oldItem);
+                    UpdateProjectile(oldItem, true);
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    SubtractWeight(e.OldItem.Value);
-                    AddWeight(e.NewItem.Value);
+                    _items.TotalWeight.Value -= GetTotalWeight(oldItem);
+                    _items.TotalWeight.Value += GetTotalWeight(newItem);
+                    if (oldItem.Guid != newItem.Guid)
+                    {
+                        UpdateProjectile(newItem);
+                    }
+
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     break;
@@ -509,9 +470,9 @@ namespace Domivium.Client.Contents.Systems
             }
         }
 
-        private void OnChangedLoot(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemData>> e)
+        private void OnChangedLoot(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
         {
-            _filledLootCapacity.Value = _loot.Count;
+            _items.FilledLootCapacity.Value = _items.Loot.Count;
         }
 
         private void OnSceneMessage(SceneMessage message)
@@ -520,9 +481,10 @@ namespace Domivium.Client.Contents.Systems
             {
                 case SceneMessageType.Unload:
                 case SceneMessageType.Load:
-                    _loot.Clear();
-                    _totalProjectile.Value += _loadedProjectile.Value;
-                    _loadedProjectile.Value = 0;
+                    _items.Loot.Clear();
+                    _items.TotalProjectile.Value += _items.LoadedProjectile.Value;
+                    _items.LoadedProjectile.Value = 0;
+                    _localDataService.Save(_items);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

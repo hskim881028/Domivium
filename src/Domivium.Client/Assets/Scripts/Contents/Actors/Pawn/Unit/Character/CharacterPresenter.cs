@@ -49,10 +49,12 @@ namespace Domivium.Client.Contents.Actors
         {
             await base.SpawnAsync(token, param);
             Actor.SetSight(param is not LobbyCharacterParams);
+
             foreach (var (_, item) in _itemSystem.Equipment)
             {
                 ApplyStat(item);
             }
+
             OnLoadedProjectile(_itemSystem.LoadedProjectile.CurrentValue);
             OnTotalProjectile(_itemSystem.TotalProjectile.CurrentValue);
             TotalWeight(_itemSystem.TotalWeight.CurrentValue);
@@ -147,7 +149,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.TryActivateAbility(ref context);
         }
 
-        private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemData>> e)
+        private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
         {
             switch (e.Action)
             {
@@ -169,7 +171,7 @@ namespace Domivium.Client.Contents.Actors
             }
         }
 
-        private void ApplyStat(ItemData item, bool unequip = false)
+        private void ApplyStat(ItemEntity item, bool unequip = false)
         {
             var mul = unequip ? -1 : 1;
             switch (item.Type)
@@ -199,7 +201,7 @@ namespace Domivium.Client.Contents.Actors
             }
         }
 
-        private void ApplyWeaponStat(ItemData item, int mul)
+        private void ApplyWeaponStat(ItemEntity item, int mul)
         {
             if (!_masterDbService.DB.WeaponRowTable.TryFindById(item.Id, out var wp)) return;
 
@@ -212,7 +214,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Stat.Apply(StatId.CriticalDamage, wp.CriticalDamage * mul, StatChannel.Add);
         }
 
-        private void ApplyProjectileStat(ItemData item, int mul)
+        private void ApplyProjectileStat(ItemEntity item, int mul)
         {
             if (!_masterDbService.DB.ProjectileRowTable.TryFindById(item.Id, out var proj)) return;
 

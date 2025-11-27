@@ -13,15 +13,15 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         [SerializeField] private ItemSlotType _type;
         [SerializeField] private int _index;
 
-        public ItemSlotData SlotInfo => new(_type, _index);
+        public ItemSlotEntry SlotInfo => new(_type, _index);
         public Sprite Sprite => _itemVisual.Item;
         public int Count => _itemVisual.Count;
         public bool IsStackable => _itemVisual.IsStackable;
         public RectTransform RectTransform { get; private set; }
-        public Action<ItemSlotData> SelectItem { get; set; }
-        public Action<ItemSlotData, Vector2> PickItem { get; set; }
+        public Action<ItemSlotEntry> SelectItem { get; set; }
+        public Action<ItemSlotEntry, Vector2> PickItem { get; set; }
         public Action<Vector2> MoveItem { get; set; }
-        public Action<ItemSlotData, Vector2> DropItem { get; set; }
+        public Action<ItemSlotEntry, Vector2> DropItem { get; set; }
 
         private void Awake()
         {

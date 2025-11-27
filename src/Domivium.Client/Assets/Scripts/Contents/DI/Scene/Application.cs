@@ -135,6 +135,7 @@ namespace Domivium.Client.Contents.DI.Scene
         private void Services(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<MasterDbService>(lifetime).WithParameter(_configContainer.MasterDB);
+            builder.Register<LocalDataService>(lifetime);
             builder.Register<NetworkService>(lifetime);
             builder.Register<SceneService>(lifetime);
             builder.Register<EnvironmentService>(lifetime);

@@ -17,15 +17,15 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         [SerializeField] private Button _removeButton;
         [SerializeField] private RectTransform _pivot;
 
-        private ItemSlotData _slot;
+        private ItemSlotEntry _slot;
 
-        public Action<ItemSlotData> Equip { get; set; }
-        public Action<ItemSlotData> Unequip { get; set; }
-        public Action<ItemSlotData> Split { get; set; }
-        public Action<ItemSlotData> Use { get; set; }
-        public Action<ItemSlotData> Keep { get; set; }
-        public Action<ItemSlotData> TakeOut { get; set; }
-        public Action<ItemSlotData> Remove { get; set; }
+        public Action<ItemSlotEntry> Equip { get; set; }
+        public Action<ItemSlotEntry> Unequip { get; set; }
+        public Action<ItemSlotEntry> Split { get; set; }
+        public Action<ItemSlotEntry> Use { get; set; }
+        public Action<ItemSlotEntry> Keep { get; set; }
+        public Action<ItemSlotEntry> TakeOut { get; set; }
+        public Action<ItemSlotEntry> Remove { get; set; }
 
         private void Awake()
         {
@@ -40,7 +40,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
 
         public void Show(
             RectTransform parent,
-            ItemSlotData slot,
+            ItemSlotEntry slot,
             ItemType itemType,
             bool canKeep)
         {
@@ -130,7 +130,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
 
         public void Hide()
         {
-            _slot = ItemSlotData.Default;
+            _slot = ItemSlotEntry.Default;
             _pivot.gameObject.SetActive(false);
             _rectTransform.gameObject.SetActive(false);
         }

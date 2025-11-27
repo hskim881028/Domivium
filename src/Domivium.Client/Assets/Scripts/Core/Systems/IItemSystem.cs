@@ -7,9 +7,9 @@ namespace Domivium.Client.Core.Systems
 {
     public interface IItemSystem
     {
-        public IReadOnlyObservableDictionary<int, ItemData> Equipment { get; }
-        public IReadOnlyObservableDictionary<int, ItemData> Inventory { get; }
-        public IReadOnlyObservableDictionary<int, ItemData> Loot { get; }
+        public IReadOnlyObservableDictionary<int, ItemEntity> Equipment { get; }
+        public IReadOnlyObservableDictionary<int, ItemEntity> Inventory { get; }
+        public IReadOnlyObservableDictionary<int, ItemEntity> Loot { get; }
         public ReadOnlyReactiveProperty<int> FilledInventoryCapacity { get; }
         public ReadOnlyReactiveProperty<int> InventoryCapacity { get; }
         public ReadOnlyReactiveProperty<int> FilledLootCapacity { get; }
@@ -19,7 +19,7 @@ namespace Domivium.Client.Core.Systems
         public ReadOnlyReactiveProperty<int> TotalWeight { get; }
 
         public ItemContext GetItemContext(ItemType itemType, int itemId);
-        public bool TryGetItem(ItemSlotData slot, out ItemData item);
+        public bool TryGetItem(ItemSlotEntry slot, out ItemEntity item);
         public bool TryGetEmptySlotIndex(ItemSlotType slotType, out int slotIndex);
     }
 }

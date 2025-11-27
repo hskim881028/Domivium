@@ -26,7 +26,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         [SerializeField] private FloatStat _criticalRate;
         [SerializeField] private FloatStat _criticalDamage;
 
-        public void Show(Sprite sprite, ItemData item, ItemContext context)
+        public void Show(Sprite sprite, ItemEntity item, ItemContext context)
         {
             gameObject.SetActive(true);
             _itemVisual.Show(sprite, item.Count, item.IsStackable);

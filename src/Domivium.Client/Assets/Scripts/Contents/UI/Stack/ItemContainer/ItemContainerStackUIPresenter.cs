@@ -27,7 +27,7 @@ namespace Domivium.Client.Contents.UI.Stack
         private readonly ICharacterSystemCommand _characterSystemCommand;
         private readonly IItemSystemCommand _itemSystemCommand;
 
-        private ItemSlotData _selectedSlot = ItemSlotData.Default;
+        private ItemSlotEntry _selectedSlot = ItemSlotEntry.Default;
         private ItemSlotType _openType = ItemSlotType.None;
         private IBattleSystem _character;
 
@@ -109,7 +109,7 @@ namespace Domivium.Client.Contents.UI.Stack
             _characterSystemCommand.Stop();
         }
 
-        public void OnClick(ItemSlotData slot)
+        public void OnClick(ItemSlotEntry slot)
         {
             if (_itemSystem.TryGetItem(slot, out var item) && !_selectedSlot.IsSame(slot))
             {
@@ -120,11 +120,11 @@ namespace Domivium.Client.Contents.UI.Stack
             else
             {
                 View.DeselectItem();
-                _selectedSlot = ItemSlotData.Default;
+                _selectedSlot = ItemSlotEntry.Default;
             }
         }
 
-        public void OnBeginDrag(ItemSlotData slot, Vector2 position)
+        public void OnBeginDrag(ItemSlotEntry slot, Vector2 position)
         {
             if (!_itemSystem.TryGetItem(slot, out var item)) return;
 
@@ -137,7 +137,7 @@ namespace Domivium.Client.Contents.UI.Stack
             View.MoveItem(position);
         }
 
-        public void OnEndDrag(ItemSlotData sourceSlot, Vector2 position)
+        public void OnEndDrag(ItemSlotEntry sourceSlot, Vector2 position)
         {
             View.DropItem();
 
@@ -191,17 +191,17 @@ namespace Domivium.Client.Contents.UI.Stack
             }
         }
 
-        public void OnEquip(ItemSlotData slot)
+        public void OnEquip(ItemSlotEntry slot)
         {
             View.DeselectItem();
 
             if (!_itemSystem.TryGetItem(slot, out var item)) return;
 
-            var targetSlot = new ItemSlotData(ItemSlotType.Equipment, Converter.GetSlotIndex(item.Type));
+            var targetSlot = new ItemSlotEntry(ItemSlotType.Equipment, Converter.GetSlotIndex(item.Type));
             _itemSystemCommand.Equip(slot, targetSlot);
         }
 
-        public void OnUnequip(ItemSlotData slot)
+        public void OnUnequip(ItemSlotEntry slot)
         {
             View.DeselectItem();
 
@@ -209,41 +209,41 @@ namespace Domivium.Client.Contents.UI.Stack
 
             if (!_itemSystem.TryGetEmptySlotIndex(ItemSlotType.Inventory, out var slotIndex)) return;
 
-            var targetSlot = new ItemSlotData(ItemSlotType.Inventory, slotIndex);
+            var targetSlot = new ItemSlotEntry(ItemSlotType.Inventory, slotIndex);
             _itemSystemCommand.Unequip(slot, targetSlot);
         }
 
-        public void OnShowSplitter(ItemSlotData slot)
+        public void OnShowSplitter(ItemSlotEntry slot)
         {
             if (!_itemSystem.TryGetItem(slot, out var item)) return;
 
             View.ShowSplitter(slot, item.Count);
         }
 
-        public void OnUse(ItemSlotData slot)
+        public void OnUse(ItemSlotEntry slot)
         {
             View.DeselectItem();
         }
 
-        public void OnKeep(ItemSlotData slot)
+        public void OnKeep(ItemSlotEntry slot)
         {
             View.DeselectItem();
 
             if (!_itemSystem.TryGetEmptySlotIndex(_openType, out var slotIndex)) return;
 
-            _itemSystemCommand.SwapOrMerge(slot, new ItemSlotData(_openType, slotIndex));
+            _itemSystemCommand.SwapOrMerge(slot, new ItemSlotEntry(_openType, slotIndex));
         }
 
-        public void OnTakeOut(ItemSlotData slot)
+        public void OnTakeOut(ItemSlotEntry slot)
         {
             View.DeselectItem();
 
             if (!_itemSystem.TryGetEmptySlotIndex(ItemSlotType.Inventory, out var slotIndex)) return;
 
-            _itemSystemCommand.SwapOrMerge(slot, new ItemSlotData(ItemSlotType.Inventory, slotIndex));
+            _itemSystemCommand.SwapOrMerge(slot, new ItemSlotEntry(ItemSlotType.Inventory, slotIndex));
         }
 
-        public void OnRemove(ItemSlotData slot)
+        public void OnRemove(ItemSlotEntry slot)
         {
             View.DeselectItem();
 
@@ -252,13 +252,13 @@ namespace Domivium.Client.Contents.UI.Stack
             _itemSystemCommand.Remove(slot);
         }
 
-        public void OnSplit(ItemSlotData slot, int count)
+        public void OnSplit(ItemSlotEntry slot, int count)
         {
             View.DeselectItem();
             _itemSystemCommand.SplitStack(slot, count);
         }
 
-        private void SetItem(ItemSlotType slotType, int index, ItemData item)
+        private void SetItem(ItemSlotType slotType, int index, ItemEntity item)
         {
             var sprite = _spriteSystem.GetSprite(item.Type, item.Id);
             var itemCount = item.Count;
@@ -386,7 +386,7 @@ namespace Domivium.Client.Contents.UI.Stack
             _character.Gauge.AddListener(StatId.Weight, OnWeightGaugeChanged);
         }
 
-        private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemData>> e)
+        private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
         {
             switch (e.Action)
             {
@@ -407,7 +407,7 @@ namespace Domivium.Client.Contents.UI.Stack
             }
         }
 
-        private void OnChangedInventory(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemData>> e)
+        private void OnChangedInventory(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
         {
             switch (e.Action)
             {
@@ -421,13 +421,14 @@ namespace Domivium.Client.Contents.UI.Stack
                     SetItem(ItemSlotType.Inventory, e.NewItem.Key, e.NewItem.Value);
                     break;
                 case NotifyCollectionChangedAction.Reset:
+                    break;
                 case NotifyCollectionChangedAction.Move:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private void OnChangedLoot(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemData>> e)
+        private void OnChangedLoot(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
         {
             switch (e.Action)
             {

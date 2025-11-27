@@ -5,6 +5,7 @@
         None,
         Equipment,
         Inventory,
+        Storage,
         Loot
     }
 }

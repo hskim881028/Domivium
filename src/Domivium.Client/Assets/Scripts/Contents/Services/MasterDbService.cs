@@ -8,6 +8,7 @@ namespace Domivium.Client.Contents.Services
 
         public MasterDbService(TextAsset data)
         {
+            this.Log();
             DB = new MemoryDatabase(data.bytes);
         }
     }

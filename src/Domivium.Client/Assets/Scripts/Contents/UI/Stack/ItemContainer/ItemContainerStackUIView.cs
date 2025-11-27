@@ -134,7 +134,7 @@ namespace Domivium.Client.Contents.UI.Stack
             _equipment.ClearFocus();
         }
 
-        public void SelectItem(ItemSlotData slot, ItemData item, ItemContext context)
+        public void SelectItem(ItemSlotEntry slot, ItemEntity item, ItemContext context)
         {
             // todo: 조건 추가 - 창고 on/off 상태
             var canKeep = _openType == ItemSlotType.Loot;
@@ -145,7 +145,7 @@ namespace Domivium.Client.Contents.UI.Stack
             Focus(slot.Type, item.Type);
         }
 
-        public void PickItem(ItemSlotData slot, ItemType itemType, Vector2 position)
+        public void PickItem(ItemSlotEntry slot, ItemType itemType, Vector2 position)
         {
             _itemInformation.Hide();
             _itemSelector.Hide();
@@ -194,7 +194,7 @@ namespace Domivium.Client.Contents.UI.Stack
             _equipment.ClearFocus();
         }
 
-        public bool TryGetSlot(Vector2 position, out ItemSlotData slot)
+        public bool TryGetSlot(Vector2 position, out ItemSlotEntry slot)
         {
             slot = default;
 
@@ -207,7 +207,7 @@ namespace Domivium.Client.Contents.UI.Stack
             return false;
         }
 
-        public void ShowSplitter(ItemSlotData slot, int itemCount)
+        public void ShowSplitter(ItemSlotEntry slot, int itemCount)
         {
             _itemSplitter.Show(slot, itemCount);
         }
@@ -247,7 +247,7 @@ namespace Domivium.Client.Contents.UI.Stack
             _wallet.SetGem(value);
         }
 
-        private ItemSlot GetSlot(ItemSlotData slot)
+        private ItemSlot GetSlot(ItemSlotEntry slot)
         {
             switch (slot.Type)
             {
