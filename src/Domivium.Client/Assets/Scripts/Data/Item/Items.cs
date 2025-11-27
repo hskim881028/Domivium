@@ -34,14 +34,14 @@ namespace Domivium.Client.Data.Item
             InventoryCapacity.Value = 0;
             StorageCapacity.Value = 0;
             LootCapacity.Value = 0;
-            
+
             FilledInventoryCapacity.Value = 0;
             FilledStorageCapacity.Value = 0;
             FilledLootCapacity.Value = 0;
-            
+
             LoadedProjectile.Value = 0;
             TotalProjectile.Value = 0;
-            
+
             TotalWeight.Value = 0;
         }
     }
