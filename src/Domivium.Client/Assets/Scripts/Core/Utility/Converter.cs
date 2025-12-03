@@ -11,14 +11,39 @@ namespace Domivium.Client.Core.Utility
             return slotIndex switch
             {
                 0 => ItemType.Weapon,
-                1 => ItemType.Helmet,
-                2 => ItemType.Necklace,
-                3 => ItemType.Backpack,
-                4 => ItemType.Projectile,
-                5 => ItemType.Armor,
-                6 => ItemType.Ring,
+                1 => ItemType.Projectile,
+                2 => ItemType.Ring,
+                3 => ItemType.Necklace,
+                4 => ItemType.Head,
+                5 => ItemType.Body,
+                6 => ItemType.Feet,
+                7 => ItemType.Bag,
                 _ => throw new ArgumentOutOfRangeException(nameof(slotIndex))
             };
+        }
+
+        public static bool IsStackable(ItemType itemType)
+        {
+            switch (itemType)
+            {
+                case ItemType.Weapon:
+                case ItemType.Ring:
+                case ItemType.Necklace:
+                case ItemType.Head:
+                case ItemType.Body:
+                case ItemType.Feet:
+                case ItemType.Bag:
+                    return false;
+                case ItemType.Projectile:
+                case ItemType.Potion:
+                case ItemType.Food:
+                case ItemType.Cash:
+                case ItemType.Material:
+                    return true;
+                case ItemType.None:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(itemType), itemType, null);
+            }
         }
 
         public static int GetSlotIndex(ItemType itemType)
@@ -26,12 +51,18 @@ namespace Domivium.Client.Core.Utility
             return itemType switch
             {
                 ItemType.Weapon => 0,
-                ItemType.Helmet => 1,
-                ItemType.Necklace => 2,
-                ItemType.Backpack => 3,
-                ItemType.Projectile => 4,
-                ItemType.Armor => 5,
-                ItemType.Ring => 6,
+                ItemType.Projectile => 1,
+                ItemType.Ring => 2,
+                ItemType.Necklace => 3,
+                ItemType.Head => 4,
+                ItemType.Body => 5,
+                ItemType.Feet => 6,
+                ItemType.Bag => 7,
+                ItemType.None => throw new ArgumentOutOfRangeException(nameof(itemType)),
+                ItemType.Potion => throw new ArgumentOutOfRangeException(nameof(itemType)),
+                ItemType.Food => throw new ArgumentOutOfRangeException(nameof(itemType)),
+                ItemType.Cash => throw new ArgumentOutOfRangeException(nameof(itemType)),
+                ItemType.Material => throw new ArgumentOutOfRangeException(nameof(itemType)),
                 _ => throw new ArgumentOutOfRangeException(nameof(itemType))
             };
         }
@@ -68,22 +99,28 @@ namespace Domivium.Client.Core.Utility
             {
                 case ItemType.Weapon:
                     return "무기";
-                case ItemType.Helmet:
-                    return "투구";
-                case ItemType.Necklace:
-                    return "목걸이";
-                case ItemType.Backpack:
-                    return "가방";
                 case ItemType.Projectile:
                     return "스펠";
-                case ItemType.Armor:
-                    return "갑옷";
+                case ItemType.Necklace:
+                    return "목걸이";
                 case ItemType.Ring:
                     return "반지";
-                case ItemType.Food:
-                    return "음식";
+                case ItemType.Head:
+                    return "모자";
+                case ItemType.Body:
+                    return "옷";
+                case ItemType.Feet:
+                    return "신발";
+                case ItemType.Bag:
+                    return "가방";
                 case ItemType.Potion:
                     return "물약";
+                case ItemType.Food:
+                    return "음식";
+                case ItemType.Cash:
+                    return "재화";
+                case ItemType.Material:
+                    return "재료";
                 case ItemType.None:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(itemType), itemType, null);
@@ -101,12 +138,6 @@ namespace Domivium.Client.Core.Utility
                         2 => "말포이 지팡이",
                         _ => throw new ArgumentOutOfRangeException(nameof(id))
                     };
-                case ItemType.Helmet:
-                    return "투구";
-                case ItemType.Necklace:
-                    return "목걸이";
-                case ItemType.Backpack:
-                    return "가방";
                 case ItemType.Projectile:
                     return id switch
                     {
@@ -116,14 +147,26 @@ namespace Domivium.Client.Core.Utility
                         4 => "스타폴샤드",
                         _ => throw new ArgumentOutOfRangeException(nameof(id))
                     };
-                case ItemType.Armor:
-                    return "갑옷";
+                case ItemType.Necklace:
+                    return "목걸이";
                 case ItemType.Ring:
                     return "반지";
-                case ItemType.Food:
-                    return "음식";
+                case ItemType.Head:
+                    return "모자";
+                case ItemType.Body:
+                    return "옷";
+                case ItemType.Feet:
+                    return "신발";
+                case ItemType.Bag:
+                    return "가방";
                 case ItemType.Potion:
                     return "물약";
+                case ItemType.Food:
+                    return "음식";
+                case ItemType.Cash:
+                    return "재화";
+                case ItemType.Material:
+                    return "재료";
                 case ItemType.None:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(itemType), itemType, null);

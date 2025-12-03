@@ -3,6 +3,7 @@ using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Audio;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.Battle;
+using Domivium.Client.Contents.Container;
 using Domivium.Client.Contents.DI.Container;
 using Domivium.Client.Contents.DI.Entry;
 using Domivium.Client.Contents.Factory;
@@ -15,12 +16,12 @@ using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Container;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Provider;
 using Domivium.Client.Core.Scene;
-using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Data.Cache;
@@ -59,6 +60,7 @@ namespace Domivium.Client.Contents.DI.Scene
             Context(builder, Lifetime.Singleton);
 
             Services(builder, Lifetime.Singleton);
+            Container(builder, Lifetime.Singleton);
             System(builder, Lifetime.Singleton);
             Provider(builder, Lifetime.Singleton);
             Audio(builder, Lifetime.Singleton);
@@ -141,18 +143,20 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<EnvironmentService>(lifetime);
         }
 
+        private void Container(IContainerBuilder builder, Lifetime lifetime)
+        {
+            builder.Register<IUserContainer, UserContainer>(lifetime);
+        }
+
         private void System(IContainerBuilder builder, Lifetime lifetime)
         {
-            builder.Register<LobbySystem>(lifetime).AsImplementedInterfaces();
-            builder.Register<StageSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<PointerSystem>(lifetime).AsImplementedInterfaces();
-            builder.Register<CharacterSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<LobbyFieldSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<StageFieldSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<CameraSystem>(lifetime).AsImplementedInterfaces();
-            builder.Register<LootSystem>(lifetime).AsImplementedInterfaces();
-            builder.Register<ItemSystem>(lifetime).AsImplementedInterfaces();
-            builder.Register<SpriteSystem>(lifetime).AsImplementedInterfaces().WithParameter(_spriteContainer.Items());
+            builder.Register<SpriteSystem>(lifetime).AsImplementedInterfaces()
+                .WithParameter(_spriteContainer.Items)
+                .WithParameter(_spriteContainer.Projectiles);
         }
 
         private void Provider(IContainerBuilder builder, Lifetime lifetime)

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
-using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.UI.Presenter;
 using Domivium.Client.Core.UI.View;
 using MessagePipe;
@@ -104,7 +103,7 @@ namespace Domivium.Client.Core.UI
                     break;
                 case SceneMessageType.Load:
                     _uiRoot = message.SceneScope.UIScope;
-                    _appContext.SetMode(StageMode.UILoaded);
+                    _appContext.SetMode(SceneMode.UILoaded);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

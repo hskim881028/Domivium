@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Actors;
@@ -51,16 +50,12 @@ namespace Domivium.Client.Contents.Factory
 
         public ActorParam CreateProjectile(
             int id,
-            ActorId target,
             StatSet sourceStatSet,
+            ActorId sourceActorId,
+            ActorId targetActorId,
             Vector2 spawnPosition,
             Vector2 direction,
-            IReadOnlyList<BattleAbility> abilities)
-        {
-            var projectileRow = _masterDbService.DB.ProjectileRowTable.FindById(id);
-            var projectileContext = new ProjectileContext(projectileRow);
-            return new ProjectileParams(target, sourceStatSet, spawnPosition, direction, projectileContext, abilities);
-        }
+            IReadOnlyList<BattleAbility> abilities) => new ProjectileParams(id, sourceStatSet, sourceActorId, targetActorId, spawnPosition, direction, abilities);
 
         public ActorParam CreateProp(int id, Vector2 spawnPosition) => new PropParams(spawnPosition);
     }

@@ -4,6 +4,7 @@ using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.State;
+using Domivium.Client.Core.Systems;
 using MessagePipe;
 using R3;
 using UnityEngine;
@@ -15,8 +16,14 @@ namespace Domivium.Client.Contents.Factory
         private readonly IPublisher<ActorStateMessage> _statePublisher;
         private readonly IPublisher<BattleCueMessage> _cuePublisher;
 
-        public SystemFactory(IPublisher<ActorStateMessage> statePublisher, IPublisher<BattleCueMessage> cuePublisher)
+        public ISpriteSystem SpriteSystem { get; }
+
+        public SystemFactory(
+            ISpriteSystem spriteSystem,
+            IPublisher<ActorStateMessage> statePublisher,
+            IPublisher<BattleCueMessage> cuePublisher)
         {
+            SpriteSystem = spriteSystem;
             _statePublisher = statePublisher;
             _cuePublisher = cuePublisher;
         }

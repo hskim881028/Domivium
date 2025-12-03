@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Domivium.Client.Core.UI.Navigation
+﻿namespace Domivium.Client.Core.UI.Navigation
 {
     public interface IUINavigationNodePool
     {

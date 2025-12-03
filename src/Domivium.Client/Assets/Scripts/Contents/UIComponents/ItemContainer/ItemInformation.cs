@@ -1,5 +1,4 @@
 ﻿using System;
-using Domivium.Client.Core.Component;
 using Domivium.Client.Core.Component.Stat;
 using Domivium.Client.Core.Component.Text;
 using Domivium.Client.Core.Utility;
@@ -17,6 +16,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         [SerializeField] private FloatStat _weight;
         [SerializeField] private FloatStat _attack;
         [SerializeField] private FloatStat _defense;
+        [SerializeField] private FloatStat _penetration;
         [SerializeField] private FloatStat _moveSpeed;
         [SerializeField] private FloatStat _attackRange;
         [SerializeField] private FloatStat _attackSpeed;
@@ -36,6 +36,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
 
             _attack.Hide();
             _defense.Hide();
+            _penetration.Hide();
             _attackRange.Hide();
             _attackSpeed.Hide();
             _moveSpeed.Hide();
@@ -59,16 +60,20 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
                     break;
                 case ItemType.Projectile:
                     _attack.Set(context.Attack);
+                    _penetration.Set(context.Penetration);
                     _projectileSpeed.Set(context.ProjectileSpeed * Constant.Percent);
                     _criticalRate.Set(context.CriticalRate * Constant.Percent);
                     _criticalDamage.Set(context.CriticalDamage * Constant.Percent);
                     break;
-                case ItemType.Helmet:
-                case ItemType.Necklace:
-                case ItemType.Backpack:
-                case ItemType.Armor:
                 case ItemType.Ring:
+                case ItemType.Necklace:
+                case ItemType.Head:
+                case ItemType.Body:
+                case ItemType.Feet:
+                case ItemType.Bag:
                 case ItemType.Food:
+                case ItemType.Cash:
+                case ItemType.Material:
                 case ItemType.Potion:
                     break;
                 case ItemType.None:

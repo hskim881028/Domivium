@@ -1,105 +1,133 @@
-﻿using System.IO;
-using Domivium.Client.Contents.DI;
-using Domivium.Client.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Cysharp.Threading.Tasks;
+using Domivium.Client.Core.Systems;
+using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.DataTransferObject;
-using Domivium.Client.Data.Item;
 using Newtonsoft.Json;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Domivium.Client.Contents.Services
 {
     public class LocalDataService
     {
-        private readonly IAppContext _appContext;
-        public static string SavePath => Path.Combine(Application.persistentDataPath, FileName);
+        public static string LocalDataDirectory => Path.Combine(Application.persistentDataPath, "local_data");
+        private static string UserDataPath(int userId, int characterId) => Path.Combine(LocalDataDirectory, $"user_{userId}_{characterId}.json");
+        private static string ItemDataPath(int userId, int characterId) => Path.Combine(LocalDataDirectory, $"items_{userId}_{characterId}.json");
+        private static string LootDataPath(int userId, int characterId, int stageId) => Path.Combine(LocalDataDirectory, $"loot_{userId}_{characterId}_{stageId}.json");
 
-        private const string FileName = "items.json";
+        private readonly IStageFieldSystem _stageFieldSystem;
+        private readonly MasterDbService _masterDbService;
 
-        public LocalDataService(IAppContext appContext)
+        public LocalDataService(MasterDbService masterDbService, IStageFieldSystem stageFieldSystem)
         {
-            _appContext = appContext;
+            _masterDbService = masterDbService;
+            _stageFieldSystem = stageFieldSystem;
+            if (!Directory.Exists(LocalDataDirectory))
+            {
+                Directory.CreateDirectory(LocalDataDirectory);
+            }
         }
 
-        public void Save(Items items)
+        public async UniTask<UserDto> LoadUserAsync(int userId, int characterId)
         {
-            if (_appContext.Scene.CurrentValue != SceneScopeIds.Lobby) return;
-
-            var data = new InventorySaveData
+            var path = UserDataPath(userId, characterId);
+            if (!File.Exists(path))
             {
-                InventoryCapacity = items.InventoryCapacity.CurrentValue,
-                StorageCapacity = items.StorageCapacity.CurrentValue
-            };
-
-            foreach (var kvp in items.Equipment)
-            {
-                data.Equipment.Add(new ItemSlotSaveData
-                {
-                    SlotIndex = kvp.Key,
-                    Guid = kvp.Value.Guid,
-                    ItemType = kvp.Value.Type,
-                    ItemId = kvp.Value.Id,
-                    ItemCount = kvp.Value.Count
-                });
+                var data = new UserDto { Id = userId, CharacterId = characterId, Level = 1 };
+                await SaveUserAsync(data);
+                return data;
             }
 
-            foreach (var kvp in items.Inventory)
+            var json = await File.ReadAllTextAsync(path);
+            return JsonConvert.DeserializeObject<UserDto>(json);
+        }
+
+        public async UniTask<ItemsDto> LoadItemAsync(int userId, int characterId)
+        {
+            var path = ItemDataPath(userId, characterId);
+            if (!File.Exists(path))
             {
-                data.Inventory.Add(new ItemSlotSaveData
-                {
-                    SlotIndex = kvp.Key,
-                    Guid = kvp.Value.Guid,
-                    ItemType = kvp.Value.Type,
-                    ItemId = kvp.Value.Id,
-                    ItemCount = kvp.Value.Count
-                });
+                var data = new ItemsDto { UserId = userId, CharacterId = characterId };
+                await SaveItemAsync(data);
+                return data;
             }
 
-            foreach (var kvp in items.Storage)
+            var json = await File.ReadAllTextAsync(path);
+            return JsonConvert.DeserializeObject<ItemsDto>(json);
+        }
+
+        public async UniTask<LootsDto> LoadLootAsync(int userId, int characterId, int stageId)
+        {
+            var path = LootDataPath(userId, characterId, stageId);
+            if (!File.Exists(path))
             {
-                data.Storage.Add(new ItemSlotSaveData
+                var data = new LootsDto { UserId = userId, CharacterId = characterId, StageId = stageId };
+                foreach (var (lootType, loots) in _stageFieldSystem.Loots)
                 {
-                    SlotIndex = kvp.Key,
-                    Guid = kvp.Value.Guid,
-                    ItemType = kvp.Value.Type,
-                    ItemId = kvp.Value.Id,
-                    ItemCount = kvp.Value.Count
-                });
+                    foreach (var (lootId, position) in loots)
+                    {
+                        var items = new List<ItemDto>();
+                        var context = _masterDbService.GetLootContext(lootType, lootId);
+                        var slotIndex = 0;
+                        foreach (var (itemType, itemId, minCount, maxCount, dropRate) in context.Loots)
+                        {
+                            if (Random.Range(0, 10000) >= dropRate) continue;
+
+                            var item = new ItemDto
+                            {
+                                SlotIndex = slotIndex,
+                                Guid = Guid.NewGuid(),
+                                ItemType = itemType,
+                                ItemId = itemId,
+                                ItemCount = Random.Range(minCount, maxCount + 1),
+                                IsStackable = Converter.IsStackable(itemType)
+                            };
+                            items.Add(item);
+                            slotIndex++;
+                        }
+
+                        var loot = new LootDto
+                        {
+                            Guid = Guid.NewGuid(),
+                            X = position.x,
+                            Y = position.y,
+                            LootType = lootType,
+                            Capacity = slotIndex,
+                            Items = items
+                        };
+
+                        data.Entities.Add(loot);
+                    }
+                }
+
+                await SaveLootAsync(data);
+                return data;
             }
 
+            var json = await File.ReadAllTextAsync(path);
+            return JsonConvert.DeserializeObject<LootsDto>(json);
+        }
+
+        public async UniTask SaveUserAsync(UserDto data)
+        {
             var json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            File.WriteAllText(SavePath, json);
+            await File.WriteAllTextAsync(UserDataPath(data.Id, data.CharacterId), json);
         }
 
-        public bool Load(ref Items items)
+        public async UniTask SaveItemAsync(ItemsDto data)
         {
-            if (!File.Exists(SavePath)) return false;
+            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
+            await File.WriteAllTextAsync(ItemDataPath(data.UserId, data.CharacterId), json);
+        }
 
-            var json = File.ReadAllText(SavePath);
-            var data = JsonConvert.DeserializeObject<InventorySaveData>(json);
-            if (data == null) return false;
-
-            items.InventoryCapacity.Value = data.InventoryCapacity;
-            items.StorageCapacity.Value = data.StorageCapacity;
-
-            items.Equipment.Clear();
-            foreach (var item in data.Equipment)
-            {
-                items.Equipment[item.SlotIndex] = new ItemEntity(item.Guid, item.ItemType, item.ItemId, item.ItemCount);
-            }
-
-            items.Inventory.Clear();
-            foreach (var item in data.Inventory)
-            {
-                items.Inventory[item.SlotIndex] = new ItemEntity(item.Guid, item.ItemType, item.ItemId, item.ItemCount);
-            }
-
-            items.Storage.Clear();
-            foreach (var item in data.Storage)
-            {
-                items.Storage[item.SlotIndex] = new ItemEntity(item.Guid, item.ItemType, item.ItemId, item.ItemCount);
-            }
-
-            return true;
+        public async UniTask SaveLootAsync(LootsDto data)
+        {
+            var path = LootDataPath(data.UserId, data.CharacterId, data.StageId);
+            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
+            await File.WriteAllTextAsync(path, json);
         }
     }
 }

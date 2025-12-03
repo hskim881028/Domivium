@@ -100,10 +100,12 @@ namespace Domivium.Client.Data.Stat
                 id == StatId.Sanity ||
                 id == StatId.Durability ||
                 id == StatId.Weight ||
+                id == StatId.WeightCapacity ||
                 id == StatId.InventoryCapacity ||
                 id == StatId.ProjectileCapacity ||
                 id == StatId.Attack ||
-                id == StatId.Defense)
+                id == StatId.Defense ||
+                id == StatId.Penetration)
             {
                 return StatDomain.Value;
             }

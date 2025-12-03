@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Actors.Contract;
+using Domivium.Client.Core.Systems;
 using UnityEngine;
 
 namespace Domivium.Client.Core.Actors
@@ -10,6 +11,8 @@ namespace Domivium.Client.Core.Actors
         public ushort Uid { get; private set; }
         public ActorId Id { get; private set; }
 
+        protected ISpriteSystem SpriteSystem;
+
         private void Awake()
         {
             OnAwake();
@@ -18,6 +21,11 @@ namespace Domivium.Client.Core.Actors
         private void OnDestroy()
         {
             OnDestroyInternal();
+        }
+
+        public void Configure(ISpriteSystem spriteSystem)
+        {
+            SpriteSystem = spriteSystem;
         }
 
         public virtual void Initialize(ushort uid, ActorId actorId, Transform parent)

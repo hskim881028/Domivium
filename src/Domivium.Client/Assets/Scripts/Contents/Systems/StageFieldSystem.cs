@@ -1,4 +1,6 @@
-﻿using Domivium.Client.Core.Systems;
+﻿using System.Collections.Generic;
+using Domivium.Client.Core.Systems;
+using Domivium.Client.Data.Loot;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -14,9 +16,17 @@ namespace Domivium.Client.Contents.Systems
 
         private Tilemap _grid;
 
-        public void InitializeAsync(Tilemap grid)
+        public IReadOnlyDictionary<LootType, IReadOnlyList<(ushort lootId, Vector2 position)>> Loots { get; private set; }
+
+        public void InitializeForLobbyAsync(Tilemap grid)
         {
             _grid = grid;
+        }
+
+        public void InitializeForStageAsync(Tilemap grid, IReadOnlyDictionary<LootType, IReadOnlyList<(ushort lootId, Vector2 position)>> loots)
+        {
+            _grid = grid;
+            Loots = loots;
         }
 
         public Vector3 GetNextPosition(Vector3 position, Vector3 delta, Vector2 collider)

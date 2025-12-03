@@ -18,7 +18,11 @@ namespace Domivium.Client.Contents.Services
 
         private void OnChangeScene(SceneScopeId sceneScopeId)
         {
-            if (sceneScopeId == SceneScopeIds.Title)
+            if (sceneScopeId == SceneScopeIds.Login)
+            {
+                _environmentRig.gameObject.SetActive(false);
+            }
+            else if (sceneScopeId == SceneScopeIds.Bootstrap)
             {
                 _environmentRig.gameObject.SetActive(false);
             }

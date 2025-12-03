@@ -9,15 +9,16 @@ namespace Domivium.Client.Contents.UI.Generated
 
 	public static class StaticUIId
 	{
+		public static UIId Bootstrap = 505954425;
 		public static UIId Lobby = 684247923;
+		public static UIId Login = 367913938;
 		public static UIId Stage = 773196749;
-		public static UIId Title = 617902505;
 	}
 
 	public static class StackUIId
 	{
-		public static UIId ItemContainer = 148036831;
-		public static UIId Login = 367913938;
+		public static UIId ItemContainer = 657524037;
+		public static UIId LoginPopup = 258704644;
 	}
 }
 // </auto-generated>

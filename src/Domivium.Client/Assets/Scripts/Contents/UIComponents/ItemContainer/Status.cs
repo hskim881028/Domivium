@@ -1,4 +1,5 @@
-﻿using Domivium.Client.Core.Component.Stat;
+﻿using System.Collections.Generic;
+using Domivium.Client.Core.Component.Stat;
 using Domivium.Client.Data.Stat;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
 
         [SerializeField] private FloatStat _attack;
         [SerializeField] private FloatStat _defense;
+        [SerializeField] private FloatStat _penetration;
         [SerializeField] private FloatStat _moveSpeed;
         [SerializeField] private FloatStat _attackRange;
         [SerializeField] private FloatStat _attackSpeed;
@@ -24,6 +26,9 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         [SerializeField] private FloatStat _reloadSpeed;
         [SerializeField] private FloatStat _criticalRate;
         [SerializeField] private FloatStat _criticalDamage;
+
+        private IReadOnlyDictionary<StatId, SliderStat> _gauges;
+        private IReadOnlyDictionary<StatId, FloatStat> _stats;
 
         public void Show()
         {
@@ -40,74 +45,47 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
             _level.Set(value);
         }
 
-        public void SetExp(int current, int limit)
+        public void SetFilledExperience(int value)
         {
-            _exp.Set(current, limit);
+            _exp.SetCurrent(value);
         }
 
+        public void SetExperience(int value)
+        {
+            _exp.SetLimit(value);
+        }
 
         public void SetStat(StatId statId, float value)
         {
-            if (statId == StatId.Attack)
+            _stats ??= new Dictionary<StatId, FloatStat>
             {
-                _attack.Set(value);
-            }
-            else if (statId == StatId.Defense)
-            {
-                _defense.Set(value);
-            }
-            else if (statId == StatId.MoveSpeed)
-            {
-                _moveSpeed.Set(value);
-            }
-            else if (statId == StatId.AttackRange)
-            {
-                _attackRange.Set(value);
-            }
-            else if (statId == StatId.AttackSpeed)
-            {
-                _attackSpeed.Set(value);
-            }
-            else if (statId == StatId.ProjectileSpeed)
-            {
-                _projectileSpeed.Set(value);
-            }
-            else if (statId == StatId.ProjectileCapacity)
-            {
-                _projectileCapacity.Set(value);
-            }
-            else if (statId == StatId.ReloadSpeed)
-            {
-                _reloadSpeed.Set(value);
-            }
-            else if (statId == StatId.CriticalRate)
-            {
-                _criticalRate.Set(value);
-            }
-            else if (statId == StatId.CriticalDamage)
-            {
-                _criticalDamage.Set(value);
-            }
+                { StatId.Attack, _attack },
+                { StatId.Defense, _defense },
+                { StatId.Penetration, _penetration },
+                { StatId.MoveSpeed, _moveSpeed },
+                { StatId.AttackRange, _attackRange },
+                { StatId.AttackSpeed, _attackSpeed },
+                { StatId.ProjectileSpeed, _projectileSpeed },
+                { StatId.ProjectileCapacity, _projectileCapacity },
+                { StatId.ReloadSpeed, _reloadSpeed },
+                { StatId.CriticalRate, _criticalRate },
+                { StatId.CriticalDamage, _criticalDamage }
+            };
+
+            _stats[statId].Set(value);
         }
 
         public void SetGauge(StatId statId, int current, int limit)
         {
-            if (statId == StatId.Health)
+            _gauges ??= new Dictionary<StatId, SliderStat>
             {
-                _health.Set(current, limit);
-            }
-            else if (statId == StatId.Hunger)
-            {
-                _hunger.Set(current, limit);
-            }
-            else if (statId == StatId.Stamina)
-            {
-                _stamina.Set(current, limit);
-            }
-            else if (statId == StatId.Sanity)
-            {
-                _sanity.Set(current, limit);
-            }
+                { StatId.Health, _health },
+                { StatId.Hunger, _hunger },
+                { StatId.Stamina, _stamina },
+                { StatId.Sanity, _sanity }
+            };
+
+            _gauges[statId].Set(current, limit);
         }
     }
 }

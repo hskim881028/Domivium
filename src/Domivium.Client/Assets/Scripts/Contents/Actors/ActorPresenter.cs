@@ -22,6 +22,7 @@ namespace Domivium.Client.Contents.Actors
         protected ActorPresenter(TActor actor, ISystemFactory systemFactory)
         {
             Actor = actor;
+            Actor.Configure(systemFactory.SpriteSystem);
             StateSystem = systemFactory.CreateState(this);
             StateSystem.Tag.DistinctUntilChanged().Subscribe(OnStateChanged).AddTo(ref DisposableBag);
         }

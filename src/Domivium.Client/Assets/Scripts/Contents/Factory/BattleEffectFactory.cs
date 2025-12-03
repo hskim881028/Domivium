@@ -2,51 +2,51 @@
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Battle.Effect;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Container;
 using Domivium.Client.Core.Factory;
-using Domivium.Client.Core.Systems;
 
 namespace Domivium.Client.Contents.Factory
 {
     public sealed class BattleEffectFactory : IBattleEffectFactory
     {
-        private readonly IItemUsageSystemCommand _itemUsage;
+        private readonly IUserContainer _userUsage;
 
-        public BattleEffectFactory(IItemUsageSystemCommand itemUsage)
+        public BattleEffectFactory(IUserContainer userUsage)
         {
-            _itemUsage = itemUsage;
+            _userUsage = userUsage;
         }
 
         public BattleEffect Create(BattleEffectId id, ref BattleEffectContext context)
         {
             if (id == BattleEffectIds.Attack)
             {
-                return new AttackEffect(_itemUsage, ref context);
+                return new AttackEffect(_userUsage, ref context);
             }
 
             if (id == BattleEffectIds.Damage)
             {
-                return new DamageEffect(_itemUsage, ref context);
+                return new DamageEffect(_userUsage, ref context);
             }
 
             if (id == BattleEffectIds.Durability)
             {
-                return new DurabilityEffect(_itemUsage, ref context);
+                return new DurabilityEffect(_userUsage, ref context);
             }
 
             if (id == BattleEffectIds.Reload)
             {
-                return new ReloadEffect(_itemUsage, ref context);
+                return new ReloadEffect(_userUsage, ref context);
             }
 
             if (id == BattleEffectIds.Avoid)
             {
-                return new AvoidEffect(_itemUsage, ref context);
+                return new AvoidEffect(_userUsage, ref context);
             }
 
 
             if (id == BattleEffectIds.Heal)
             {
-                return new HealEffect(_itemUsage, ref context);
+                return new HealEffect(_userUsage, ref context);
             }
 
             throw new Exception($"Invalid battle effect: {id}");

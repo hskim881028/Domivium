@@ -1,0 +1,4 @@
+Id,GroupId,ItemType,itemId,MinCount,MaxCount,DropRate
+int,int,string,int,int,int,percent
+1,1,Potion,1,1,2,10000
+2,1,Potion,2,1,2,5000

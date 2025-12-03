@@ -54,5 +54,13 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         {
             _slots[index].Clear();
         }
+
+        public void Clear()
+        {
+            foreach (var slot in _slots)
+            {
+                slot.Clear();
+            }
+        }
     }
 }

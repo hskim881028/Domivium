@@ -1,5 +1,4 @@
 ﻿using System;
-using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Utility;

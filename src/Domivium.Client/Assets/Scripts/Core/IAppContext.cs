@@ -1,5 +1,4 @@
 ﻿using Domivium.Client.Core.Scene;
-using Domivium.Client.Core.Systems;
 using R3;
 
 namespace Domivium.Client.Core
@@ -7,8 +6,8 @@ namespace Domivium.Client.Core
     public interface IAppContext
     {
         public ReadOnlyReactiveProperty<SceneScopeId> Scene { get; }
-        public ReadOnlyReactiveProperty<StageMode> Mode { get; }
+        public ReadOnlyReactiveProperty<SceneMode> Mode { get; }
         public void SetScene(SceneScopeId sceneScopeId);
-        public void SetMode(StageMode mode);
+        public void SetMode(SceneMode mode);
     }
 }

@@ -4,13 +4,16 @@
     {
         None,
         Weapon,
-        Helmet,
-        Necklace,
-        Backpack,
         Projectile,
-        Armor,
         Ring,
+        Necklace,
+        Head,
+        Body,
+        Feet,
+        Bag,
+        Potion,
         Food,
-        Potion
+        Cash,
+        Material
     }
 }

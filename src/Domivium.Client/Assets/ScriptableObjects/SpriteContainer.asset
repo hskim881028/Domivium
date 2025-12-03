@@ -12,14 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a71830fe78de4e82914d6e37706d5a70, type: 3}
   m_Name: SpriteContainer
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.DI.Container.SpriteContainer
-  _none: {fileID: 21300000, guid: e744f64d6f5090a46a58e9563356849c, type: 3}
-  _weapon:
+  _noneItem: {fileID: 21300000, guid: e744f64d6f5090a46a58e9563356849c, type: 3}
+  _weaponItems:
   - {fileID: 21300000, guid: 6c5a0631b82a115488399a365a6ab920, type: 3}
   - {fileID: 21300000, guid: 810668cb96886b242ab1adf43ee99f26, type: 3}
   - {fileID: 21300000, guid: 65bc054c236514f4dafc525ec0ab817b, type: 3}
   - {fileID: 21300000, guid: aff74e77eb6fe7c41b0cf80e8f0617ce, type: 3}
-  _projectile:
+  _projectileItems:
   - {fileID: 21300000, guid: 83b4b940d40efa64a9b370f81e282a5d, type: 3}
   - {fileID: 21300000, guid: 949cfc083a7a90b43976fd1840763ab4, type: 3}
   - {fileID: 21300000, guid: 08b90d219c2602041831bc88725cad25, type: 3}
   - {fileID: 21300000, guid: 1200f17d39cb5884fbdd0b97ce623c69, type: 3}
+  _ringItems: []
+  _necklaceItems: []
+  _headItems: []
+  _bodyItems: []
+  _feetItems: []
+  _bagItems: []
+  _potionItems: []
+  _foodItems: []
+  _cashItems: []
+  _materialItems: []
+  _projectiles:
+  - {fileID: 21300000, guid: ff5ae924795b4ea42bd360c133cce7b2, type: 3}
+  _monsterProjectiles:
+  - {fileID: -2282990572870065373, guid: 2c1fd26363363144a8eadf31678dd834, type: 3}

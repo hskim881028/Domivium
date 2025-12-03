@@ -1,0 +1,4 @@
+Id,Type,Rarity,Health,Hunger,Stamina,Sanity,Durability,Weight,WeightCapacity,InventoryCapacity,ProjectileCapacity,Attack,Defense,Penetration,DetectionRange,AttackRange,MoveSpeed,AttackSpeed,ReloadSpeed,ProjectileSpeed,CriticalRate,CriticalDamage
+int,string,string,int,int,int,int,int,int,int,int,int,int,int,int,percent,percent,percent,percent,percent,percent,percent,percent
+1,Swarovsko,Common,0,0,0,0,100,1000,0,0,0,0,10,0,0,0,0,0,0,0,0,2000
+2,Toffany,Common,0,0,0,0,100,1500,0,0,0,0,20,0,0,0,0,0,0,0,0,3000

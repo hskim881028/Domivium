@@ -10,7 +10,6 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
 
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private IntLimitText _capacity;
-        [SerializeField] private IntLimitText _weight;
 
         public override void Reset()
         {

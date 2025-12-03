@@ -63,20 +63,23 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
                     switch (itemType)
                     {
                         case ItemType.Weapon:
-                        case ItemType.Armor:
-                        case ItemType.Backpack:
-                        case ItemType.Ring:
                         case ItemType.Necklace:
-                        case ItemType.Helmet:
+                        case ItemType.Ring:
+                        case ItemType.Body:
+                        case ItemType.Feet:
+                        case ItemType.Head:
+                        case ItemType.Bag:
                             _splitButton.gameObject.SetActive(false);
                             _useButton.gameObject.SetActive(false);
                             break;
                         case ItemType.Projectile:
+                        case ItemType.Cash:
+                        case ItemType.Material:
                             _splitButton.gameObject.SetActive(true);
                             _useButton.gameObject.SetActive(false);
                             break;
-                        case ItemType.Food:
                         case ItemType.Potion:
+                        case ItemType.Food:
                             _splitButton.gameObject.SetActive(true);
                             _useButton.gameObject.SetActive(true);
                             break;
@@ -93,16 +96,19 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
                     switch (itemType)
                     {
                         case ItemType.Weapon:
-                        case ItemType.Armor:
-                        case ItemType.Backpack:
-                        case ItemType.Ring:
                         case ItemType.Necklace:
-                        case ItemType.Helmet:
+                        case ItemType.Ring:
+                        case ItemType.Head:
+                        case ItemType.Body:
+                        case ItemType.Feet:
+                        case ItemType.Bag:
                             _splitButton.gameObject.SetActive(false);
                             break;
                         case ItemType.Projectile:
-                        case ItemType.Food:
                         case ItemType.Potion:
+                        case ItemType.Food:
+                        case ItemType.Cash:
+                        case ItemType.Material:
                             _splitButton.gameObject.SetActive(true);
                             break;
                         case ItemType.None:

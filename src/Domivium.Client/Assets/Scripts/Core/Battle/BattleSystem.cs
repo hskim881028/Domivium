@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.State;
-using Domivium.Client.Data.Rarity;
 using Domivium.Client.Data.Stat;
 using MessagePipe;
 using R3;
@@ -34,9 +33,7 @@ namespace Domivium.Client.Core.Battle
         private bool _isDisposed;
 
         public ushort Uid { get; private set; }
-        public int Id { get; private set; }
         public ActorId ActorId { get; private set; }
-        public RarityType Rarity { get; private set; }
         public StatSet Stat { get; } = new();
         public GaugeSet Gauge { get; } = new();
         public Vector2 PrePosition { get; private set; }
@@ -71,14 +68,10 @@ namespace Domivium.Client.Core.Battle
         public void Initialize(
             ushort uid,
             ActorId actorId,
-            int id,
-            RarityType rarity,
             Vector2 position)
         {
             Uid = uid;
             ActorId = actorId;
-            Id = id;
-            Rarity = rarity;
             PrePosition = position;
             _pawn.position = position;
             Reset();

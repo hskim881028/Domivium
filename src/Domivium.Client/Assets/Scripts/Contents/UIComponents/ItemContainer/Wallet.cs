@@ -12,14 +12,27 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         [SerializeField] private IntText _moneyText;
         [SerializeField] private IntText _gemText;
 
-        public void SetWeight(float current, float limit)
+        public void SetFilledWeightCapacity(float value)
         {
-            _weightImage.color = current < limit ? Color.white : Color.red;
-            _weightText.Color = current < limit ? Color.white : Color.red;
-            _weightText.Value = current * Constant.Percent;
-            _weightText.Limit = limit * Constant.Percent;
-            _weightSlider.maxValue = limit;
-            _weightSlider.value = Mathf.Min(current, limit);
+            _weightText.Value = value * Constant.Percent;
+            if (_weightSlider.maxValue < value)
+            {
+                _weightSlider.maxValue = value;
+            }
+
+            _weightSlider.value = value;
+            SetWeightColor();
+        }
+
+        public void SetWeightCapacity(float value)
+        {
+            _weightText.Limit = value * Constant.Percent;
+            _weightSlider.maxValue = value;
+            if (value < _weightSlider.value)
+            {
+                _weightSlider.value = value;
+            }
+            SetWeightColor();
         }
 
         public void SetMoney(int value)
@@ -30,6 +43,13 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         public void SetGem(int value)
         {
             _gemText.Value = value;
+        }
+
+        private void SetWeightColor()
+        {
+            var color = _weightText.Value < _weightText.Limit ? Color.white : Color.red;
+            _weightImage.color = color;
+            _weightText.Color = color;
         }
     }
 }

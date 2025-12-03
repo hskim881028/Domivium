@@ -7,12 +7,6 @@ namespace Domivium.Client.Core.Message
         public SceneMessageType Type { get; }
         public SceneScope SceneScope { get; }
 
-        private SceneMessage(SceneMessageType type)
-        {
-            Type = type;
-            SceneScope = null;
-        }
-
         private SceneMessage(SceneMessageType type, SceneScope sceneScope)
         {
             Type = type;
@@ -21,6 +15,6 @@ namespace Domivium.Client.Core.Message
 
         public static SceneMessage Load(SceneScope sceneScope) => new(SceneMessageType.Load, sceneScope);
 
-        public static SceneMessage Unload => new(SceneMessageType.Unload);
+        public static SceneMessage Unload(SceneScope sceneScope) => new(SceneMessageType.Unload, sceneScope);
     }
 }

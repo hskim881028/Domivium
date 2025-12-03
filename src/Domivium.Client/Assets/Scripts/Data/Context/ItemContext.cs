@@ -11,10 +11,12 @@ namespace Domivium.Client.Data.Context
         public RarityType RarityType { get; }
         public int Durability { get; }
         public int Weight { get; }
+        public int WeightCapacity { get; }
         public int InventoryCapacity { get; }
         public int ProjectileCapacity { get; }
         public int Attack { get; }
         public int Defense { get; }
+        public int Penetration { get; }
         public int AttackRange { get; }
         public int MoveSpeed { get; }
         public int ProjectileSpeed { get; }
@@ -30,10 +32,12 @@ namespace Domivium.Client.Data.Context
             RarityType = Enum.Parse<RarityType>(row.Rarity);
             Durability = row.Durability;
             Weight = row.Weight;
+            WeightCapacity = row.WeightCapacity;
             InventoryCapacity = row.InventoryCapacity;
             ProjectileCapacity = row.ProjectileCapacity;
             Attack = row.Attack;
             Defense = row.Defense;
+            Penetration = row.Penetration;
             AttackRange = row.AttackRange;
             MoveSpeed = row.MoveSpeed;
             AttackSpeed = row.AttackSpeed;
@@ -50,10 +54,12 @@ namespace Domivium.Client.Data.Context
             RarityType = Enum.Parse<RarityType>(row.Rarity);
             Durability = row.Durability;
             Weight = row.Weight;
+            WeightCapacity = row.WeightCapacity;
             InventoryCapacity = row.InventoryCapacity;
             ProjectileCapacity = row.ProjectileCapacity;
             Attack = row.Attack;
             Defense = row.Defense;
+            Penetration = row.Penetration;
             AttackRange = row.AttackRange;
             MoveSpeed = row.MoveSpeed;
             AttackSpeed = row.AttackSpeed;

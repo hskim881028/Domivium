@@ -25,9 +25,14 @@ namespace Domivium.Client.Contents.UI.Static
             _battleHud.SetInteractButton(value);
         }
 
-        public void SetProjectileCapacity(int cur, int max)
+        public void SetRemainProjectiles(int value)
         {
-            _battleHud.SetProjectileCapacity(cur, max);
+            _battleHud.SetRemainCount(value);
+        }
+
+        public void SetLoadedProjectiles(int value)
+        {
+            _battleHud.SetLoadedCount(value);
         }
 
         public void Reload(float duration)
