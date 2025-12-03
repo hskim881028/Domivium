@@ -1,5 +1,4 @@
 ﻿using System;
-using Domivium.Client.Core.Component;
 using Domivium.Client.Core.Component.Text;
 using Domivium.Client.Data.Item;
 using UnityEngine;

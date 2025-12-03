@@ -17,9 +17,13 @@ namespace Domivium.Client.Contents.Services
 
         public void Load(SceneScopeId sceneScopeId)
         {
-            if (sceneScopeId == SceneScopeIds.Title)
+            if (sceneScopeId == SceneScopeIds.Login)
             {
-                _sceneScopeManager.LoadScope<Title>(sceneScopeId);
+                _sceneScopeManager.LoadScope<Login>(sceneScopeId);
+            }
+            else if (sceneScopeId == SceneScopeIds.Bootstrap)
+            {
+                _sceneScopeManager.LoadScope<Bootstrap>(sceneScopeId);
             }
             else if (sceneScopeId == SceneScopeIds.Lobby)
             {

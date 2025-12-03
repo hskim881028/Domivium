@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Domivium.Client.Core;
-using Domivium.Client.Core.Utility;
 using Domivium.Client.Network.ClientFilters;
 using Domivium.Shared.Response;
 using MagicOnion;
 using MagicOnion.Client;
-using UnityEngine;
 
 namespace Domivium.Client.Network
 {

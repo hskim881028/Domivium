@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
-using Domivium.Client.Core.Systems;
+using Domivium.Client.Core.Container;
 using Domivium.Client.Core.UI;
-using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Navigation;
 using Domivium.Client.Core.UI.Presenter;
+using Domivium.Client.Data.Loot;
 using Domivium.Client.Data.Stat;
 using R3;
 using UnityEngine;
@@ -29,34 +27,20 @@ namespace Domivium.Client.Contents.UI.Static
             IUINavigation navigation,
             IAudioPlayer audioPlayer,
             IActorManager actorManager,
-            ILootSystem lootSystem)
+            IUserContainer userContainer)
             : base(view, navigation, audioPlayer)
         {
             actorManager.Character.Subscribe(OnChangeCharacter).AddTo(ref DisposableBag);
-            lootSystem.OnFind.Subscribe(OnFindProp).AddTo(ref DisposableBag);
-        }
-
-        public override async UniTask<bool> InitializeAsync(CancellationToken token)
-        {
-            if (!await base.InitializeAsync(token)) return false;
-
-            View.SetAvoidButton(Constant.AvoidCooldown);
-            View.SetInteractButton(false);
-            return true;
-        }
-
-        public override async UniTask ShowAsync(CancellationToken token, UIParam param, bool immediately = false)
-        {
-            await base.ShowAsync(token, param, immediately);
-            OnProjectileCapacityChanged();
+            userContainer.Loot.Subscribe(OnFindProp).AddTo(ref DisposableBag);
+            userContainer.LoadedProjectile.Subscribe(OnChangedLoadedProjectile).AddTo(ref DisposableBag);
+            userContainer.RemainProjectile.Subscribe(OnChangedRemainProjectile).AddTo(ref DisposableBag);
         }
 
         private void OnActivateAbility(BattleAbilitySpec ability)
         {
             if (ability.Id == BattleAbilityIds.Reload)
             {
-                var reloadSpeed = _character.Stat.RateValue(StatId.ReloadSpeed);
-                View.Reload(reloadSpeed);
+                View.Reload(_character.Stat.RateValue(StatId.ReloadSpeed));
             }
             else if (ability.Id == BattleAbilityIds.CancelReload)
             {
@@ -103,16 +87,19 @@ namespace Domivium.Client.Contents.UI.Static
             SetStatGauge(StatId.Sanity);
         }
 
-        private void OnProjectileCapacityChanged()
+        private void OnChangedLoadedProjectile(int count)
         {
-            var cur = _character.Gauge.Current(StatId.ProjectileCapacity);
-            var max = _character.Gauge.Max(StatId.ProjectileCapacity);
-            View.SetProjectileCapacity(cur, max);
+            View.SetLoadedProjectiles(count);
         }
 
-        private void OnFindProp(ushort lootId)
+        private void OnChangedRemainProjectile(int count)
         {
-            View.SetInteractButton(lootId > 0);
+            View.SetRemainProjectiles(count);
+        }
+
+        private void OnFindProp(LootEntity loot)
+        {
+            View.SetInteractButton(loot != null);
         }
 
         private void OnChangeCharacter(IUnitPresenter character)
@@ -129,7 +116,8 @@ namespace Domivium.Client.Contents.UI.Static
             _character.Gauge.AddListener(StatId.Hunger, OnHungerChanged);
             _character.Gauge.AddListener(StatId.Stamina, OnStaminaChanged);
             _character.Gauge.AddListener(StatId.Sanity, OnSanityChanged);
-            _character.Gauge.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityChanged);
+
+            View.Reload(_character.Stat.RateValue(StatId.ReloadSpeed));
         }
     }
 }

@@ -1,0 +1,4 @@
+Id,GroupId,ItemType,itemId,MinCount,MaxCount,DropRate
+int,int,string,int,int,int,percent
+1,1,Helmet,1,1,1,10000
+2,1,Armor,1,1,1,5000

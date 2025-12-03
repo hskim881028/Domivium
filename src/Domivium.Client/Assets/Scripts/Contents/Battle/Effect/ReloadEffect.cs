@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
-using Domivium.Client.Core.Systems;
+using Domivium.Client.Core.Container;
 using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Stat;
 
@@ -12,7 +12,7 @@ namespace Domivium.Client.Contents.Battle.Effect
         public override BattleEffectId Id => BattleEffectIds.Reload;
         public override IReadOnlyCollection<BattleEffectTag> GrantedEffectTags => TagGenerator.SetBattleTag(BattleEffectTags.Reloading);
 
-        public ReloadEffect(IItemUsageSystemCommand itemUsage, ref BattleEffectContext context) : base(itemUsage, ref context) { }
+        public ReloadEffect(IUserContainer userContainer, ref BattleEffectContext context) : base(userContainer, ref context) { }
 
         public override void Reset(BattleEffectContext context)
         {
@@ -45,7 +45,7 @@ namespace Domivium.Client.Contents.Battle.Effect
 
         private void Reload(int capacity)
         {
-            ItemUsage.Reload(capacity);
+            UserContainer.Reload(capacity);
         }
     }
 }

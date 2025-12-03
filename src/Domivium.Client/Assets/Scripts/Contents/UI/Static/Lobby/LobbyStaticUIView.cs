@@ -1,4 +1,6 @@
-﻿using Domivium.Client.Contents.UIComponents;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
+using Domivium.Client.Contents.UIComponents;
 using Domivium.Client.Core.UI.View;
 using UnityEngine;
 
@@ -7,6 +9,15 @@ namespace Domivium.Client.Contents.UI.Static
     public class LobbyStaticUIView : StaticUIView<ILobbyStaticUIMessage>
     {
         [SerializeField] private BattleHud _battleHud;
+
+        public override async UniTask<bool> InitializeAsync(CancellationToken token)
+        {
+            if (!await base.InitializeAsync(token)) return false;
+
+            SetAvoidButton(0);
+            SetInteractButton(false);
+            return true;
+        }
 
         public void SetAttackButton(bool canAttack)
         {
@@ -23,9 +34,14 @@ namespace Domivium.Client.Contents.UI.Static
             _battleHud.SetInteractButton(value);
         }
 
-        public void SetProjectileCapacity(int cur, int max)
+        public void SetRemainProjectile(int value)
         {
-            _battleHud.SetProjectileCapacity(cur, max);
+            _battleHud.SetRemainCount(value);
+        }
+
+        public void SetLoadedProjectile(int value)
+        {
+            _battleHud.SetLoadedCount(value);
         }
 
         public void Reload(float duration)

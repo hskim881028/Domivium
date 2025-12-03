@@ -1,0 +1,4 @@
+Id,Type,Rarity,Health,Hunger,Stamina,Sanity,Durability,Weight,WeightCapacity,InventoryCapacity,ProjectileCapacity,Attack,Defense,Penetration,DetectionRange,AttackRange,MoveSpeed,AttackSpeed,ReloadSpeed,ProjectileSpeed,CriticalRate,CriticalDamage
+int,string,string,int,int,int,int,int,int,int,int,int,int,int,int,percent,percent,percent,percent,percent,percent,percent,percent
+1,healthPotion,Common,80,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+2,SanityPotion,Common,0,0,0,50,0,150,0,0,0,0,0,0,0,0,0,0,0,0,0,0

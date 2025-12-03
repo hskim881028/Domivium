@@ -71,6 +71,16 @@ namespace Domivium.Client.Contents.UI.Stack
             }
         }
 
+        public void SetFilledWeightCapacity(int capacity)
+        {
+            _wallet.SetFilledWeightCapacity(capacity);
+        }
+
+        public void SetWeightCapacity(int capacity)
+        {
+            _wallet.SetWeightCapacity(capacity);
+        }
+
         public void SetFilledInventoryCapacity(int capacity)
         {
             _inventory.SetFilledCapacity(capacity);
@@ -119,6 +129,11 @@ namespace Domivium.Client.Contents.UI.Stack
         public void ClearLootSlot(int index)
         {
             _loot.ClearSlot(index);
+        }
+
+        public void ClearLoot()
+        {
+            _loot.Clear();
         }
 
         public void SetUICamera(Camera uiCamera)
@@ -217,9 +232,14 @@ namespace Domivium.Client.Contents.UI.Stack
             _status.SetLevel(value);
         }
 
-        public void SetExp(int value, int limit)
+        public void SetFilledExperience(int value)
         {
-            _status.SetExp(value, limit);
+            _status.SetFilledExperience(value);
+        }
+
+        public void SetExperience(int value)
+        {
+            _status.SetExperience(value);
         }
 
         public void SetStat(StatId statId, float value)
@@ -230,11 +250,6 @@ namespace Domivium.Client.Contents.UI.Stack
         public void SetGauge(StatId statId, int current, int limit)
         {
             _status.SetGauge(statId, current, limit);
-        }
-
-        public void SetWeight(float current, float limit)
-        {
-            _wallet.SetWeight(current, limit);
         }
 
         public void SetMoney(int value)

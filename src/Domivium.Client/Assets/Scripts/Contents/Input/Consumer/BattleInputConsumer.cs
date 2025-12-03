@@ -5,10 +5,11 @@ using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.UI;
 using Domivium.Client.Contents.UI.Contract;
 using Domivium.Client.Contents.UI.Generated;
-using Domivium.Client.Core;
+using Domivium.Client.Core.Container;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
-using Domivium.Client.Core.Systems;
+using Domivium.Client.Core.Scene;
 using Domivium.Client.Core.UI.Contract;
 using Domivium.Client.Core.UI.Navigation;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace Domivium.Client.Contents.Input.Consumer
     public sealed class BattleInputConsumer : InputConsumer
     {
         private readonly SceneService _sceneService;
-        private readonly ICharacterSystemCommand _characterSystemCommand;
+        private readonly IUserContainer _userContainer;
 
         public override InputPriority Priority => InputPriorities.Battle;
 
@@ -26,16 +27,16 @@ namespace Domivium.Client.Contents.Input.Consumer
             IAppContext appContext,
             IUINavigation uiNavigation,
             SceneService sceneService,
-            ICharacterSystemCommand characterSystemCommand)
+            IUserContainer userContainer)
             : base(appContext, uiNavigation)
         {
             _sceneService = sceneService;
-            _characterSystemCommand = characterSystemCommand;
+            _userContainer = userContainer;
         }
 
         public override bool TryHandle(InputMessage message)
         {
-            if (AppContext.Mode.CurrentValue != StageMode.Run) return false;
+            if (AppContext.Mode.CurrentValue != SceneMode.Run) return false;
 
             if (UINavigation.IsRunning || UINavigation.HasOpenSystemUI) return false;
 
@@ -63,14 +64,14 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.Move:
                     if (UINavigation.HasOpenStackUI) return false;
 
-                    return _characterSystemCommand.SetDirection(message.Value);
+                    return _userContainer.SetDirection(message.Value);
                 case InputMessageType.Look:
-                    return _characterSystemCommand.LookAt(UINavigation.HasOpenStackUI ? Vector2.zero : message.Value);
+                    return _userContainer.LookAt(UINavigation.HasOpenStackUI ? Vector2.zero : message.Value);
 
                 case InputMessageType.LookCanceled:
                     if (UINavigation.HasOpenStackUI) return false;
 
-                    return _characterSystemCommand.LookAt(Vector2.zero);
+                    return _userContainer.LookAt(Vector2.zero);
                 case InputMessageType.Quick:
                 case InputMessageType.QuickCanceled:
                     return false;
@@ -78,7 +79,7 @@ namespace Domivium.Client.Contents.Input.Consumer
                     if (!UINavigation.HasOpenStackUI)
                     {
                         UINavigation.ShowStackUIAsync(StackUIId.ItemContainer, new InventoryParams()).Forget();
-                        _characterSystemCommand.Stop();
+                        _userContainer.Stop();
                         UINavigation.ApplyUILayer(UILayers.HideAll).Forget();
                         return true;
                     }
@@ -91,15 +92,17 @@ namespace Domivium.Client.Contents.Input.Consumer
                 case InputMessageType.Interact:
                     if (UINavigation.HasOpenStackUI) return false;
 
+                    if (!_userContainer.FoundLoot) return false;
+
                     UINavigation.ShowStackUIAsync(StackUIId.ItemContainer, new InventoryWithLootParams()).Forget();
-                    _characterSystemCommand.Stop();
+                    _userContainer.Stop();
                     UINavigation.ApplyUILayer(UILayers.HideAll).Forget();
                     return true;
 
                 case InputMessageType.Avoid:
                     if (UINavigation.HasOpenStackUI) return false;
 
-                    return _characterSystemCommand.Avoid();
+                    return _userContainer.Avoid();
                 default:
                     throw new ArgumentOutOfRangeException();
             }

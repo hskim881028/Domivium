@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
-using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;

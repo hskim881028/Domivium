@@ -1,71 +1,51 @@
 ﻿using System;
+using Domivium.Client.Data.DataTransferObject;
 
 namespace Domivium.Client.Data.Item
 {
-    public struct ItemEntity
+    public sealed class ItemEntity
     {
         public Guid Guid { get; }
         public ItemType Type { get; }
         public int Id { get; }
-        public int Count { get; private set; }
+        public int Count { get; }
+        public bool IsStackable { get; }
 
-        public bool IsStackable => Type is ItemType.Projectile or ItemType.Food or ItemType.Potion;
-
-        public ItemEntity(Guid guid, ItemType type, int id, int count)
+        public ItemEntity(
+            Guid guid,
+            ItemType type,
+            int id,
+            int count,
+            bool isStackable)
         {
             Guid = guid;
             Id = id;
             Type = type;
             Count = count;
+            IsStackable = isStackable;
         }
 
-        public void Add(int value)
+        public ItemEntity AddCount(int value) => new(Guid.NewGuid(), Type, Id, Count + value, IsStackable);
+
+        public ItemEntity RemoveCount(int value) => new(Guid.NewGuid(), Type, Id, Count - value, IsStackable);
+
+        public (ItemEntity oldItem, ItemEntity newItem) Split(int value)
         {
-            if (!IsStackable)
-            {
-                throw new InvalidOperationException("Non stackable item cannot change count.");
-            }
-
-            if (value <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value));
-            }
-
-            Count += value;
-        }
-
-        public ItemEntity Remove(int value)
-        {
-            if (!IsStackable)
-            {
-                throw new InvalidOperationException("Non stackable item cannot be split.");
-            }
-
-            if (value <= 0 || value > Count)
-            {
-                throw new ArgumentOutOfRangeException($"value: {value}({Count})");
-            }
-
-            Count -= value;
-            return new ItemEntity(Guid, Type, Id, Count);
-        }
-
-        public ItemEntity Split(int value)
-        {
-            if (!IsStackable)
-            {
-                throw new InvalidOperationException("Non stackable item cannot be split.");
-            }
-
-            if (value <= 0 || value >= Count)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value));
-            }
-
-            Count -= value;
-            return new ItemEntity(Guid.NewGuid(), Type, Id, value);
+            var oldItem = new ItemEntity(Guid.NewGuid(), Type, Id, Count - value, IsStackable);
+            var newItem = new ItemEntity(Guid.NewGuid(), Type, Id, value, IsStackable);
+            return (oldItem, newItem);
         }
 
         public bool CanMerge(ItemEntity other) => IsStackable && other.IsStackable && Id == other.Id && Type == other.Type;
+
+        public ItemDto ToDto(int slotIndex) => new()
+        {
+            SlotIndex = slotIndex,
+            Guid = Guid,
+            ItemType = Type,
+            ItemId = Id,
+            ItemCount = Count,
+            IsStackable = IsStackable
+        };
     }
 }

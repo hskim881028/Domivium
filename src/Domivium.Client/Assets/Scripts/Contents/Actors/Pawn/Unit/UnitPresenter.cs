@@ -23,7 +23,7 @@ namespace Domivium.Client.Contents.Actors
             var p = param.As<UnitParams>();
             var row = p.UnitContext;
 
-            BattleSystem.Initialize(Uid, row.ActorId, row.Id, row.RarityType, p.SpawnPosition);
+            BattleSystem.Initialize(Uid, row.ActorId, p.SpawnPosition);
 
             BattleSystem.Stat.Register(StatId.Health, row.Health);
             BattleSystem.Stat.Register(StatId.Hunger, row.Hunger);
@@ -35,6 +35,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Stat.Register(StatId.ProjectileCapacity, row.ProjectileCapacity);
             BattleSystem.Stat.Register(StatId.Attack, row.Attack);
             BattleSystem.Stat.Register(StatId.Defense, row.Defense);
+            BattleSystem.Stat.Register(StatId.Penetration, row.Penetration);
             BattleSystem.Stat.Register(StatId.AttackRange, row.AttackRange);
             BattleSystem.Stat.Register(StatId.DetectionRange, row.DetectionRange);
             BattleSystem.Stat.Register(StatId.MoveSpeed, row.MoveSpeed);
@@ -50,10 +51,12 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Stat.AddListener(StatId.Sanity, OnSanityStatChanged);
             BattleSystem.Stat.AddListener(StatId.Durability, OnDurabilityStatChanged);
             BattleSystem.Stat.AddListener(StatId.Weight, OnWeightStatChanged);
+            BattleSystem.Stat.AddListener(StatId.WeightCapacity, OnWeightCapacityStatChanged);
             BattleSystem.Stat.AddListener(StatId.InventoryCapacity, OnInventoryCapacityStatChanged);
             BattleSystem.Stat.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityStatChanged);
             BattleSystem.Stat.AddListener(StatId.Attack, OnAttackStatChanged);
             BattleSystem.Stat.AddListener(StatId.Defense, OnDefenseStatChanged);
+            BattleSystem.Stat.AddListener(StatId.Penetration, OnPenetrationStatChanged);
             BattleSystem.Stat.AddListener(StatId.AttackRange, OnAttackRangeStatChanged);
             BattleSystem.Stat.AddListener(StatId.DetectionRange, OnDetectionRangeStatChanged);
             BattleSystem.Stat.AddListener(StatId.MoveSpeed, OnMoveSpeedStatChanged);
@@ -67,7 +70,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Gauge.Register(StatId.Hunger, row.Hunger, row.Hunger);
             BattleSystem.Gauge.Register(StatId.Stamina, row.Stamina, row.Stamina);
             BattleSystem.Gauge.Register(StatId.Sanity, row.Sanity, row.Sanity);
-            BattleSystem.Gauge.Register(StatId.Weight, 0, row.Sanity);
+            BattleSystem.Gauge.Register(StatId.WeightCapacity, 0, row.Sanity);
             BattleSystem.Gauge.Register(StatId.InventoryCapacity, 0, row.InventoryCapacity);
             BattleSystem.Gauge.Register(StatId.ProjectileCapacity, 0, row.ProjectileCapacity);
 
@@ -75,7 +78,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Gauge.AddListener(StatId.Hunger, OnHungerGaugeChanged);
             BattleSystem.Gauge.AddListener(StatId.Stamina, OnStaminaGaugeChanged);
             BattleSystem.Gauge.AddListener(StatId.Sanity, OnSanityGaugeChanged);
-            BattleSystem.Gauge.AddListener(StatId.Weight, OnWeightGaugeChanged);
+            BattleSystem.Gauge.AddListener(StatId.WeightCapacity, OnWeightCapacityGaugeChanged);
             BattleSystem.Gauge.AddListener(StatId.InventoryCapacity, OnInventoryCapacityGaugeChanged);
             BattleSystem.Gauge.AddListener(StatId.ProjectileCapacity, OnProjectileCapacityGaugeChanged);
 
@@ -104,6 +107,8 @@ namespace Domivium.Client.Contents.Actors
 
         protected virtual void OnWeightStatChanged() { }
 
+        protected virtual void OnWeightCapacityStatChanged() { }
+
         protected virtual void OnInventoryCapacityStatChanged() { }
 
         protected virtual void OnProjectileCapacityStatChanged() { }
@@ -111,6 +116,8 @@ namespace Domivium.Client.Contents.Actors
         protected virtual void OnAttackStatChanged() { }
 
         protected virtual void OnDefenseStatChanged() { }
+
+        protected virtual void OnPenetrationStatChanged() { }
 
         protected virtual void OnAttackRangeStatChanged()
         {
@@ -152,7 +159,7 @@ namespace Domivium.Client.Contents.Actors
         protected virtual void OnHungerGaugeChanged() { }
         protected virtual void OnStaminaGaugeChanged() { }
         protected virtual void OnSanityGaugeChanged() { }
-        protected virtual void OnWeightGaugeChanged() { }
+        protected virtual void OnWeightCapacityGaugeChanged() { }
         protected virtual void OnInventoryCapacityGaugeChanged() { }
         protected virtual void OnProjectileCapacityGaugeChanged() { }
 

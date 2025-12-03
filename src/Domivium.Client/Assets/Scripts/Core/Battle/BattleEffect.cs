@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domivium.Client.Core.Container;
 using Domivium.Client.Core.State;
-using Domivium.Client.Core.Systems;
 using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Stat;
 
@@ -37,11 +37,11 @@ namespace Domivium.Client.Core.Battle
         protected virtual IReadOnlyCollection<BattleEffectTag> RequiredEffectTags => TagGenerator.EmptyBattleEffectTag;
         protected virtual IReadOnlyCollection<BattleEffectTag> BlockedEffectTags => TagGenerator.EmptyBattleEffectTag;
         protected virtual IReadOnlyCollection<StateTag> BlockedStateTags => TagGenerator.DefaultBlockedStateTag;
-        protected readonly IItemUsageSystemCommand ItemUsage;
+        protected readonly IUserContainer UserContainer;
 
-        protected BattleEffect(IItemUsageSystemCommand itemUsage, ref BattleEffectContext context)
+        protected BattleEffect(IUserContainer userContainer, ref BattleEffectContext context)
         {
-            ItemUsage = itemUsage;
+            UserContainer = userContainer;
             _context = context;
         }
 

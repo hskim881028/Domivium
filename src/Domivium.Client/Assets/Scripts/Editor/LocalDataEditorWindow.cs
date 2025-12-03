@@ -9,9 +9,9 @@ namespace Domivium.Client.Editor
         [MenuItem("Domivium/Delete local data")]
         public static void ApplicationScene()
         {
-            if (!File.Exists(LocalDataService.SavePath)) return;
+            if (!Directory.Exists(LocalDataService.LocalDataDirectory)) return;
 
-            File.Delete(LocalDataService.SavePath);
+            Directory.Delete(LocalDataService.LocalDataDirectory, true);
             EditorUtility.DisplayDialog("local data", "Delete complete!", "OK");
         }
     }

@@ -1,10 +1,13 @@
-﻿namespace Domivium.Client.Core.Utility
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+namespace Domivium.Client.Core.Utility
 {
-    public sealed class HitDistanceComparer : System.Collections.Generic.IComparer<UnityEngine.RaycastHit2D>
+    public sealed class HitDistanceComparer : IComparer<RaycastHit2D>
     {
         public static readonly HitDistanceComparer Instance = new();
 
-        public int Compare(UnityEngine.RaycastHit2D a, UnityEngine.RaycastHit2D b)
+        public int Compare(RaycastHit2D a, RaycastHit2D b)
             => a.distance.CompareTo(b.distance);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
-using Domivium.Client.Core.Utility;
-using TMPro;
+using Domivium.Client.Core.Component.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +8,7 @@ namespace Domivium.Client.Contents.UIComponents
 {
     public class ProjectileCapacity : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI _text;
+        [SerializeField] private IntLimitText _text;
         [SerializeField] private Image _gaugeImage;
 
         private readonly char[] _buf = new char[32];
@@ -39,12 +38,14 @@ namespace Domivium.Client.Contents.UIComponents
             _gaugeImage.fillAmount = 0;
         }
 
-        public void Set(int cur, int max)
+        public void SetRemainCount(int value)
         {
-            var length = TextWriteUtils.WriteIntGrouped(cur, _buf, ',');
-            _buf[length++] = '/';
-            length += TextWriteUtils.WriteIntGrouped(max, _buf, length, ',');
-            _text.SetCharArray(_buf, 0, length);
+            _text.Limit = value;
+        }
+
+        public void SetLoadedCount(int value)
+        {
+            _text.Value = value;
         }
 
         private void Reset()

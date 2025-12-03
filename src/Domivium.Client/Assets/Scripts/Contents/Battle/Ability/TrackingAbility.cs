@@ -1,5 +1,4 @@
 ﻿using System;
-using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Utility;
@@ -41,16 +40,16 @@ namespace Domivium.Client.Contents.Battle.Ability
             }
 
             Array.Sort(_hits, 0, count, HitDistanceComparer.Instance);
-            var durability = source.Gauge.Current(StatId.Durability);
+            var penetration = source.Gauge.Current(StatId.Penetration);
             for (var i = 0; i < count; i++)
             {
-                if (durability <= 0) break;
+                if (penetration <= 0) break;
 
                 var actor = _hits[i].transform.GetComponent<Actor>();
                 if (!context.Source.TryAddHistory(actor.Uid)) continue;
 
-                var durabilityEffect = EffectPool.Get(BattleEffectIds.Durability, context.Source, context.Source);
-                context.Source.ActivateEffect(durabilityEffect);
+                var pierceEffect = EffectPool.Get(BattleEffectIds.Pierce, context.Source, context.Source);
+                context.Source.ActivateEffect(pierceEffect);
 
                 if (actor.Id == context.Target)
                 {
@@ -61,7 +60,7 @@ namespace Domivium.Client.Contents.Battle.Ability
                     }
                 }
 
-                durability--;
+                penetration--;
             }
 
             return Tracking(source, context.DeltaTime);

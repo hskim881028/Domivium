@@ -1,6 +1,6 @@
 ﻿using System;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Message;
-using Domivium.Client.Core.Systems;
 using JetBrains.Annotations;
 using MessagePipe;
 using UnityEngine;
@@ -32,7 +32,7 @@ namespace Domivium.Client.Core.Scene
             }
 
             _appContext.SetScene(sceneScopeId);
-            _appContext.SetMode(StageMode.Loading);
+            _appContext.SetMode(SceneMode.Loading);
             _current = _root.CreateChild<T>(
                 builder => builder.RegisterInstance(sceneScopeId).AsSelf(),
                 typeof(T).Name);
@@ -48,7 +48,7 @@ namespace Domivium.Client.Core.Scene
 
         private void Unload()
         {
-            _publisher.Publish(SceneMessage.Unload);
+            _publisher.Publish(SceneMessage.Unload(_current));
 
             _current?.Dispose();
             _current = null;

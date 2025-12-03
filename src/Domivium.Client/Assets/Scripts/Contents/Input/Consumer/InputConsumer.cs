@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.DI;
 using Domivium.Client.Contents.UI;
-using Domivium.Client.Core;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.UI.Navigation;
@@ -26,9 +26,13 @@ namespace Domivium.Client.Contents.Input.Consumer
         protected async UniTask ApplyUILayer()
         {
             var layer = UILayers.HideAll;
-            if (AppContext.Scene.CurrentValue == SceneScopeIds.Title)
+            if (AppContext.Scene.CurrentValue == SceneScopeIds.Login)
             {
-                layer = UILayers.Title;
+                layer = UILayers.Login;
+            }
+            else if (AppContext.Scene.CurrentValue == SceneScopeIds.Bootstrap)
+            {
+                layer = UILayers.Bootstrap;
             }
             else if (AppContext.Scene.CurrentValue == SceneScopeIds.Lobby)
             {

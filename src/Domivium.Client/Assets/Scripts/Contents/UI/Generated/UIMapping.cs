@@ -10,19 +10,20 @@ namespace Domivium.Client.Contents.UI.Generated
 		public static readonly Dictionary<UIId, (Type presenter, Type view)> UI = new() 
 		{
 			// Static
+			{ StaticUIId.Bootstrap, (typeof(Domivium.Client.Contents.UI.Static.BootstrapStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.BootstrapStaticUIView)) },
 			{ StaticUIId.Lobby, (typeof(Domivium.Client.Contents.UI.Static.LobbyStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.LobbyStaticUIView)) },
+			{ StaticUIId.Login, (typeof(Domivium.Client.Contents.UI.Static.LoginStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.LoginStaticUIView)) },
 			{ StaticUIId.Stage, (typeof(Domivium.Client.Contents.UI.Static.StageStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.StageStaticUIView)) },
-			{ StaticUIId.Title, (typeof(Domivium.Client.Contents.UI.Static.TitleStaticUIPresenter), typeof(Domivium.Client.Contents.UI.Static.TitleStaticUIView)) },
 			// Stack
 			{ StackUIId.ItemContainer, (typeof(Domivium.Client.Contents.UI.Stack.ItemContainerStackUIPresenter), typeof(Domivium.Client.Contents.UI.Stack.ItemContainerStackUIView)) },
-			{ StackUIId.Login, (typeof(Domivium.Client.Contents.UI.Stack.LoginStackUIPresenter), typeof(Domivium.Client.Contents.UI.Stack.LoginStackUIView)) },
+			{ StackUIId.LoginPopup, (typeof(Domivium.Client.Contents.UI.Stack.LoginPopupStackUIPresenter), typeof(Domivium.Client.Contents.UI.Stack.LoginPopupStackUIView)) },
 		};
 
 		public static readonly Dictionary<UILayer, HashSet<UIId>> UIsByLayer = new () 
 		{
 			{ Domivium.Client.Contents.UI.UILayers.Lobby, new HashSet<UIId> { StaticUIId.Lobby } },
+			{ Domivium.Client.Contents.UI.UILayers.Login, new HashSet<UIId> { StaticUIId.Login } },
 			{ Domivium.Client.Contents.UI.UILayers.Stage, new HashSet<UIId> { StaticUIId.Stage } },
-			{ Domivium.Client.Contents.UI.UILayers.Title, new HashSet<UIId> { StaticUIId.Title } },
 		};
 	}
 }

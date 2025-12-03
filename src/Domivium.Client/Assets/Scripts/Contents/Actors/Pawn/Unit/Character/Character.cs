@@ -29,14 +29,8 @@ namespace Domivium.Client.Contents.Actors
         public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
             await base.SpawnAsync(token, param);
-            var p = param.As<CharacterParams>();
-            // var color = p.PawnContext.PawnType.ToColor();
+            _sight.SetActive(param is not LobbyCharacterParams);
             _layerMask = Id == ActorId.Character ? Layer.MonsterOrPropMask : Layer.CharacterOrPropMask;
-        }
-
-        public void SetSight(bool value)
-        {
-            _sight.SetActive(value);
         }
 
         public void SetAim(Vector2 direction, float range)

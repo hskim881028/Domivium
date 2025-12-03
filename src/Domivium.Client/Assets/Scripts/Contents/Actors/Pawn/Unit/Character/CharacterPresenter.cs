@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Container;
 using Domivium.Client.Core.Factory;
-using Domivium.Client.Core.Systems;
 using Domivium.Client.Data.Item;
 using Domivium.Client.Data.Stat;
 using ObservableCollections;
@@ -22,47 +21,47 @@ namespace Domivium.Client.Contents.Actors
     public class CharacterPresenter : UnitPresenter<Character>
     {
         private readonly MasterDbService _masterDbService;
-        private readonly IItemSystem _itemSystem;
+        private readonly IUserContainer _userContainer;
         private bool _firing;
 
         public CharacterPresenter(
             Character actor,
             ISystemFactory systemFactory,
             MasterDbService masterDbService,
-            IItemSystem itemSystem,
-            ICharacterSystem characterSystem)
+            IUserContainer userContainer)
             : base(actor, systemFactory)
         {
             _masterDbService = masterDbService;
-            _itemSystem = itemSystem;
-            _itemSystem.Equipment.CollectionChanged += OnChangedEquipment;
-            _itemSystem.LoadedProjectile.Subscribe(OnLoadedProjectile).AddTo(ref DisposableBag);
-            _itemSystem.TotalProjectile.Subscribe(OnTotalProjectile).AddTo(ref DisposableBag);
-            _itemSystem.TotalWeight.Subscribe(TotalWeight).AddTo(ref DisposableBag);
+            _userContainer = userContainer;
+            _userContainer.Equipment.CollectionChanged += OnChangedEquipment;
+            _userContainer.LoadedProjectile.Subscribe(OnChangedLoadedProjectile).AddTo(ref DisposableBag);
+            _userContainer.RemainProjectile.Subscribe(OnChangedRemainProjectile).AddTo(ref DisposableBag);
+            _userContainer.WeightCapacity.Subscribe(TotalWeight).AddTo(ref DisposableBag);
 
-            characterSystem.OnTurn.Subscribe(OnTurn).AddTo(ref DisposableBag);
-            characterSystem.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
-            characterSystem.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
+            _userContainer.OnTurn.Subscribe(OnTurn).AddTo(ref DisposableBag);
+            _userContainer.OnLookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
+            _userContainer.OnBattleTag.Subscribe(OnBattleTag).AddTo(ref DisposableBag);
         }
 
         public override async UniTask SpawnAsync(CancellationToken token, ActorParam param)
         {
             await base.SpawnAsync(token, param);
-            Actor.SetSight(param is not LobbyCharacterParams);
 
-            foreach (var (_, item) in _itemSystem.Equipment)
+            foreach (var (_, item) in _userContainer.Equipment)
             {
                 ApplyStat(item);
             }
 
-            OnLoadedProjectile(_itemSystem.LoadedProjectile.CurrentValue);
-            OnTotalProjectile(_itemSystem.TotalProjectile.CurrentValue);
-            TotalWeight(_itemSystem.TotalWeight.CurrentValue);
+            OnChangedLoadedProjectile(_userContainer.LoadedProjectile.CurrentValue);
+            OnChangedRemainProjectile(_userContainer.RemainProjectile.CurrentValue);
+            TotalWeight(_userContainer.WeightCapacity.CurrentValue);
+
+            OnBattleTag(_userContainer.OnBattleTag.CurrentValue);
         }
 
         protected override void OnDispose()
         {
-            _itemSystem.Equipment.CollectionChanged -= OnChangedEquipment;
+            _userContainer.Equipment.CollectionChanged -= OnChangedEquipment;
             base.OnDispose();
         }
 
@@ -179,21 +178,25 @@ namespace Domivium.Client.Contents.Actors
                 case ItemType.Weapon:
                     ApplyWeaponStat(item, mul);
                     break;
-                case ItemType.Helmet:
-                    break;
-                case ItemType.Necklace:
-                    break;
-                case ItemType.Backpack:
-                    break;
                 case ItemType.Projectile:
                     ApplyProjectileStat(item, mul);
                     break;
-                case ItemType.Armor:
-                    break;
                 case ItemType.Ring:
                     break;
-                case ItemType.Food: //  do nothing
+                case ItemType.Necklace:
+                    break;
+                case ItemType.Head:
+                    break;
+                case ItemType.Body:
+                    break;
+                case ItemType.Feet:
+                    break;
+                case ItemType.Bag:
+                    break;
                 case ItemType.Potion: //  do nothing
+                case ItemType.Food:
+                case ItemType.Cash:
+                case ItemType.Material:
                     break;
                 case ItemType.None:
                 default:
@@ -219,24 +222,25 @@ namespace Domivium.Client.Contents.Actors
             if (!_masterDbService.DB.ProjectileRowTable.TryFindById(item.Id, out var proj)) return;
 
             BattleSystem.Stat.Apply(StatId.Attack, proj.Attack * mul, StatChannel.Add);
-            BattleSystem.Stat.Apply(StatId.ProjectileSpeed, proj.AttackSpeed * mul, StatChannel.Add);
+            BattleSystem.Stat.Apply(StatId.Penetration, proj.Penetration * mul, StatChannel.Add);
+            BattleSystem.Stat.Apply(StatId.ProjectileSpeed, proj.ProjectileSpeed * mul, StatChannel.Add);
             BattleSystem.Stat.Apply(StatId.CriticalRate, proj.CriticalRate * mul, StatChannel.Add);
             BattleSystem.Stat.Apply(StatId.CriticalDamage, proj.CriticalDamage * mul, StatChannel.Add);
         }
 
-        private void OnLoadedProjectile(int count)
+        private void OnChangedLoadedProjectile(int count)
         {
             BattleSystem.Gauge.Apply(StatId.ProjectileCapacity, count, GaugeChannel.Set);
         }
 
-        private void OnTotalProjectile(int count)
+        private void OnChangedRemainProjectile(int count)
         {
             BattleSystem.Gauge.ApplyMax(StatId.ProjectileCapacity, count, GaugeChannel.Set);
         }
 
         private void TotalWeight(int weight)
         {
-            BattleSystem.Gauge.Apply(StatId.Weight, weight, GaugeChannel.Set);
+            BattleSystem.Gauge.Apply(StatId.WeightCapacity, weight, GaugeChannel.Set);
         }
     }
 }

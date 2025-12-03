@@ -31,9 +31,14 @@ namespace Domivium.Client.Contents.UIComponents
             _interactButton.SetActive(value);
         }
 
-        public void SetProjectileCapacity(int cur, int max)
+        public void SetRemainCount(int value)
         {
-            _projectileCapacity.Set(cur, max);
+            _projectileCapacity.SetRemainCount(value);
+        }
+
+        public void SetLoadedCount(int value)
+        {
+            _projectileCapacity.SetLoadedCount(value);
         }
 
         public void Reload(float duration)

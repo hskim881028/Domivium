@@ -13,9 +13,10 @@ namespace Domivium.Client.Contents.UI
 
         #region Static
 
-        public static UIPriority Title = 100;
-        public static UIPriority Lobby = 200;
-        public static UIPriority Stage = 300;
+        public static UIPriority Login = 100;
+        public static UIPriority Bootstrap = 200;
+        public static UIPriority Lobby = 300;
+        public static UIPriority Stage = 400;
 
         #endregion
     }

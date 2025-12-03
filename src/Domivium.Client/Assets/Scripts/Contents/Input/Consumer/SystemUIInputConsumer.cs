@@ -1,6 +1,6 @@
 ﻿using System;
-using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.UI.Navigation;

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Cache;
 using Domivium.Shared.Common;
 using Domivium.Shared.Request;

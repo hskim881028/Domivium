@@ -33,7 +33,7 @@ namespace Domivium.Client.Contents.DI.Entry
         {
             DOTween.SetTweensCapacity(512, 256);
             Application.targetFrameRate = 60;
-            _sceneService.Load(SceneScopeIds.Title);
+            _sceneService.Load(SceneScopeIds.Login);
         }
     }
 }

@@ -327,6 +327,7 @@ MonoBehaviour:
   _hitCollider: {fileID: 4287768703745321132}
   _moveMoveCollider: {fileID: 4287768703745321132}
   _trailRenderer: {fileID: 2557347853723296025}
+  _body: {fileID: 8857296461729078136}
 --- !u!58 &4287768703745321132
 CircleCollider2D:
   m_ObjectHideFlags: 0

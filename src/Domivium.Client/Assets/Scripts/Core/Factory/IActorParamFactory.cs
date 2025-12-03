@@ -27,8 +27,9 @@ namespace Domivium.Client.Core.Factory
 
         public ActorParam CreateProjectile(
             int id,
-            ActorId target,
             StatSet sourceStatSet,
+            ActorId sourceActorId,
+            ActorId targetActorId,
             Vector2 spawnPosition,
             Vector2 direction,
             IReadOnlyList<BattleAbility> abilities);

@@ -17,10 +17,12 @@ namespace Domivium.Client.Data.Context
         public int Sanity { get; }
         public int Durability { get; }
         public int Weight { get; }
+        public int WeightCapacity { get; }
         public int InventoryCapacity { get; }
         public int ProjectileCapacity { get; }
         public int Attack { get; }
         public int Defense { get; }
+        public int Penetration { get; }
         public int AttackRange { get; }
         public int DetectionRange { get; }
         public int MoveSpeed { get; }
@@ -43,10 +45,12 @@ namespace Domivium.Client.Data.Context
             Sanity = row.Sanity;
             Durability = row.Durability;
             Weight = row.Weight;
+            WeightCapacity = row.WeightCapacity;
             InventoryCapacity = row.InventoryCapacity;
             ProjectileCapacity = row.ProjectileCapacity;
             Attack = row.Attack;
             Defense = row.Defense;
+            Penetration = row.Penetration;
             AttackRange = row.AttackRange;
             DetectionRange = row.DetectionRange;
             MoveSpeed = row.MoveSpeed;
@@ -70,10 +74,12 @@ namespace Domivium.Client.Data.Context
             Sanity = row.Sanity;
             Durability = row.Durability;
             Weight = row.Weight;
+            WeightCapacity = row.WeightCapacity;
             InventoryCapacity = row.InventoryCapacity;
             ProjectileCapacity = row.ProjectileCapacity;
             Attack = row.Attack;
             Defense = row.Defense;
+            Penetration = row.Penetration;
             AttackRange = row.AttackRange;
             DetectionRange = row.DetectionRange;
             MoveSpeed = row.MoveSpeed;

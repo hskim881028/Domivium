@@ -16,10 +16,12 @@ namespace Domivium.Client.Data.Row
 		public int Sanity { get; set; }
 		public int Durability { get; set; }
 		public int Weight { get; set; }
+		public int WeightCapacity { get; set; }
 		public int InventoryCapacity { get; set; }
 		public int ProjectileCapacity { get; set; }
 		public int Attack { get; set; }
 		public int Defense { get; set; }
+		public int Penetration { get; set; }
 		public int DetectionRange { get; set; } // percent
 		public int AttackRange { get; set; } // percent
 		public int MoveSpeed { get; set; } // percent

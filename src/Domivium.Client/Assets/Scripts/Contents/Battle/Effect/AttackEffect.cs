@@ -1,6 +1,6 @@
 ﻿using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
-using Domivium.Client.Core.Systems;
+using Domivium.Client.Core.Container;
 using Domivium.Client.Data.Stat;
 
 namespace Domivium.Client.Contents.Battle.Effect
@@ -9,13 +9,13 @@ namespace Domivium.Client.Contents.Battle.Effect
     {
         public override BattleEffectId Id => BattleEffectIds.Attack;
 
-        public AttackEffect(IItemUsageSystemCommand itemUsage, ref BattleEffectContext context) : base(itemUsage, ref context) { }
+        public AttackEffect(IUserContainer userContainer, ref BattleEffectContext context) : base(userContainer, ref context) { }
 
         protected override bool OnActivate()
         {
             if (Context.Owner.ActorId == ActorId.Character)
             {
-                return ItemUsage.UseProjectile();
+                return UserContainer.Attack();
             }
 
             if (Context.Owner.ActorId == ActorId.Monster)

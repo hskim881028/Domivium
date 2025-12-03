@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Battle.Ability;
 using Domivium.Client.Core.Actors;

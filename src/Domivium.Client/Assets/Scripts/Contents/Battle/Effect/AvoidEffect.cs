@@ -1,12 +1,12 @@
 ﻿using Domivium.Client.Core.Battle;
-using Domivium.Client.Core.Systems;
+using Domivium.Client.Core.Container;
 
 namespace Domivium.Client.Contents.Battle.Effect
 {
     public class AvoidEffect : BattleEffect
     {
         public override BattleEffectId Id => BattleEffectIds.Avoid;
-        public AvoidEffect(IItemUsageSystemCommand itemUsage, ref BattleEffectContext context) : base(itemUsage, ref context) { }
+        public AvoidEffect(IUserContainer userUsage, ref BattleEffectContext context) : base(userUsage, ref context) { }
 
         protected override bool OnActivate() => true;
     }

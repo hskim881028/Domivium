@@ -4,8 +4,10 @@ namespace Domivium.Client.Contents.DI
 {
     public static class SceneScopeIds
     {
-        public static SceneScopeId Title = 0;
-        public static SceneScopeId Lobby = 1;
-        public static SceneScopeId Stage = 2;
+        public static SceneScopeId Application = 0;
+        public static SceneScopeId Login = 1;
+        public static SceneScopeId Bootstrap = 2;
+        public static SceneScopeId Lobby = 3;
+        public static SceneScopeId Stage = 4;
     }
 }

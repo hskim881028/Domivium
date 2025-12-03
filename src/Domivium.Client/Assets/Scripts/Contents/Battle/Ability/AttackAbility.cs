@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Actors.Generated;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
@@ -39,12 +38,13 @@ namespace Domivium.Client.Contents.Battle.Ability
         {
             var effect = EffectPool.Get(BattleEffectIds.Attack, context.Source, context.Source);
             context.Source.ActivateEffect(effect);
+            var source = context.Source.ActorId;
             var target = context.Source.ActorId == ActorId.Character ? ActorId.Monster : ActorId.Character;
             var stat = context.Source.Stat;
             var position = context.Source.MuzzlePosition;
             var direction = context.Source.LookAt.CurrentValue;
             var abilities = _abilityFactory.GetAbilities(ActorId.Projectile);
-            var param = _actorParamFactory.CreateProjectile(1, target, stat, position, direction, abilities);
+            var param = _actorParamFactory.CreateProjectile(1, stat, source, target, position, direction, abilities);
             _actorSpawner.SpawnAsync(ActorId.Projectile, param).Forget();
 
             var attackSpeed = stat.RateValue(StatId.AttackSpeed);

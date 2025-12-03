@@ -3,21 +3,20 @@ using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Data.Context;
-using Domivium.Client.Data.Item;
 using Domivium.Client.Data.Stat;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace Domivium.Client.Contents.Actors.Contract
 {
     public record PawnParams(Vector2 SpawnPosition) : ActorParam;
 
     public record ProjectileParams(
-        ActorId Target,
+        int Id,
         StatSet SourceStatSet,
+        ActorId SourceActorId,
+        ActorId TargetActorId,
         Vector2 SpawnPosition,
         Vector2 Direction,
-        ProjectileContext ProjectileContext,
         IReadOnlyList<BattleAbility> Abilities) : PawnParams(SpawnPosition);
 
     public record UnitParams(

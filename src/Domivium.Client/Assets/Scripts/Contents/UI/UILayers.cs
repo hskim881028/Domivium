@@ -6,8 +6,9 @@ namespace Domivium.Client.Contents.UI
     {
         public static UILayer HideAll = UILayer.HideAll;
         public static UILayer Default = UILayer.Default;
-        public static UILayer Title = 10;
-        public static UILayer Lobby = 20;
-        public static UILayer Stage = 30;
+        public static UILayer Login = 10;
+        public static UILayer Bootstrap = 20;
+        public static UILayer Lobby = 30;
+        public static UILayer Stage = 40;
     }
 }

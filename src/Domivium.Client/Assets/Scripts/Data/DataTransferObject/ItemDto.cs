@@ -7,7 +7,7 @@ using Newtonsoft.Json.Converters;
 namespace Domivium.Client.Data.DataTransferObject
 {
     [Serializable]
-    public class ItemSlotSaveData
+    public class ItemDto
     {
         public int SlotIndex;
         public Guid Guid;
@@ -17,16 +17,18 @@ namespace Domivium.Client.Data.DataTransferObject
 
         public int ItemId;
         public int ItemCount;
+        public bool IsStackable;
     }
 
     [Serializable]
-    public class InventorySaveData
+    public class ItemsDto
     {
-        public int InventoryCapacity;
-        public int StorageCapacity;
+        public int UserId;
+        public int CharacterId;
 
-        public List<ItemSlotSaveData> Equipment = new();
-        public List<ItemSlotSaveData> Inventory = new();
-        public List<ItemSlotSaveData> Storage = new();
+        public List<ItemDto> Equipment = new();
+        public List<ItemDto> Inventory = new();
+        public List<ItemDto> Storage = new();
+        public DateTime Modified;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Domivium.Client.Contents.DI;
-using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Scene;
 using R3;
 
@@ -18,7 +18,11 @@ namespace Domivium.Client.Contents.Services
 
         private void OnChangeScene(SceneScopeId sceneScopeId)
         {
-            if (sceneScopeId == SceneScopeIds.Title)
+            if (sceneScopeId == SceneScopeIds.Login)
+            {
+                _environmentRig.gameObject.SetActive(false);
+            }
+            else if (sceneScopeId == SceneScopeIds.Bootstrap)
             {
                 _environmentRig.gameObject.SetActive(false);
             }

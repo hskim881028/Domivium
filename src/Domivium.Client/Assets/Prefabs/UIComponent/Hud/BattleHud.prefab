@@ -827,6 +827,7 @@ GameObject:
   - component: {fileID: 348805703066410182}
   - component: {fileID: 6955866838323769535}
   - component: {fileID: 4540522935055640698}
+  - component: {fileID: 3627900509728586055}
   m_Layer: 5
   m_Name: ProjectileCapacityText
   m_TagString: Untagged
@@ -881,7 +882,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "0/10 \n(0)"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3e5e203b0bce9e24f809247c31925366, type: 2}
   m_sharedMaterial: {fileID: -3171694771615495509, guid: 3e5e203b0bce9e24f809247c31925366, type: 2}
@@ -908,7 +909,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
+  m_fontSize: 18
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -952,6 +953,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &3627900509728586055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3028144299203367681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e6acaa438274c56a755b8829c8031a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Domivium.Client.Core::Domivium.Client.Core.Component.Text.IntLimitText
+  _text: {fileID: 4540522935055640698}
+  _suffix: 
 --- !u!1 &3186118936816799584
 GameObject:
   m_ObjectHideFlags: 0
@@ -1544,7 +1559,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 358b8fbbe0024b7eb9ae380a931a4a17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.UIComponents.ProjectileCapacity
-  _text: {fileID: 4540522935055640698}
+  _text: {fileID: 3627900509728586055}
   _gaugeImage: {fileID: 3066843677639133154}
 --- !u!1 &5065569439700499641
 GameObject:
