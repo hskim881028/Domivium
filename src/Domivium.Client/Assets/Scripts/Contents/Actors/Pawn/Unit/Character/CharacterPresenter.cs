@@ -55,6 +55,8 @@ namespace Domivium.Client.Contents.Actors
             OnChangedLoadedProjectile(_userContainer.LoadedProjectile.CurrentValue);
             OnChangedRemainProjectile(_userContainer.RemainProjectile.CurrentValue);
             TotalWeight(_userContainer.WeightCapacity.CurrentValue);
+
+            OnBattleTag(_userContainer.OnBattleTag.CurrentValue);
         }
 
         protected override void OnDispose()

@@ -159,7 +159,7 @@ namespace Domivium.Client.Contents.UI.Stack
                             return;
                         case ItemSlotType.Inventory:
                         case ItemSlotType.Loot:
-                            _userContainer.SwapOrMerge(sourceSlot, targetSlot);
+                            _userContainer.SwapOrMergeItem(sourceSlot, targetSlot);
                             return;
                         case ItemSlotType.None:
                         default:
@@ -172,7 +172,7 @@ namespace Domivium.Client.Contents.UI.Stack
                             return;
                         case ItemSlotType.Inventory:
                         case ItemSlotType.Loot:
-                            _userContainer.SwapOrMerge(sourceSlot, targetSlot);
+                            _userContainer.SwapOrMergeItem(sourceSlot, targetSlot);
                             return;
                         case ItemSlotType.None:
                         default:
@@ -224,7 +224,7 @@ namespace Domivium.Client.Contents.UI.Stack
 
             if (!_userContainer.TryGetEmptySlotIndex(_openType, out var slotIndex)) return;
 
-            _userContainer.SwapOrMerge(slot, new ItemSlotEntry(_openType, slotIndex));
+            _userContainer.SwapOrMergeItem(slot, new ItemSlotEntry(_openType, slotIndex));
         }
 
         public void OnTakeOut(ItemSlotEntry slot)
@@ -233,7 +233,7 @@ namespace Domivium.Client.Contents.UI.Stack
 
             if (!_userContainer.TryGetEmptySlotIndex(ItemSlotType.Inventory, out var slotIndex)) return;
 
-            _userContainer.SwapOrMerge(slot, new ItemSlotEntry(ItemSlotType.Inventory, slotIndex));
+            _userContainer.SwapOrMergeItem(slot, new ItemSlotEntry(ItemSlotType.Inventory, slotIndex));
         }
 
         public void OnRemove(ItemSlotEntry slot)
@@ -242,13 +242,13 @@ namespace Domivium.Client.Contents.UI.Stack
 
             if (!_userContainer.TryGetItem(slot, out _)) return;
 
-            _userContainer.Remove(slot);
+            _userContainer.RemoveItem(slot);
         }
 
         public void OnSplit(ItemSlotEntry slot, int count)
         {
             View.DeselectItem();
-            _userContainer.SplitStack(slot, count);
+            _userContainer.SplitItem(slot, count);
         }
 
         private void SetItem(ItemSlotType slotType, int index, ItemEntity item)

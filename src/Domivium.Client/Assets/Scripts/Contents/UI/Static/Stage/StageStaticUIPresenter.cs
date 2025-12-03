@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
@@ -38,21 +36,11 @@ namespace Domivium.Client.Contents.UI.Static
             userContainer.RemainProjectile.Subscribe(OnChangedRemainProjectile).AddTo(ref DisposableBag);
         }
 
-        public override async UniTask<bool> InitializeAsync(CancellationToken token)
-        {
-            if (!await base.InitializeAsync(token)) return false;
-
-            _character.OnActivateAbility.Subscribe(OnActivateAbility).AddTo(ref DisposableBag);
-            _character.LookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
-            return true;
-        }
-
         private void OnActivateAbility(BattleAbilitySpec ability)
         {
             if (ability.Id == BattleAbilityIds.Reload)
             {
-                var reloadSpeed = _character.Stat.RateValue(StatId.ReloadSpeed);
-                View.Reload(reloadSpeed);
+                View.Reload(_character.Stat.RateValue(StatId.ReloadSpeed));
             }
             else if (ability.Id == BattleAbilityIds.CancelReload)
             {
@@ -128,6 +116,8 @@ namespace Domivium.Client.Contents.UI.Static
             _character.Gauge.AddListener(StatId.Hunger, OnHungerChanged);
             _character.Gauge.AddListener(StatId.Stamina, OnStaminaChanged);
             _character.Gauge.AddListener(StatId.Sanity, OnSanityChanged);
+
+            View.Reload(_character.Stat.RateValue(StatId.ReloadSpeed));
         }
     }
 }

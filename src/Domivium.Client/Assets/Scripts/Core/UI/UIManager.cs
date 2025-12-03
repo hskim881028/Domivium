@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Scene;
 using Domivium.Client.Core.UI.Presenter;

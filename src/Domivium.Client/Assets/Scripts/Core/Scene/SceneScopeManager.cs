@@ -1,4 +1,5 @@
 ﻿using System;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Message;
 using JetBrains.Annotations;
 using MessagePipe;

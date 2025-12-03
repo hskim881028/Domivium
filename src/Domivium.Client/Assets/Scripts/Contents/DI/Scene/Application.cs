@@ -4,6 +4,7 @@ using Domivium.Client.Contents.Audio;
 using Domivium.Client.Contents.Audio.Generated;
 using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Container;
+using Domivium.Client.Contents.Context;
 using Domivium.Client.Contents.DI.Container;
 using Domivium.Client.Contents.DI.Entry;
 using Domivium.Client.Contents.Factory;
@@ -17,6 +18,7 @@ using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Audio;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Container;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Input;
 using Domivium.Client.Core.Message;
@@ -132,6 +134,10 @@ namespace Domivium.Client.Contents.DI.Scene
         private static void Context(IContainerBuilder builder, Lifetime lifetime)
         {
             builder.Register<IAppContext, AppContext>(lifetime);
+            builder.Register<IBattleContext, BattleContext>(lifetime);
+            builder.Register<ILootsContext, LootsContext>(lifetime);
+            builder.Register<IUserContext, UserContext>(lifetime);
+            builder.Register<IItemsContext, ItemsContext>(lifetime);
         }
 
         private void Services(IContainerBuilder builder, Lifetime lifetime)

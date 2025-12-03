@@ -28,9 +28,9 @@ namespace Domivium.Client.Contents.Factory
                 return new DamageEffect(_userUsage, ref context);
             }
 
-            if (id == BattleEffectIds.Durability)
+            if (id == BattleEffectIds.Pierce)
             {
-                return new DurabilityEffect(_userUsage, ref context);
+                return new PierceEffect(_userUsage, ref context);
             }
 
             if (id == BattleEffectIds.Reload)

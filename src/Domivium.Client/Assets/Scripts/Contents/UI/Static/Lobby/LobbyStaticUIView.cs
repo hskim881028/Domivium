@@ -14,7 +14,7 @@ namespace Domivium.Client.Contents.UI.Static
         {
             if (!await base.InitializeAsync(token)) return false;
 
-            SetAvoidButton(Constant.AvoidCooldown);
+            SetAvoidButton(0);
             SetInteractButton(false);
             return true;
         }

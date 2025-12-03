@@ -35,6 +35,7 @@ namespace Domivium.Client.Contents.Actors
             BattleSystem.Stat.Register(StatId.ProjectileCapacity, row.ProjectileCapacity);
             BattleSystem.Stat.Register(StatId.Attack, row.Attack);
             BattleSystem.Stat.Register(StatId.Defense, row.Defense);
+            BattleSystem.Stat.Register(StatId.Penetration, row.Penetration);
             BattleSystem.Stat.Register(StatId.AttackRange, row.AttackRange);
             BattleSystem.Stat.Register(StatId.DetectionRange, row.DetectionRange);
             BattleSystem.Stat.Register(StatId.MoveSpeed, row.MoveSpeed);

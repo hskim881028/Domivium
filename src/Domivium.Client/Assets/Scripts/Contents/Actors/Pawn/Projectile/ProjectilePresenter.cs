@@ -96,7 +96,6 @@ namespace Domivium.Client.Contents.Actors
         protected virtual void OnPenetrationGaugeChanged()
         {
             var current = BattleSystem.Gauge.Current(StatId.Penetration);
-            this.Log(current);
             if (current <= 0)
             {
                 Die();

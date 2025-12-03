@@ -10,26 +10,24 @@ namespace Domivium.Client.Core.Container
 {
     public interface IUserContainer : ITicker
     {
-        public IReadOnlyObservableDictionary<int, ItemEntity> Equipment { get; }
-        public IReadOnlyObservableDictionary<int, ItemEntity> Inventory { get; }
-        public ReadOnlyReactiveProperty<LootEntity> Loot { get; }
-
-        public ReadOnlyReactiveProperty<int> FilledInventoryCapacity { get; }
-        public ReadOnlyReactiveProperty<int> InventoryCapacity { get; }
-        public ReadOnlyReactiveProperty<int> LoadedProjectile { get; }
-        public ReadOnlyReactiveProperty<int> RemainProjectile { get; }
-        public ReadOnlyReactiveProperty<int> FilledWeightCapacity { get; }
-        public ReadOnlyReactiveProperty<int> WeightCapacity { get; }
-
         public ReadOnlyReactiveProperty<int> Level { get; }
         public ReadOnlyReactiveProperty<int> FilledExperience { get; }
         public ReadOnlyReactiveProperty<int> Experience { get; }
-        
-        // behaviour
+
+        public ReadOnlyReactiveProperty<int> LoadedProjectile { get; }
+        public ReadOnlyReactiveProperty<int> RemainProjectile { get; }
         public ReadOnlyReactiveProperty<Vector2> OnTurn { get; }
         public ReadOnlyReactiveProperty<Vector2> OnLookAt { get; }
-        public ReactiveCommand<BattleTag> OnBattleTag { get; }
+        public ReadOnlyReactiveProperty<BattleTag> OnBattleTag { get; }
+        
+        public IReadOnlyObservableDictionary<int, ItemEntity> Equipment { get; }
+        public IReadOnlyObservableDictionary<int, ItemEntity> Inventory { get; }
+        public ReadOnlyReactiveProperty<int> FilledInventoryCapacity { get; }
+        public ReadOnlyReactiveProperty<int> InventoryCapacity { get; }
+        public ReadOnlyReactiveProperty<int> FilledWeightCapacity { get; }
+        public ReadOnlyReactiveProperty<int> WeightCapacity { get; }
 
+        public ReadOnlyReactiveProperty<LootEntity> Loot { get; }
         public bool FoundLoot { get; }
 
         public UniTask InitializeUserAsync(int userId, int characterId);
@@ -42,9 +40,9 @@ namespace Domivium.Client.Core.Container
         public bool TryGetEmptySlotIndex(ItemSlotType slotType, out int slotIndex);
         public void Equip(ItemSlotEntry fromSlot, ItemSlotEntry toSlot);
         public void Unequip(ItemSlotEntry fromSlot, ItemSlotEntry toSlot);
-        public void SwapOrMerge(ItemSlotEntry fromSlot, ItemSlotEntry toSlot);
-        public void SplitStack(ItemSlotEntry slot, int count);
-        public void Remove(ItemSlotEntry slot);
+        public void SwapOrMergeItem(ItemSlotEntry fromSlot, ItemSlotEntry toSlot);
+        public void SplitItem(ItemSlotEntry slot, int count);
+        public void RemoveItem(ItemSlotEntry slot);
 
         public bool Attack();
         public void Reload(int capacity);

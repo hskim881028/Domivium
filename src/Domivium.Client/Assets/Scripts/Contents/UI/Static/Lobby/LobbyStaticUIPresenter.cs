@@ -18,6 +18,7 @@ namespace Domivium.Client.Contents.UI.Static
         private IBattleSystem _character;
 
         protected override HashSet<UILayer> Layer => UILayer.Set(UILayers.Lobby);
+
         public override UIPriority Priority => UIPriorities.Lobby;
 
         public LobbyStaticUIPresenter(
@@ -36,8 +37,7 @@ namespace Domivium.Client.Contents.UI.Static
         {
             if (ability.Id == BattleAbilityIds.Reload)
             {
-                var reloadSpeed = _character.Stat.RateValue(StatId.ReloadSpeed);
-                View.Reload(reloadSpeed);
+                View.Reload(_character.Stat.RateValue(StatId.ReloadSpeed));
             }
             else if (ability.Id == BattleAbilityIds.CancelReload)
             {
@@ -72,6 +72,8 @@ namespace Domivium.Client.Contents.UI.Static
             _character = character.BattleSystem;
             _character.OnActivateAbility.Subscribe(OnActivateAbility).AddTo(ref DisposableBag);
             _character.LookAt.Subscribe(OnLookAt).AddTo(ref DisposableBag);
+
+            View.Reload(_character.Stat.RateValue(StatId.ReloadSpeed));
         }
     }
 }

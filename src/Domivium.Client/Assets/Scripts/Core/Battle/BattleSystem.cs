@@ -125,7 +125,6 @@ namespace Domivium.Client.Core.Battle
             if (!_abilitySpecs.TryGetValue(context.AbilityId, out var spec))
                 return false;
 
-
             if (!spec.TryActivate(ref context)) return false;
 
             OnActivateAbility.Execute(spec);

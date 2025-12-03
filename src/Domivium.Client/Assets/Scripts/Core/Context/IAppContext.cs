@@ -1,7 +1,7 @@
 ﻿using Domivium.Client.Core.Scene;
 using R3;
 
-namespace Domivium.Client.Core
+namespace Domivium.Client.Core.Context
 {
     public interface IAppContext
     {

@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using Cysharp.Threading.Tasks;
-using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Container;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Core.Message;
 using Domivium.Client.Core.Utility;
 using Domivium.Client.Data.Item;
 using Domivium.Client.Data.Loot;
-using Domivium.Client.Data.User;
 using MessagePipe;
 using ObservableCollections;
 using R3;
@@ -23,84 +20,63 @@ namespace Domivium.Client.Contents.Container
         private readonly MasterDbService _masterDbService;
         private readonly LocalDataService _localDataService;
 
-        private readonly User _user = new();
-        private readonly Items _items = new();
-        private readonly Loots _loots = new();
+        private readonly IUserContext _user;
+        private readonly IBattleContext _battle;
+        private readonly IItemsContext _items;
+        private readonly ILootsContext _loots;
 
-        private readonly ReactiveProperty<LootEntity> _loot = new();
+        public ReadOnlyReactiveProperty<int> Level => _user.Level;
+        public ReadOnlyReactiveProperty<int> FilledExperience => _user.FilledExperience;
+        public ReadOnlyReactiveProperty<int> Experience => _user.Experience;
         
-        private readonly ReactiveProperty<int> _filledInventoryCapacity = new();
-        private readonly ReactiveProperty<int> _inventoryCapacity = new();
-        private readonly ReactiveProperty<int> _filledWeightCapacity = new();
-        private readonly ReactiveProperty<int> _weightCapacity = new();
+        public ReadOnlyReactiveProperty<int> LoadedProjectile => _battle.LoadedProjectile;
+        public ReadOnlyReactiveProperty<int> RemainProjectile => _battle.RemainProjectile;
+        public ReadOnlyReactiveProperty<Vector2> OnTurn => _battle.OnTurn;
+        public ReadOnlyReactiveProperty<Vector2> OnLookAt => _battle.OnLookAt;
+        public ReadOnlyReactiveProperty<BattleTag> OnBattleTag => _battle.OnBattleTag;
         
-        private readonly ReactiveProperty<int> _loadedProjectile = new();
-        private readonly ReactiveProperty<int> _remainProjectile = new();
-        
-        private readonly ReactiveProperty<int> _level = new();
-        private readonly ReactiveProperty<int> _filledExperience = new();
-        private readonly ReactiveProperty<int> _experience = new();
-
-        private readonly ReactiveProperty<Vector2> _direction = new();
-        private readonly ReactiveProperty<Vector2> _lookAt = new();
-
-        private readonly Dictionary<(ItemType, int), int> _weightCache = new();
-
         public IReadOnlyObservableDictionary<int, ItemEntity> Equipment => _items.Equipment;
         public IReadOnlyObservableDictionary<int, ItemEntity> Inventory => _items.Inventory;
-        public ReadOnlyReactiveProperty<LootEntity> Loot => _loot;
-        public ReadOnlyReactiveProperty<int> FilledInventoryCapacity => _filledInventoryCapacity;
-        public ReadOnlyReactiveProperty<int> InventoryCapacity => _inventoryCapacity;
-        public ReadOnlyReactiveProperty<int> FilledWeightCapacity => _filledWeightCapacity;
-        public ReadOnlyReactiveProperty<int> WeightCapacity => _weightCapacity;
-        
-        public ReadOnlyReactiveProperty<int> LoadedProjectile => _loadedProjectile;
-        public ReadOnlyReactiveProperty<int> RemainProjectile => _remainProjectile;
-        
-        public ReadOnlyReactiveProperty<int> Level => _level;
-        public ReadOnlyReactiveProperty<int> FilledExperience => _filledExperience;
-        public ReadOnlyReactiveProperty<int> Experience => _experience;
-        public ReactiveCommand<BattleTag> OnBattleTag { get; } = new();
-        public ReadOnlyReactiveProperty<Vector2> OnTurn => _direction;
-        public ReadOnlyReactiveProperty<Vector2> OnLookAt => _lookAt;
+        public ReadOnlyReactiveProperty<int> FilledInventoryCapacity => _items.FilledInventoryCapacity;
+        public ReadOnlyReactiveProperty<int> InventoryCapacity => _items.InventoryCapacity;
+        public ReadOnlyReactiveProperty<int> FilledWeightCapacity => _items.FilledWeightCapacity;
+        public ReadOnlyReactiveProperty<int> WeightCapacity => _items.WeightCapacity;
 
-        public bool FoundLoot => _loot.CurrentValue != null;
+        public ReadOnlyReactiveProperty<LootEntity> Loot => _loots.Loot;
+        public bool FoundLoot => _loots.FoundLoot;
 
         public UserContainer(
             MasterDbService masterDbService,
             LocalDataService localDataService,
+            IUserContext user,
+            IBattleContext battle,
+            IItemsContext items,
+            ILootsContext loots,
             ISubscriber<SceneMessage> sceneSubscriber)
         {
-            _items.Inventory.CollectionChanged += OnChangedInventory;
-            _items.Equipment.CollectionChanged += OnChangedEquipment;
             _masterDbService = masterDbService;
             _localDataService = localDataService;
+            _user = user;
+            _battle = battle;
+            _items = items;
+            _loots = loots;
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
-        }
-
-        protected override void OnDispose()
-        {
-            _items.Inventory.CollectionChanged -= OnChangedInventory;
-            _items.Equipment.CollectionChanged -= OnChangedEquipment;
-            base.OnDispose();
         }
 
         public async UniTask InitializeUserAsync(int userId, int characterId)
         {
             var data = await _localDataService.LoadUserAsync(userId, characterId);
-            _user.SetData(data);
-            var characterRow = _masterDbService.DB.CharacterRowTable.FindById(_user.CharacterId);
-            _inventoryCapacity.Value = characterRow.InventoryCapacity;
-            _weightCapacity.Value = characterRow.WeightCapacity;
-            _level.Value = _user.Level;
-            _filledExperience.Value = _user.Experience;
-            _experience.Value = _user.Level * 100;
+            _user.Initialize(data);
+
+            var characterRow = _masterDbService.DB.CharacterRowTable.FindById(characterId);
+            _items.SetInventoryCapacity(characterRow.InventoryCapacity);
+            _items.SetWeightCapacity(characterRow.WeightCapacity);
         }
 
         public async UniTask InitializeItemAsync()
         {
             var data = await _localDataService.LoadItemAsync(_user.Id, _user.CharacterId);
-            _items.SetData(data);
+            _items.Initialize(data);
             foreach (var (_, item) in _items.Equipment)
             {
                 OnChangedEquipState(item);
@@ -110,20 +86,22 @@ namespace Domivium.Client.Contents.Container
         public async UniTask InitializeLootAsync(Transform character, int stageId)
         {
             var data = await _localDataService.LoadLootAsync(_user.Id, _user.CharacterId, stageId);
-            _loots.SetData(character, data);
+            _loots.Initialize(character, data);
         }
 
         public async UniTask SaveAsync()
         {
-            if (_user.ToDto(out var userData))
+            if (_user.TryToDto(out var userData))
             {
                 await _localDataService.SaveUserAsync(userData);
             }
-            if (_items.ToDto(out var itemsData))
+
+            if (_items.TryToDto(out var itemsData))
             {
                 await _localDataService.SaveItemAsync(itemsData);
             }
-            if (_loots.ToDto(out var lootsData))
+
+            if (_loots.TryToDto(out var lootsData))
             {
                 await _localDataService.SaveLootAsync(lootsData);
             }
@@ -138,8 +116,7 @@ namespace Domivium.Client.Contents.Container
                 case ItemSlotType.Inventory:
                     return _items.Inventory.TryGetValue(slot.Index, out item);
                 case ItemSlotType.Loot:
-                    item = null;
-                    return _loot.CurrentValue != null && _loot.CurrentValue.Items.TryGetValue(slot.Index, out item);
+                    return _loots.TryGetItem(slot.Index, out item);
                 case ItemSlotType.None:
                 case ItemSlotType.Storage:
                 default:
@@ -153,26 +130,9 @@ namespace Domivium.Client.Contents.Container
             switch (slotType)
             {
                 case ItemSlotType.Inventory:
-                    for (var i = 0; i < _inventoryCapacity.CurrentValue; i++)
-                    {
-                        if (_items.Inventory.ContainsKey(i)) continue;
-
-                        slotIndex = i;
-                        return true;
-                    }
-                    return false;
-
+                    return _items.TryGetInventoryEmptySlotIndex(out slotIndex);
                 case ItemSlotType.Loot:
-                    if (_loot.CurrentValue == null) return false;
-
-                    for (var i = 0; i < _loot.CurrentValue.Capacity; i++)
-                    {
-                        if (_loot.CurrentValue.Items.ContainsKey(i)) continue;
-
-                        slotIndex = i;
-                        return true;
-                    }
-                    return false;
+                    return _loots.TryGetEmptySlotIndex(out slotIndex);
                 case ItemSlotType.Equipment:
                 case ItemSlotType.None:
                 case ItemSlotType.Storage:
@@ -200,7 +160,7 @@ namespace Domivium.Client.Contents.Container
             else // move
             {
                 SetInternal(toSlot, fromItem);
-                Remove(fromSlot);
+                RemoveItem(fromSlot);
             }
 
             OnChangedEquipState(fromItem);
@@ -225,12 +185,12 @@ namespace Domivium.Client.Contents.Container
             else // move
             {
                 SetInternal(toSlot, fromItem);
-                Remove(fromSlot);
+                RemoveItem(fromSlot);
                 OnChangedEquipState(fromItem, true);
             }
         }
 
-        public void SwapOrMerge(ItemSlotEntry fromSlot, ItemSlotEntry toSlot)
+        public void SwapOrMergeItem(ItemSlotEntry fromSlot, ItemSlotEntry toSlot)
         {
             if (!IsValid(fromSlot) || !IsValid(toSlot)) return;
 
@@ -243,7 +203,7 @@ namespace Domivium.Client.Contents.Container
                 if (toItem.CanMerge(fromItem)) // merge
                 {
                     Merge(toSlot, fromItem.Count);
-                    Remove(fromSlot);
+                    RemoveItem(fromSlot);
                 }
                 else // swap
                 {
@@ -254,11 +214,11 @@ namespace Domivium.Client.Contents.Container
             else // move
             {
                 SetInternal(toSlot, fromItem);
-                Remove(fromSlot);
+                RemoveItem(fromSlot);
             }
         }
 
-        public void SplitStack(ItemSlotEntry slot, int count)
+        public void SplitItem(ItemSlotEntry slot, int count)
         {
             if (!IsValid(slot)) return;
 
@@ -280,7 +240,7 @@ namespace Domivium.Client.Contents.Container
                 case ItemSlotType.Loot:
                     var changed = new ItemEntity(Guid.NewGuid(), item.Type, item.Id, item.Count - count, item.IsStackable);
                     var newItem = new ItemEntity(Guid.NewGuid(), item.Type, item.Id, count, item.IsStackable);
-                    Remove(slot);
+                    RemoveItem(slot);
                     SetInternal(slot, changed);
                     SetInternal(new ItemSlotEntry(slot.Type, newSlotIndex), newItem);
                     break;
@@ -291,7 +251,7 @@ namespace Domivium.Client.Contents.Container
             }
         }
 
-        public void Remove(ItemSlotEntry slot)
+        public void RemoveItem(ItemSlotEntry slot)
         {
             switch (slot.Type)
             {
@@ -302,10 +262,7 @@ namespace Domivium.Client.Contents.Container
                     _items.RemoveInventory(slot.Index);
                     break;
                 case ItemSlotType.Loot:
-                    if (_loot.CurrentValue == null) return;
-
-                    _loot.CurrentValue.Items.Remove(slot.Index);
-                    _loot.ForceNotify();
+                    _loots.Remove(slot.Index);
                     break;
                 case ItemSlotType.None:
                 case ItemSlotType.Storage:
@@ -318,62 +275,25 @@ namespace Domivium.Client.Contents.Container
         {
             if (!_items.UseEquipmentItem(Constant.ProjectileIndex, 1)) return false;
 
-            _loadedProjectile.Value -= 1;
+            _battle.Attack();
             return true;
         }
 
         public void Reload(int capacity)
         {
-            if (capacity <= 0) return;
-
-            var need = capacity - _loadedProjectile.Value;
-            var refill = _remainProjectile.CurrentValue < need ? _remainProjectile.CurrentValue : need;
-            _remainProjectile.Value -= refill;
-            _loadedProjectile.Value += refill;
+            _battle.Reload(capacity);
         }
 
         public void Stop()
         {
-            _direction.Value = Vector2.zero;
-            _lookAt.Value = Vector2.zero;
-            OnBattleTag.Execute(BattleTags.Idle);
+            _battle.Stop();
         }
 
-        public bool SetDirection(Vector2 value)
-        {
-            if (value.sqrMagnitude > 1f)
-            {
-                value.Normalize();
-            }
+        public bool SetDirection(Vector2 value) => _battle.SetDirection(value);
 
-            _direction.Value = value;
-            return true;
-        }
+        public bool LookAt(Vector2 value) => _battle.LookAt(value);
 
-        public bool LookAt(Vector2 value)
-        {
-            _lookAt.Value = value;
-            switch (_lookAt.Value.sqrMagnitude)
-            {
-                case > 0 when value.sqrMagnitude <= Constant.CanAttackRange:
-                    OnBattleTag.Execute(BattleTags.Aiming);
-                    break;
-                case > Constant.CanAttackRange:
-                    OnBattleTag.Execute(BattleTags.Firing);
-                    break;
-                default:
-                    OnBattleTag.Execute(BattleTags.Idle);
-                    break;
-            }
-
-            return true;
-        }
-
-        public bool Avoid()
-        {
-            OnBattleTag.Execute(BattleTags.Avoid);
-            return true;
-        }
+        public bool Avoid() => _battle.Avoid();
 
         private void SetInternal(ItemSlotEntry slot, ItemEntity item)
         {
@@ -386,10 +306,7 @@ namespace Domivium.Client.Contents.Container
                     _items.SetInventory(slot.Index, item);
                     break;
                 case ItemSlotType.Loot:
-                    if (_loot.CurrentValue == null) return;
-
-                    _loot.CurrentValue.Items[slot.Index] = item;
-                    _loot.ForceNotify();
+                    _loots.Set(slot.Index, item);
                     break;
                 case ItemSlotType.None:
                 case ItemSlotType.Storage:
@@ -406,10 +323,7 @@ namespace Domivium.Client.Contents.Container
                     _items.MergeInventoryItem(slot.Index, count);
                     break;
                 case ItemSlotType.Loot:
-                    if (_loot.CurrentValue == null) return;
-
-                    _loot.CurrentValue.Items[slot.Index] = _loot.CurrentValue.Items[slot.Index].AddCount(count);
-                    _loot.ForceNotify();
+                    _loots.Merge(slot.Index, count);
                     break;
                 case ItemSlotType.None:
                 case ItemSlotType.Equipment:
@@ -426,10 +340,9 @@ namespace Domivium.Client.Contents.Container
                 case ItemSlotType.Equipment:
                     return slot.Index is >= 0 and < Constant.EquipmentCapacity;
                 case ItemSlotType.Inventory:
-                    return slot.Index >= 0 && slot.Index < _inventoryCapacity.CurrentValue;
+                    return slot.Index >= 0 && slot.Index < _items.InventoryCapacity.CurrentValue;
                 case ItemSlotType.Loot:
-                    var capacity = _loot.CurrentValue?.Capacity ?? 0;
-                    return slot.Index >= 0 && slot.Index < capacity;
+                    return _loots.IsValid(slot.Index);
                 case ItemSlotType.None:
                 case ItemSlotType.Storage:
                 default:
@@ -439,17 +352,7 @@ namespace Domivium.Client.Contents.Container
 
         public void Tick(float deltaTime)
         {
-            _loot.Value = _loots.FindNearestLoot();
-        }
-
-        private int GetTotalWeight(ItemEntity item)
-        {
-            var key = (item.Type, item.Id);
-            if (_weightCache.TryGetValue(key, out var weight)) return weight * item.Count;
-
-            var context = _masterDbService.GetItemContext(item.Type, item.Id);
-            _weightCache[key] = context.Weight;
-            return context.Weight * item.Count;
+            _loots.Tick(deltaTime);
         }
 
         private void OnChangedEquipState(ItemEntity item, bool unequip = false)
@@ -457,24 +360,22 @@ namespace Domivium.Client.Contents.Container
             switch (item.Type)
             {
                 case ItemType.Weapon:
-                    _remainProjectile.Value += _loadedProjectile.Value;
-                    _loadedProjectile.Value = 0;
+                    _battle.RestoreProjectile();
                     break;
                 case ItemType.Projectile:
-                    _remainProjectile.Value = unequip ? 0 : item.Count;
-                    _loadedProjectile.Value = 0;
+                    _battle.SetProjectile(unequip ? 0 : item.Count);
                     break;
                 case ItemType.Bag:
                     var row = _masterDbService.DB.BagRowTable.FindById(item.Id);
                     if (unequip)
                     {
-                        _inventoryCapacity.Value -= row.InventoryCapacity;
-                        _weightCapacity.Value -= row.WeightCapacity;
+                        _items.AddInventoryCapacity(-row.InventoryCapacity);
+                        _items.AddWeightCapacity(-row.WeightCapacity);
                     }
                     else
                     {
-                        _inventoryCapacity.Value += row.InventoryCapacity;
-                        _weightCapacity.Value += row.WeightCapacity;
+                        _items.AddInventoryCapacity(row.InventoryCapacity);
+                        _items.AddWeightCapacity(row.WeightCapacity);
                     }
 
                     break;
@@ -494,67 +395,13 @@ namespace Domivium.Client.Contents.Container
             }
         }
 
-        private void OnChangedInventory(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
-        {
-            var newItem = e.NewItem.Value;
-            var oldItem = e.OldItem.Value;
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    _filledWeightCapacity.Value += GetTotalWeight(newItem);
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    _filledWeightCapacity.Value -= GetTotalWeight(oldItem);
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    _filledWeightCapacity.Value -= GetTotalWeight(oldItem);
-                    _filledWeightCapacity.Value += GetTotalWeight(newItem);
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            _filledInventoryCapacity.Value = _items.Inventory.Count;
-        }
-
-        private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)
-        {
-            var newItem = e.NewItem.Value;
-            var oldItem = e.OldItem.Value;
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    _filledWeightCapacity.Value += GetTotalWeight(newItem);
-
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    _filledWeightCapacity.Value -= GetTotalWeight(oldItem);
-
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    _filledWeightCapacity.Value -= GetTotalWeight(oldItem);
-                    _filledWeightCapacity.Value += GetTotalWeight(newItem);
-
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
         private void OnSceneMessage(SceneMessage message)
         {
             switch (message.Type)
             {
                 case SceneMessageType.Unload:
                 case SceneMessageType.Load:
-                    _remainProjectile.Value += _loadedProjectile.Value;
-                    _loadedProjectile.Value = 0;
+                    _battle.RestoreProjectile();
                     Stop();
                     break;
                 default:
