@@ -8,7 +8,7 @@ namespace Domivium.Client.Data.Loot
     public class LootEntity
     {
         public Guid Guid { get; }
-        public Vector2 Position { get; }
+        public Vector2 Position { get; private set; }
         public LootType Type { get; }
         public Dictionary<int, ItemEntity> Items { get; }
         public int Capacity { get; }

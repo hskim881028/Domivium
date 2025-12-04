@@ -8,6 +8,7 @@ using Domivium.Client.Core.Scene;
 using Domivium.Client.Core.UI;
 using MessagePipe;
 using R3;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using Object = UnityEngine.Object;
@@ -45,8 +46,10 @@ namespace Domivium.Client.Core.Actors
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
-        public async UniTask<IActorPresenter> SpawnAsync(ActorId actorId, ActorParam param)
+        public async UniTask<IActorPresenter> SpawnAsync(ActorId actorId, ActorParam param, float delayTime = 0f)
         {
+            await Awaitable.WaitForSecondsAsync(delayTime);
+
             if (TryGet(actorId, out var actor))
             {
                 await SpawnInternalAsync(actor.scope, actor.scope.Presenter, actor.uid, actorId, param);

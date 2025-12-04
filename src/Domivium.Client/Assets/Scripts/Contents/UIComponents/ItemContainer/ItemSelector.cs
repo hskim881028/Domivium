@@ -73,8 +73,12 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
                             _useButton.gameObject.SetActive(false);
                             break;
                         case ItemType.Projectile:
+                            _splitButton.gameObject.SetActive(true);
+                            _useButton.gameObject.SetActive(false);
+                            break;
                         case ItemType.Cash:
                         case ItemType.Material:
+                            _equipButton.gameObject.SetActive(false);
                             _splitButton.gameObject.SetActive(true);
                             _useButton.gameObject.SetActive(false);
                             break;

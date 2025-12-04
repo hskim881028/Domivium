@@ -20,28 +20,32 @@ namespace Domivium.Client.Contents.Actors.Contract
         IReadOnlyList<BattleAbility> Abilities) : PawnParams(SpawnPosition);
 
     public record UnitParams(
+        int Id,
         Vector2 SpawnPosition,
-        UnitContext UnitContext,
+        UnitTable UnitTable,
         IReadOnlyList<BattleAbility> Abilities) : PawnParams(SpawnPosition);
 
     public record LobbyCharacterParams(
+        int Id,
         Vector2 SpawnPosition,
-        UnitContext UnitContext,
-        IReadOnlyList<BattleAbility> Abilities) : CharacterParams(SpawnPosition, UnitContext, Abilities);
+        UnitTable UnitTable,
+        IReadOnlyList<BattleAbility> Abilities) : CharacterParams(Id, SpawnPosition, UnitTable, Abilities);
 
     public record CharacterParams(
+        int Id,
         Vector2 SpawnPosition,
-        UnitContext UnitContext,
-        IReadOnlyList<BattleAbility> Abilities) : UnitParams(SpawnPosition, UnitContext, Abilities);
+        UnitTable UnitTable,
+        IReadOnlyList<BattleAbility> Abilities) : UnitParams(Id, SpawnPosition, UnitTable, Abilities);
 
     public record MonsterParams(
+        int Id,
         Vector2 SpawnPosition,
-        UnitContext UnitContext,
+        UnitTable UnitTable,
         IReadOnlyList<BattleAbility> Abilities,
-        IBattleSystem Target) : UnitParams(SpawnPosition, UnitContext, Abilities);
+        IBattleSystem Target) : UnitParams(Id, SpawnPosition, UnitTable, Abilities);
 
 
-    public record PropParams(Vector2 SpawnPosition) : ActorParam;
+    public record PropParams(int Id, Vector2 SpawnPosition) : ActorParam;
 
     public record VFXParams(float DespawnTime) : ActorParam;
 

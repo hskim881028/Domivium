@@ -15,6 +15,7 @@ namespace Domivium.Client.Contents.Battle
 
         public static BattleAbilityId Chase = new(10);
 
+        public static BattleAbilityId Die = new(100);
         public static BattleAbilityId Heal = new(101);
     }
 }

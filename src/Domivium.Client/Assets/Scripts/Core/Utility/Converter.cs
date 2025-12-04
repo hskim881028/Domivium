@@ -46,25 +46,45 @@ namespace Domivium.Client.Core.Utility
             }
         }
 
-        public static int GetSlotIndex(ItemType itemType)
+        public static bool TryGetEquipmentSlotIndex(ItemType itemType, out int slotIndex)
         {
-            return itemType switch
+            slotIndex = -1;
+            switch (itemType)
             {
-                ItemType.Weapon => 0,
-                ItemType.Projectile => 1,
-                ItemType.Ring => 2,
-                ItemType.Necklace => 3,
-                ItemType.Head => 4,
-                ItemType.Body => 5,
-                ItemType.Feet => 6,
-                ItemType.Bag => 7,
-                ItemType.None => throw new ArgumentOutOfRangeException(nameof(itemType)),
-                ItemType.Potion => throw new ArgumentOutOfRangeException(nameof(itemType)),
-                ItemType.Food => throw new ArgumentOutOfRangeException(nameof(itemType)),
-                ItemType.Cash => throw new ArgumentOutOfRangeException(nameof(itemType)),
-                ItemType.Material => throw new ArgumentOutOfRangeException(nameof(itemType)),
-                _ => throw new ArgumentOutOfRangeException(nameof(itemType))
-            };
+                case ItemType.Weapon:
+                    slotIndex = 0;
+                    break;
+                case ItemType.Projectile:
+                    slotIndex = 1;
+                    break;
+                case ItemType.Ring:
+                    slotIndex = 2;
+                    break;
+                case ItemType.Necklace:
+                    slotIndex = 3;
+                    break;
+                case ItemType.Head:
+                    slotIndex = 4;
+                    break;
+                case ItemType.Body:
+                    slotIndex = 5;
+                    break;
+                case ItemType.Feet:
+                    slotIndex = 6;
+                    break;
+                case ItemType.Bag:
+                    slotIndex = 7;
+                    break;
+                case ItemType.None:
+                case ItemType.Potion:
+                case ItemType.Food:
+                case ItemType.Cash:
+                case ItemType.Material:
+                default:
+                    return false;
+            }
+
+            return true;
         }
 
         public static string GetStatName(StatId statId)

@@ -1,10 +1,12 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors.Contract;
+using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Core;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
+using Domivium.Client.Core.Battle;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Data.Stat;
 using UnityEngine;
@@ -21,9 +23,9 @@ namespace Domivium.Client.Contents.Actors
             await base.SpawnAsync(token, param);
 
             var p = param.As<UnitParams>();
-            var row = p.UnitContext;
+            var row = p.UnitTable;
 
-            BattleSystem.Initialize(Uid, row.ActorId, p.SpawnPosition);
+            BattleSystem.Initialize(Uid, p.Id, row.ActorId, p.SpawnPosition);
 
             BattleSystem.Stat.Register(StatId.Health, row.Health);
             BattleSystem.Stat.Register(StatId.Hunger, row.Hunger);
@@ -152,6 +154,8 @@ namespace Domivium.Client.Contents.Actors
             var curHp = BattleSystem.Gauge.Current(StatId.Health);
             if (curHp <= 0)
             {
+                var context = BattleAbilityContext.Create(BattleAbilityIds.Die, BattleSystem);
+                BattleSystem.TryActivateAbility(ref context);
                 StateSystem.DespawnAsync(1).Forget();
             }
         }

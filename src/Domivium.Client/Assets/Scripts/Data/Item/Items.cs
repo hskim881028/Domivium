@@ -104,6 +104,16 @@ namespace Domivium.Client.Data.Item
             _inventory.Remove(slotIndex);
         }
 
+        public void ClearInventory()
+        {
+            _inventory.Clear();
+        }
+
+        public void ClearEquipment()
+        {
+            _equipment.Clear();
+        }
+
         public bool ToDto(out ItemsDto data)
         {
             data = new ItemsDto();

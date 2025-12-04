@@ -12,10 +12,12 @@ namespace Domivium.Client.Contents.Systems
         private readonly Sprite _none;
         private readonly IReadOnlyDictionary<ItemType, IReadOnlyDictionary<int, Sprite>> _items;
         private readonly IReadOnlyDictionary<ActorId, IReadOnlyDictionary<int, Sprite>> _projectiles;
+        private readonly IReadOnlyList<Sprite> _props;
 
         public SpriteSystem(
             Dictionary<ItemType, List<Sprite>> itemSprites,
-            Dictionary<ActorId, List<Sprite>> projectileSprites)
+            Dictionary<ActorId, List<Sprite>> projectileSprites,
+            List<Sprite> props)
         {
             _none = itemSprites[ItemType.None].First();
             var items = new Dictionary<ItemType, IReadOnlyDictionary<int, Sprite>>();
@@ -45,6 +47,7 @@ namespace Domivium.Client.Contents.Systems
                 projectiles.Add(actorId, projectile);
             }
             _projectiles = projectiles;
+            _props = props;
         }
 
         public Sprite GetItem(ItemType itemType, int id)
@@ -60,5 +63,7 @@ namespace Domivium.Client.Contents.Systems
 
             return sprites.GetValueOrDefault(id, _none);
         }
+
+        public Sprite GetProp(int id) => id > _props.Count ? _none : _props[id - 1];
     }
 }

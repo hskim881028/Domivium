@@ -27,7 +27,7 @@ namespace Domivium.Client.Contents.Actors
 
             var p = param.As<ProjectileParams>();
             var stat = p.SourceStatSet;
-            BattleSystem.Initialize(Uid, ActorId.Projectile, p.SpawnPosition);
+            BattleSystem.Initialize(Uid, p.Id, ActorId.Projectile, p.SpawnPosition);
 
             BattleSystem.Stat.Register(StatId.Attack, stat.RawValue(StatId.Attack));
             BattleSystem.Stat.Register(StatId.Penetration, stat.RawValue(StatId.Penetration));

@@ -49,6 +49,41 @@ namespace Domivium.Client.Data.Loot
             }
         }
 
+        public void Add(LootEntity loot)
+        {
+            _loots.Add(loot);
+        }
+
+        public bool IsExist(Vector2 position)
+        {
+            const float thresholdSqr = 0.1f * 0.1f;
+            foreach (var loot in _loots)
+            {
+                var delta = loot.Position - position;
+                if (delta.sqrMagnitude < thresholdSqr) return true;
+            }
+
+            return false;
+        }
+
+        public bool TryGetTombstones(out IReadOnlyList<LootEntity> loots)
+        {
+            loots = null;
+            var tombstones = new List<LootEntity>();
+            foreach (var loot in _loots)
+            {
+                if (loot.Type is LootType.CharacterBox or LootType.MonsterBox)
+                {
+                    tombstones.Add(loot);
+                }
+            }
+
+            if (tombstones.Count <= 0) return false;
+
+            loots = tombstones;
+            return true;
+        }
+
         public LootEntity FindNearestLoot()
         {
             LootEntity nearestLoot = null;

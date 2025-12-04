@@ -106,7 +106,7 @@ namespace Domivium.Client.Contents.UI.Stack
         {
             if (_userContainer.TryGetItem(slot, out var item) && !_selectedSlot.IsSame(slot))
             {
-                var context = _masterDbService.GetItemContext(item.Type, item.Id);
+                var context = _masterDbService.GetItemTable(item.Type, item.Id);
                 View.SelectItem(slot, item, context);
                 _selectedSlot = slot;
             }
@@ -190,7 +190,9 @@ namespace Domivium.Client.Contents.UI.Stack
 
             if (!_userContainer.TryGetItem(slot, out var item)) return;
 
-            var targetSlot = new ItemSlotEntry(ItemSlotType.Equipment, Converter.GetSlotIndex(item.Type));
+            if (!Converter.TryGetEquipmentSlotIndex(item.Type, out var slotIndex)) return;
+
+            var targetSlot = new ItemSlotEntry(ItemSlotType.Equipment, slotIndex);
             _userContainer.Equip(slot, targetSlot);
         }
 

@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Domivium.Client.Core.Battle;
 using Domivium.Client.Data.Item;
 using Domivium.Client.Data.Loot;
@@ -19,7 +20,7 @@ namespace Domivium.Client.Core.Container
         public ReadOnlyReactiveProperty<Vector2> OnTurn { get; }
         public ReadOnlyReactiveProperty<Vector2> OnLookAt { get; }
         public ReadOnlyReactiveProperty<BattleTag> OnBattleTag { get; }
-        
+
         public IReadOnlyObservableDictionary<int, ItemEntity> Equipment { get; }
         public IReadOnlyObservableDictionary<int, ItemEntity> Inventory { get; }
         public ReadOnlyReactiveProperty<int> FilledInventoryCapacity { get; }
@@ -33,9 +34,8 @@ namespace Domivium.Client.Core.Container
         public UniTask InitializeUserAsync(int userId, int characterId);
         public UniTask InitializeItemAsync();
         public UniTask InitializeLootAsync(Transform character, int stageId);
-
         public UniTask SaveAsync();
-
+        public bool TryGetTombstones(out IReadOnlyList<LootEntity> loots);
         public bool TryGetItem(ItemSlotEntry slot, out ItemEntity item);
         public bool TryGetEmptySlotIndex(ItemSlotType slotType, out int slotIndex);
         public void Equip(ItemSlotEntry fromSlot, ItemSlotEntry toSlot);
@@ -50,5 +50,9 @@ namespace Domivium.Client.Core.Container
         public bool SetDirection(Vector2 value);
         public bool LookAt(Vector2 value);
         public bool Avoid();
+        public void Die(Vector2 position);
+
+        public bool IsExistLoot(Vector2 position);
+        public void AddMonsterBox(int id, Vector2 position);
     }
 }

@@ -70,7 +70,7 @@ namespace Domivium.Client.Contents.Services
                     foreach (var (lootId, position) in loots)
                     {
                         var items = new List<ItemDto>();
-                        var context = _masterDbService.GetLootContext(lootType, lootId);
+                        var context = _masterDbService.GetLootsTable(lootType, lootId);
                         var slotIndex = 0;
                         foreach (var (itemType, itemId, minCount, maxCount, dropRate) in context.Loots)
                         {
