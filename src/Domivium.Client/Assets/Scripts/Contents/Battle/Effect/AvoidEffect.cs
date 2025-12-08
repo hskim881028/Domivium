@@ -8,11 +8,6 @@ namespace Domivium.Client.Contents.Battle.Effect
         public override BattleEffectId Id => BattleEffectIds.Avoid;
         public AvoidEffect(IUserContainer userUsage, ref BattleEffectContext context) : base(userUsage, ref context) { }
 
-        protected override bool OnActivate()
-        {
-            this.Log();
-            UserContainer.Die(Context.Owner.Position);
-            return true;
-        }
+        protected override bool OnActivate() => true;
     }
 }
