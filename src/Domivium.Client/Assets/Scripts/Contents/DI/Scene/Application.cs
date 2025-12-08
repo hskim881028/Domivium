@@ -162,7 +162,8 @@ namespace Domivium.Client.Contents.DI.Scene
             builder.Register<CameraSystem>(lifetime).AsImplementedInterfaces();
             builder.Register<SpriteSystem>(lifetime).AsImplementedInterfaces()
                 .WithParameter(_spriteContainer.Items)
-                .WithParameter(_spriteContainer.Projectiles);
+                .WithParameter(_spriteContainer.Projectiles)
+                .WithParameter(_spriteContainer.Props);
         }
 
         private void Provider(IContainerBuilder builder, Lifetime lifetime)

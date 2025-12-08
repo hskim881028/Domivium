@@ -24,6 +24,7 @@ namespace Domivium.Client.Contents.DI.Container
 
         [SerializeField] private List<Sprite> _projectiles = new();
         [SerializeField] private List<Sprite> _monsterProjectiles = new();
+        [SerializeField] private List<Sprite> _props = new();
 
         public Dictionary<ItemType, List<Sprite>> Items => new()
         {
@@ -47,5 +48,7 @@ namespace Domivium.Client.Contents.DI.Container
             { ActorId.Character, _projectiles },
             { ActorId.Monster, _monsterProjectiles }
         };
+
+        public List<Sprite> Props => _props;
     }
 }

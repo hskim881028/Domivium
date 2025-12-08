@@ -23,8 +23,8 @@ namespace Domivium.Client.Contents.Factory
         public ActorParam CreateLobbyCharacter(int id, Vector2 spawnPosition, IReadOnlyList<BattleAbility> abilities)
         {
             var characterRow = _masterDbService.DB.CharacterRowTable.FindById(id);
-            var unit = new UnitContext(characterRow);
-            return new LobbyCharacterParams(spawnPosition, unit, abilities);
+            var unit = new UnitTable(characterRow);
+            return new LobbyCharacterParams(id, spawnPosition, unit, abilities);
         }
 
         public ActorParam CreateCharacter(
@@ -33,8 +33,8 @@ namespace Domivium.Client.Contents.Factory
             IReadOnlyList<BattleAbility> abilities)
         {
             var characterRow = _masterDbService.DB.CharacterRowTable.FindById(id);
-            var unit = new UnitContext(characterRow);
-            return new CharacterParams(spawnPosition, unit, abilities);
+            var unit = new UnitTable(characterRow);
+            return new CharacterParams(id, spawnPosition, unit, abilities);
         }
 
         public ActorParam CreateMonster(
@@ -44,8 +44,8 @@ namespace Domivium.Client.Contents.Factory
             IBattleSystem target)
         {
             var row = _masterDbService.DB.MonsterRowTable.FindById(id);
-            var context = new UnitContext(row);
-            return new MonsterParams(spawnPosition, context, abilities, target);
+            var context = new UnitTable(row);
+            return new MonsterParams(id, spawnPosition, context, abilities, target);
         }
 
         public ActorParam CreateProjectile(
@@ -57,6 +57,6 @@ namespace Domivium.Client.Contents.Factory
             Vector2 direction,
             IReadOnlyList<BattleAbility> abilities) => new ProjectileParams(id, sourceStatSet, sourceActorId, targetActorId, spawnPosition, direction, abilities);
 
-        public ActorParam CreateProp(int id, Vector2 spawnPosition) => new PropParams(spawnPosition);
+        public ActorParam CreateProp(int id, Vector2 spawnPosition) => new PropParams(id, spawnPosition);
     }
 }

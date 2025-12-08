@@ -33,6 +33,7 @@ namespace Domivium.Client.Core.Battle
         private bool _isDisposed;
 
         public ushort Uid { get; private set; }
+        public int Id { get; private set; }
         public ActorId ActorId { get; private set; }
         public StatSet Stat { get; } = new();
         public GaugeSet Gauge { get; } = new();
@@ -67,10 +68,12 @@ namespace Domivium.Client.Core.Battle
 
         public void Initialize(
             ushort uid,
+            int id,
             ActorId actorId,
             Vector2 position)
         {
             Uid = uid;
+            Id = id;
             ActorId = actorId;
             PrePosition = position;
             _pawn.position = position;

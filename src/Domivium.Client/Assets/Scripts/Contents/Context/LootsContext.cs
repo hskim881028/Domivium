@@ -1,4 +1,5 @@
-﻿using Domivium.Client.Core.Context;
+﻿using System.Collections.Generic;
+using Domivium.Client.Core.Context;
 using Domivium.Client.Data.DataTransferObject;
 using Domivium.Client.Data.Item;
 using Domivium.Client.Data.Loot;
@@ -16,19 +17,19 @@ namespace Domivium.Client.Contents.Context
 
         public bool FoundLoot => _loot.CurrentValue != null;
 
+        public void Tick(float deltaTime)
+        {
+            _loot.Value = _loots.FindNearestLoot();
+        }
+
         public void Initialize(Transform character, LootsDto data)
         {
             _loots.SetData(character, data);
         }
 
-        public bool IsValid(int slotIndex)
-        {
-            if (_loot.CurrentValue == null) return false;
-
-            return slotIndex >= 0 && slotIndex < _loot.CurrentValue.Capacity;
-        }
-
         public bool TryToDto(out LootsDto data) => _loots.ToDto(out data);
+
+        public bool TryGetTombstones(out IReadOnlyList<LootEntity> loots) => _loots.TryGetTombstones(out loots);
 
         public bool TryGetItem(int slotIndex, out ItemEntity item)
         {
@@ -52,15 +53,21 @@ namespace Domivium.Client.Contents.Context
             return false;
         }
 
-        public void Remove(int slotIndex)
+        public bool IsValidSlot(int slotIndex)
         {
-            if (_loot.CurrentValue == null) return;
+            if (_loot.CurrentValue == null) return false;
 
-            _loot.CurrentValue.Items.Remove(slotIndex);
-            _loot.ForceNotify();
+            return slotIndex >= 0 && slotIndex < _loot.CurrentValue.Capacity;
         }
 
-        public void Set(int slotIndex, ItemEntity item)
+        public bool IsExistLoot(Vector2 position) => _loots.IsExist(position);
+
+        public void AddLoot(LootEntity loot)
+        {
+            _loots.Add(loot);
+        }
+
+        public void SetItem(int slotIndex, ItemEntity item)
         {
             if (_loot.CurrentValue == null) return;
 
@@ -68,7 +75,7 @@ namespace Domivium.Client.Contents.Context
             _loot.ForceNotify();
         }
 
-        public void Merge(int slotIndex, int count)
+        public void MergeItem(int slotIndex, int count)
         {
             if (_loot.CurrentValue == null) return;
 
@@ -76,9 +83,12 @@ namespace Domivium.Client.Contents.Context
             _loot.ForceNotify();
         }
 
-        public void Tick(float deltaTime)
+        public void RemoveItem(int slotIndex)
         {
-            _loot.Value = _loots.FindNearestLoot();
+            if (_loot.CurrentValue == null) return;
+
+            _loot.CurrentValue.Items.Remove(slotIndex);
+            _loot.ForceNotify();
         }
     }
 }

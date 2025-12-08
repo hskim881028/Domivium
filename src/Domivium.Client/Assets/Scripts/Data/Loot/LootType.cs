@@ -3,8 +3,8 @@
     public enum LootType
     {
         None,
-        CharacterTombStone,
-        MonsterTombStone,
+        CharacterBox,
+        MonsterBox,
         WeaponBox,
         ArmorBox,
         FoodBox,

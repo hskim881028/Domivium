@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Services;
 using Domivium.Client.Core.Battle;
@@ -12,6 +13,7 @@ using MessagePipe;
 using ObservableCollections;
 using R3;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Domivium.Client.Contents.Container
 {
@@ -28,13 +30,13 @@ namespace Domivium.Client.Contents.Container
         public ReadOnlyReactiveProperty<int> Level => _user.Level;
         public ReadOnlyReactiveProperty<int> FilledExperience => _user.FilledExperience;
         public ReadOnlyReactiveProperty<int> Experience => _user.Experience;
-        
+
         public ReadOnlyReactiveProperty<int> LoadedProjectile => _battle.LoadedProjectile;
         public ReadOnlyReactiveProperty<int> RemainProjectile => _battle.RemainProjectile;
         public ReadOnlyReactiveProperty<Vector2> OnTurn => _battle.OnTurn;
         public ReadOnlyReactiveProperty<Vector2> OnLookAt => _battle.OnLookAt;
         public ReadOnlyReactiveProperty<BattleTag> OnBattleTag => _battle.OnBattleTag;
-        
+
         public IReadOnlyObservableDictionary<int, ItemEntity> Equipment => _items.Equipment;
         public IReadOnlyObservableDictionary<int, ItemEntity> Inventory => _items.Inventory;
         public ReadOnlyReactiveProperty<int> FilledInventoryCapacity => _items.FilledInventoryCapacity;
@@ -63,6 +65,11 @@ namespace Domivium.Client.Contents.Container
             sceneSubscriber.Subscribe(OnSceneMessage).AddTo(ref DisposableBag);
         }
 
+        public void Tick(float deltaTime)
+        {
+            _loots.Tick(deltaTime);
+        }
+
         public async UniTask InitializeUserAsync(int userId, int characterId)
         {
             var data = await _localDataService.LoadUserAsync(userId, characterId);
@@ -79,7 +86,7 @@ namespace Domivium.Client.Contents.Container
             _items.Initialize(data);
             foreach (var (_, item) in _items.Equipment)
             {
-                OnChangedEquipState(item);
+                OnChangedEquipment(item);
             }
         }
 
@@ -106,6 +113,8 @@ namespace Domivium.Client.Contents.Container
                 await _localDataService.SaveLootAsync(lootsData);
             }
         }
+
+        public bool TryGetTombstones(out IReadOnlyList<LootEntity> loots) => _loots.TryGetTombstones(out loots);
 
         public bool TryGetItem(ItemSlotEntry slot, out ItemEntity item)
         {
@@ -143,7 +152,7 @@ namespace Domivium.Client.Contents.Container
 
         public void Equip(ItemSlotEntry fromSlot, ItemSlotEntry toSlot)
         {
-            if (!IsValid(fromSlot) || !IsValid(toSlot)) return;
+            if (!IsValidSlot(fromSlot) || !IsValidSlot(toSlot)) return;
 
             if (fromSlot.IsSame(toSlot)) return;
 
@@ -163,12 +172,12 @@ namespace Domivium.Client.Contents.Container
                 RemoveItem(fromSlot);
             }
 
-            OnChangedEquipState(fromItem);
+            OnChangedEquipment(fromItem);
         }
 
         public void Unequip(ItemSlotEntry fromSlot, ItemSlotEntry toSlot)
         {
-            if (!IsValid(fromSlot) || !IsValid(toSlot)) return;
+            if (!IsValidSlot(fromSlot) || !IsValidSlot(toSlot)) return;
 
             if (fromSlot.IsSame(toSlot)) return;
 
@@ -180,19 +189,19 @@ namespace Domivium.Client.Contents.Container
 
                 SetInternal(toSlot, fromItem);
                 SetInternal(fromSlot, toItem);
-                OnChangedEquipState(toItem);
+                OnChangedEquipment(toItem);
             }
             else // move
             {
                 SetInternal(toSlot, fromItem);
                 RemoveItem(fromSlot);
-                OnChangedEquipState(fromItem, true);
+                OnChangedEquipment(fromItem, true);
             }
         }
 
         public void SwapOrMergeItem(ItemSlotEntry fromSlot, ItemSlotEntry toSlot)
         {
-            if (!IsValid(fromSlot) || !IsValid(toSlot)) return;
+            if (!IsValidSlot(fromSlot) || !IsValidSlot(toSlot)) return;
 
             if (fromSlot.IsSame(toSlot)) return;
 
@@ -202,7 +211,7 @@ namespace Domivium.Client.Contents.Container
             {
                 if (toItem.CanMerge(fromItem)) // merge
                 {
-                    Merge(toSlot, fromItem.Count);
+                    MergeItem(toSlot, fromItem.Count);
                     RemoveItem(fromSlot);
                 }
                 else // swap
@@ -220,7 +229,7 @@ namespace Domivium.Client.Contents.Container
 
         public void SplitItem(ItemSlotEntry slot, int count)
         {
-            if (!IsValid(slot)) return;
+            if (!IsValidSlot(slot)) return;
 
             if (!TryGetItem(slot, out var item)) return;
 
@@ -262,7 +271,7 @@ namespace Domivium.Client.Contents.Container
                     _items.RemoveInventory(slot.Index);
                     break;
                 case ItemSlotType.Loot:
-                    _loots.Remove(slot.Index);
+                    _loots.RemoveItem(slot.Index);
                     break;
                 case ItemSlotType.None:
                 case ItemSlotType.Storage:
@@ -295,6 +304,52 @@ namespace Domivium.Client.Contents.Container
 
         public bool Avoid() => _battle.Avoid();
 
+        public void Die(Vector2 position)
+        {
+            var items = new Dictionary<int, ItemEntity>();
+            var slotIndex = 0;
+            foreach (var (_, item) in _items.Equipment)
+            {
+                items.Add(slotIndex, item);
+                slotIndex++;
+            }
+            _items.ClearEquipment();
+
+            foreach (var (_, item) in _items.Inventory)
+            {
+                items.Add(slotIndex, item);
+                slotIndex++;
+            }
+            _items.ClearInventory();
+
+            this.Log();
+            var loot = new LootEntity(Guid.NewGuid(), position, LootType.CharacterBox, items, items.Count);
+            _loots.AddLoot(loot);
+            SaveAsync().Forget();
+        }
+
+        public bool IsExistLoot(Vector2 position) => _loots.IsExistLoot(position);
+
+        public void AddMonsterBox(int id, Vector2 position)
+        {
+            var table = _masterDbService.GetLootsTable(LootType.MonsterBox, id);
+            var slotIndex = 0;
+            var items = new Dictionary<int, ItemEntity>();
+            foreach (var (itemType, itemId, minCount, maxCount, dropRate) in table.Loots)
+            {
+                if (Random.Range(0, 10000) >= dropRate) continue;
+
+                var itemCount = Random.Range(minCount, maxCount + 1);
+                var isStackable = Converter.IsStackable(itemType);
+                var item = new ItemEntity(Guid.NewGuid(), itemType, itemId, itemCount, isStackable);
+                items.Add(slotIndex, item);
+                slotIndex++;
+            }
+
+            var loot = new LootEntity(Guid.NewGuid(), position, LootType.MonsterBox, items, items.Count);
+            _loots.AddLoot(loot);
+        }
+
         private void SetInternal(ItemSlotEntry slot, ItemEntity item)
         {
             switch (slot.Type)
@@ -306,7 +361,7 @@ namespace Domivium.Client.Contents.Container
                     _items.SetInventory(slot.Index, item);
                     break;
                 case ItemSlotType.Loot:
-                    _loots.Set(slot.Index, item);
+                    _loots.SetItem(slot.Index, item);
                     break;
                 case ItemSlotType.None:
                 case ItemSlotType.Storage:
@@ -315,7 +370,7 @@ namespace Domivium.Client.Contents.Container
             }
         }
 
-        private void Merge(ItemSlotEntry slot, int count)
+        private void MergeItem(ItemSlotEntry slot, int count)
         {
             switch (slot.Type)
             {
@@ -323,7 +378,7 @@ namespace Domivium.Client.Contents.Container
                     _items.MergeInventoryItem(slot.Index, count);
                     break;
                 case ItemSlotType.Loot:
-                    _loots.Merge(slot.Index, count);
+                    _loots.MergeItem(slot.Index, count);
                     break;
                 case ItemSlotType.None:
                 case ItemSlotType.Equipment:
@@ -333,7 +388,7 @@ namespace Domivium.Client.Contents.Container
             }
         }
 
-        private bool IsValid(ItemSlotEntry slot)
+        private bool IsValidSlot(ItemSlotEntry slot)
         {
             switch (slot.Type)
             {
@@ -342,7 +397,7 @@ namespace Domivium.Client.Contents.Container
                 case ItemSlotType.Inventory:
                     return slot.Index >= 0 && slot.Index < _items.InventoryCapacity.CurrentValue;
                 case ItemSlotType.Loot:
-                    return _loots.IsValid(slot.Index);
+                    return _loots.IsValidSlot(slot.Index);
                 case ItemSlotType.None:
                 case ItemSlotType.Storage:
                 default:
@@ -350,12 +405,7 @@ namespace Domivium.Client.Contents.Container
             }
         }
 
-        public void Tick(float deltaTime)
-        {
-            _loots.Tick(deltaTime);
-        }
-
-        private void OnChangedEquipState(ItemEntity item, bool unequip = false)
+        private void OnChangedEquipment(ItemEntity item, bool unequip = false)
         {
             switch (item.Type)
             {

@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Domivium.Client.Contents.Actors;
 using Domivium.Client.Contents.Audio.Generated;
+using Domivium.Client.Contents.Services;
 using Domivium.Client.Contents.State;
 using Domivium.Client.Contents.UI;
 using Domivium.Client.Core.Actors;
@@ -25,6 +26,7 @@ namespace Domivium.Client.Contents.DI.Entry
 {
     public class StageEntry : Entry, ITickable
     {
+        private readonly SceneService _sceneService;
         private readonly IAppContext _context;
         private readonly IAudioPlayer _audioPlayer;
         private readonly IActorSpawner _actorSpawner;
@@ -35,6 +37,7 @@ namespace Domivium.Client.Contents.DI.Entry
         private readonly IUserContainer _userContainer;
 
         public StageEntry(
+            SceneService sceneService,
             IUINavigation uiNavigation,
             IBattleEffectPool effectPool,
             IBattleCuePlayer cuePlayer,
@@ -48,6 +51,7 @@ namespace Domivium.Client.Contents.DI.Entry
             IUserContainer userContainer,
             ISubscriber<ActorStateMessage> actorStateSubscriber) : base(uiNavigation)
         {
+            _sceneService = sceneService;
             _context = context;
             _audioPlayer = audioPlayer;
             _actorSpawner = actorSpawner;
@@ -93,6 +97,14 @@ namespace Domivium.Client.Contents.DI.Entry
             }
 
             await _userContainer.InitializeLootAsync(characterPresenter.Transform, stageId);
+            if (_userContainer.TryGetTombstones(out var tombstones))
+            {
+                foreach (var tombstone in tombstones)
+                {
+                    var tombstoneParam = _actorParamFactory.CreateProp(1, tombstone.Position);
+                    await _actorSpawner.SpawnAsync(ActorId.Prop, tombstoneParam);
+                }
+            }
 
             var monsterAbilities = _abilityFactory.GetAbilities(ActorId.Monster);
             var dummy = _actorParamFactory.CreateMonster(1, new Vector2(10, 6), monsterAbilities, characterPresenter.BattleSystem);
@@ -110,6 +122,7 @@ namespace Domivium.Client.Contents.DI.Entry
             if (message.Tag == StateTags.Despawn && message.ActorId == ActorId.Character)
             {
                 _context.SetMode(SceneMode.Terminated);
+                _sceneService.Load(SceneScopeIds.Lobby);
             }
         }
     }

@@ -10,6 +10,7 @@ namespace Domivium.Client.Core.Battle
     public interface IBattleSystem : ITicker, IDisposable
     {
         public ushort Uid { get; }
+        public int Id { get; }
         public ActorId ActorId { get; }
         public StatSet Stat { get; }
         public GaugeSet Gauge { get; }
@@ -23,7 +24,7 @@ namespace Domivium.Client.Core.Battle
         public ReadOnlyReactiveProperty<Vector2> Direction { get; }
         public ReadOnlyReactiveProperty<Vector2> LookAt { get; }
         public bool ContainsEffectTag(BattleEffectTag tag);
-        public void Initialize(ushort uid, ActorId actorId, Vector2 position);
+        public void Initialize(ushort uid, int id, ActorId actorId, Vector2 position);
         public void Reset();
         public void SetPosition(Vector2 position);
         public void SetDirection(Vector2 direction);

@@ -5,7 +5,7 @@ using Domivium.Client.Data.Row;
 
 namespace Domivium.Client.Data.Context
 {
-    public readonly struct UnitContext
+    public readonly struct UnitTable
     {
         public ActorId ActorId { get; }
         public RarityType RarityType { get; }
@@ -33,7 +33,7 @@ namespace Domivium.Client.Data.Context
         public int CriticalDamage { get; }
 
 
-        public UnitContext(CharacterRow row)
+        public UnitTable(CharacterRow row)
         {
             ActorId = ActorId.Character;
             Id = row.Id;
@@ -61,7 +61,7 @@ namespace Domivium.Client.Data.Context
             CriticalDamage = row.CriticalDamage;
         }
 
-        public UnitContext(MonsterRow row)
+        public UnitTable(MonsterRow row)
         {
             ActorId = ActorId.Monster;
             RarityType = Enum.Parse<RarityType>(row.Rarity);

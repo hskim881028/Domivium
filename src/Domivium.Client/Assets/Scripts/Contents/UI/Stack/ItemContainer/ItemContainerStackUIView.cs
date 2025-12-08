@@ -149,13 +149,13 @@ namespace Domivium.Client.Contents.UI.Stack
             _equipment.ClearFocus();
         }
 
-        public void SelectItem(ItemSlotEntry slot, ItemEntity item, ItemContext context)
+        public void SelectItem(ItemSlotEntry slot, ItemEntity item, ItemTable table)
         {
             // todo: 조건 추가 - 창고 on/off 상태
             var canKeep = _openType == ItemSlotType.Loot;
             var selectedSlot = GetSlot(slot);
             _itemSelector.Show(selectedSlot.RectTransform, slot, item.Type, canKeep);
-            _itemInformation.Show(selectedSlot.Sprite, item, context);
+            _itemInformation.Show(selectedSlot.Sprite, item, table);
             _itemSplitter.Hide();
             Focus(slot.Type, item.Type);
         }
@@ -282,7 +282,8 @@ namespace Domivium.Client.Contents.UI.Stack
         {
             if (slotType != ItemSlotType.Inventory) return;
 
-            var slotIndex = Converter.GetSlotIndex(itemType);
+            if (!Converter.TryGetEquipmentSlotIndex(itemType, out var slotIndex)) return;
+
             _equipment.Focus(slotIndex);
         }
 

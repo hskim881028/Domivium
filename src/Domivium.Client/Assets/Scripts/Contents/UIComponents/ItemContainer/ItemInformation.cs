@@ -26,7 +26,7 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
         [SerializeField] private FloatStat _criticalRate;
         [SerializeField] private FloatStat _criticalDamage;
 
-        public void Show(Sprite sprite, ItemEntity item, ItemContext context)
+        public void Show(Sprite sprite, ItemEntity item, ItemTable table)
         {
             gameObject.SetActive(true);
             _itemVisual.Show(sprite, item.Count, item.IsStackable);
@@ -46,24 +46,24 @@ namespace Domivium.Client.Contents.UIComponents.ItemContainer
             _criticalRate.Hide();
             _criticalDamage.Hide();
 
-            _weight.Set(context.Weight * Constant.Percent);
+            _weight.Set(table.Weight * Constant.Percent);
             switch (item.Type)
             {
                 case ItemType.Weapon:
-                    _attack.Set(context.Attack);
-                    _attackRange.Set(context.AttackRange * Constant.Percent);
-                    _projectileCapacity.Set(context.ProjectileCapacity);
-                    _attackSpeed.Set(context.AttackSpeed * Constant.Percent);
-                    _reloadSpeed.Set(context.ReloadSpeed * Constant.Percent);
-                    _criticalRate.Set(context.CriticalRate * Constant.Percent);
-                    _criticalDamage.Set(context.CriticalDamage * Constant.Percent);
+                    _attack.Set(table.Attack);
+                    _attackRange.Set(table.AttackRange * Constant.Percent);
+                    _projectileCapacity.Set(table.ProjectileCapacity);
+                    _attackSpeed.Set(table.AttackSpeed * Constant.Percent);
+                    _reloadSpeed.Set(table.ReloadSpeed * Constant.Percent);
+                    _criticalRate.Set(table.CriticalRate * Constant.Percent);
+                    _criticalDamage.Set(table.CriticalDamage * Constant.Percent);
                     break;
                 case ItemType.Projectile:
-                    _attack.Set(context.Attack);
-                    _penetration.Set(context.Penetration);
-                    _projectileSpeed.Set(context.ProjectileSpeed * Constant.Percent);
-                    _criticalRate.Set(context.CriticalRate * Constant.Percent);
-                    _criticalDamage.Set(context.CriticalDamage * Constant.Percent);
+                    _attack.Set(table.Attack);
+                    _penetration.Set(table.Penetration);
+                    _projectileSpeed.Set(table.ProjectileSpeed * Constant.Percent);
+                    _criticalRate.Set(table.CriticalRate * Constant.Percent);
+                    _criticalDamage.Set(table.CriticalDamage * Constant.Percent);
                     break;
                 case ItemType.Ring:
                 case ItemType.Necklace:

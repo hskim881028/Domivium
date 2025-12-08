@@ -6,8 +6,8 @@ using Domivium.Client.Contents.Actors.Contract;
 using Domivium.Client.Contents.Components;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Actors.Contract;
+using Domivium.Client.Core.Utility;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Domivium.Client.Contents.Actors
 {
@@ -56,9 +56,9 @@ namespace Domivium.Client.Contents.Actors
 
             var p = param.As<HealTextParams>();
             var position = p.Position;
-            var circle = Random.insideUnitCircle;
-            position.x += circle.x * 0.3f;
-            position.y += 0.5f + circle.y * 0.1f;
+            var random = MathUtils.Random(0, 0.3f);
+            position.x += random.x * 0.3f;
+            position.y += 0.5f + random.y * 0.1f;
 
             _basePos = position;
             transform.localPosition = position;

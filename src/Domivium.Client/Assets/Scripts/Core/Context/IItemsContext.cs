@@ -24,6 +24,8 @@ namespace Domivium.Client.Core.Context
         public void SetInventory(int slotIndex, ItemEntity item);
         public void RemoveEquipment(int slotIndex);
         public void RemoveInventory(int slotIndex);
+        public void ClearInventory();
+        public void ClearEquipment();
         public void SetInventoryCapacity(int value);
         public void SetWeightCapacity(int value);
         public void AddInventoryCapacity(int value);

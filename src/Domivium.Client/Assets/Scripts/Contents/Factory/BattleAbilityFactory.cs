@@ -4,6 +4,7 @@ using Domivium.Client.Contents.Battle;
 using Domivium.Client.Contents.Battle.Ability;
 using Domivium.Client.Core.Actors;
 using Domivium.Client.Core.Battle;
+using Domivium.Client.Core.Container;
 using Domivium.Client.Core.Factory;
 using Domivium.Client.Core.Systems;
 
@@ -11,6 +12,7 @@ namespace Domivium.Client.Contents.Factory
 {
     public sealed class BattleAbilityFactory : IBattleAbilityFactory
     {
+        private readonly IUserContainer _userContainer;
         private readonly IBattleEffectPool _effectPool;
         private readonly IActorParamFactory _actorParamFactory;
         private readonly IActorManager _actorManager;
@@ -21,12 +23,14 @@ namespace Domivium.Client.Contents.Factory
 
 
         public BattleAbilityFactory(
+            IUserContainer userContainer,
             IBattleEffectPool effectPool,
             IActorParamFactory actorParamFactory,
             IActorManager actorManager,
             IActorSpawner actorSpawner,
             IStageFieldSystem stageFieldSystem)
         {
+            _userContainer = userContainer;
             _effectPool = effectPool;
             _actorParamFactory = actorParamFactory;
             _actorManager = actorManager;
@@ -42,7 +46,8 @@ namespace Domivium.Client.Contents.Factory
                     Create(BattleAbilityIds.Attack),
                     Create(BattleAbilityIds.Avoid),
                     Create(BattleAbilityIds.Reload),
-                    Create(BattleAbilityIds.CancelReload)
+                    Create(BattleAbilityIds.CancelReload),
+                    Create(BattleAbilityIds.Die)
                 });
 
             _abilities.Add(ActorId.Monster,
@@ -54,7 +59,8 @@ namespace Domivium.Client.Contents.Factory
                     Create(BattleAbilityIds.Attack),
                     Create(BattleAbilityIds.Avoid),
                     Create(BattleAbilityIds.Reload),
-                    Create(BattleAbilityIds.Chase)
+                    Create(BattleAbilityIds.Chase),
+                    Create(BattleAbilityIds.Die)
                 });
 
             _abilities.Add(ActorId.Projectile,
@@ -74,42 +80,34 @@ namespace Domivium.Client.Contents.Factory
             {
                 return new TurnAbility(_effectPool);
             }
-
             if (id == BattleAbilityIds.Move)
             {
                 return new MoveAbility(_effectPool, _stageFieldSystem);
             }
-
             if (id == BattleAbilityIds.Avoid)
             {
                 return new AvoidAbility(_effectPool, _stageFieldSystem);
             }
-
             if (id == BattleAbilityIds.LookAt)
             {
                 return new LookAtAbility(_effectPool);
             }
-
             if (id == BattleAbilityIds.Attack)
             {
                 return new AttackAbility(_effectPool, this, _actorParamFactory, _actorSpawner);
             }
-
             if (id == BattleAbilityIds.Heal)
             {
                 return new HealAbility(_effectPool);
             }
-
             if (id == BattleAbilityIds.Tracking)
             {
                 return new TrackingAbility(_effectPool, _actorManager);
             }
-
             if (id == BattleAbilityIds.Reload)
             {
                 return new ReloadAbility(_effectPool);
             }
-
             if (id == BattleAbilityIds.CancelReload)
             {
                 return new CancelReloadAbility(_effectPool);
@@ -117,6 +115,10 @@ namespace Domivium.Client.Contents.Factory
             if (id == BattleAbilityIds.Chase)
             {
                 return new ChaseAbility(_effectPool, _stageFieldSystem);
+            }
+            if (id == BattleAbilityIds.Die)
+            {
+                return new DieAbility(_effectPool, _userContainer, _actorParamFactory, _actorSpawner);
             }
 
             throw new Exception($"Invalid battle ability: {id}");

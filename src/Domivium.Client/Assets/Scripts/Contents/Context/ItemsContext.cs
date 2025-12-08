@@ -47,6 +47,16 @@ namespace Domivium.Client.Contents.Context
             _items.SetData(data);
         }
 
+        public void ClearInventory()
+        {
+            _items.ClearInventory();
+        }
+
+        public void ClearEquipment()
+        {
+            _items.ClearEquipment();
+        }
+
         public bool TryToDto(out ItemsDto data) => _items.ToDto(out data);
 
         public bool TryGetInventoryEmptySlotIndex(out int slotIndex)
@@ -122,7 +132,7 @@ namespace Domivium.Client.Contents.Context
             var key = (item.Type, item.Id);
             if (_weightCache.TryGetValue(key, out var weight)) return weight * item.Count;
 
-            var context = _masterDbService.GetItemContext(item.Type, item.Id);
+            var context = _masterDbService.GetItemTable(item.Type, item.Id);
             _weightCache[key] = context.Weight;
             return context.Weight * item.Count;
         }
