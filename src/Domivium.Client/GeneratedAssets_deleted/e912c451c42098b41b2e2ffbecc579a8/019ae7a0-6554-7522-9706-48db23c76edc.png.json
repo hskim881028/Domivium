@@ -1,0 +1,20 @@
+{
+    "asset": "e912c451c42098b41b2e2ffbecc579a8",
+    "fileName": "019ae7a0-6554-7522-9706-48db23c76edc.png",
+    "prompt": "tombstone, 2d game, top-front view (slightly top-down, slightly front view), consistent proportions, thick brush outlines, simplified shading, hand-drawn, size 64x64 per frame, transparent background, clean silhouette, bottom centered on canvas, subtle texture\r\n",
+    "negativePrompt": "realistic, high detail rendering, smooth gradients, shiny metal, photographic lighting, overly dark shadows, perspective distortion",
+    "model": "5f7e3d19-c226-41ce-8781-a954991bde08",
+    "modelName": "Game Environment Items (Flux)",
+    "customSeed": -1,
+    "w3CTraceId": "736b38dba17ecfefdeb9050931ee1f66",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}

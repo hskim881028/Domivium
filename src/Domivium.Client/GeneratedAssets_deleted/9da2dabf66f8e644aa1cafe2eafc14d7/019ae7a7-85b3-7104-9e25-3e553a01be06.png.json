@@ -1,0 +1,20 @@
+{
+    "asset": "9da2dabf66f8e644aa1cafe2eafc14d7",
+    "fileName": "019ae7a7-85b3-7104-9e25-3e553a01be06.png",
+    "prompt": "tombstone, front view, transparent background, clean silhouette, outline",
+    "negativePrompt": "",
+    "model": "5f7e3d19-c226-41ce-8781-a954991bde08",
+    "modelName": "Game Environment Items (Flux)",
+    "customSeed": -1,
+    "w3CTraceId": "798b8f53dbfc9cb6d1a74ed988c16e2a",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}

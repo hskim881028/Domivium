@@ -133,6 +133,7 @@ namespace Domivium.Client.Core.Actors
             {
                 case SceneMessageType.Unload:
                     Clear();
+                    _cts = new CancellationTokenSource();
                     break;
                 case SceneMessageType.Load:
                     _cts = new CancellationTokenSource();
