@@ -95,6 +95,22 @@ namespace Domivium.Client.Contents.Actors
             Actor.SetAim(lookAt, attackRange);
         }
 
+        private static readonly int Idle = Animator.StringToHash("Idle");
+        private static readonly int Move = Animator.StringToHash("Move");
+        private static readonly int Attack = Animator.StringToHash("Attack");
+        
+        protected override void OnIdle()
+        {
+            base.OnIdle();
+            Actor.PlayAnimation(Idle);
+            
+        }
+        protected override void OnMove()
+        {
+            base.OnMove();
+            Actor.PlayAnimation(Move);
+        }
+
         private void OnTurn(Vector2 value)
         {
             if (Mathf.Approximately(value.sqrMagnitude, 0))
@@ -145,7 +161,10 @@ namespace Domivium.Client.Contents.Actors
             if (!_firing) return;
 
             var context = BattleAbilityContext.Create(BattleAbilityIds.Attack, BattleSystem);
-            BattleSystem.TryActivateAbility(ref context);
+            if (BattleSystem.TryActivateAbility(ref context))
+            {
+                Actor.PlayAnimation(Attack);
+            }
         }
 
         private void OnChangedEquipment(in NotifyCollectionChangedEventArgs<KeyValuePair<int, ItemEntity>> e)

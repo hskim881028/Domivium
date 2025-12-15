@@ -66,7 +66,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &8433643454932308709
 LineRenderer:
-  serializedVersion: 2
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -112,6 +112,7 @@ LineRenderer:
   m_SortingLayerID: 99370801
   m_SortingLayer: 5
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
@@ -170,7 +171,6 @@ LineRenderer:
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
-  m_MaskInteraction: 0
   m_UseWorldSpace: 0
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
@@ -286,6 +286,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7911066379653623394
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -331,6 +332,7 @@ SpriteRenderer:
   m_SortingLayerID: -615294447
   m_SortingLayer: 3
   m_SortingOrder: -99
+  m_MaskInteraction: 1
   m_Sprite: {fileID: 21300000, guid: 2f291d30d8bcfc84c83c05532ce72d73, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.6745098}
   m_FlipX: 0
@@ -340,7 +342,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 1
   m_SpriteSortPoint: 1
 --- !u!1 &3902494829525462350
 GameObject:
@@ -376,6 +377,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2328735919019793955
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -421,6 +423,7 @@ SpriteRenderer:
   m_SortingLayerID: -615294447
   m_SortingLayer: 3
   m_SortingOrder: -1
+  m_MaskInteraction: 1
   m_Sprite: {fileID: 21300000, guid: b5015036d1cebe54e922484ad605ca31, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.24705882}
   m_FlipX: 0
@@ -430,7 +433,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 1
   m_SpriteSortPoint: 1
 --- !u!1 &4407851217539725704
 GameObject:
@@ -466,6 +468,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2868093949878492936
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -511,6 +514,7 @@ SpriteRenderer:
   m_SortingLayerID: -615294447
   m_SortingLayer: 3
   m_SortingOrder: 1
+  m_MaskInteraction: 1
   m_Sprite: {fileID: 21300000, guid: b5015036d1cebe54e922484ad605ca31, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -520,7 +524,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 1
   m_SpriteSortPoint: 1
 --- !u!1 &4794868335411203989
 GameObject:
@@ -5280,7 +5283,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &4055239256695743848
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5326,6 +5329,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 3
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -5357,7 +5361,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &5222464683239017511
 GameObject:
   m_ObjectHideFlags: 0
@@ -5409,9 +5412,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Domivium.Client.Contents::Domivium.Client.Contents.Actors.Monster
   _healthDisplay: {fileID: 3910693198627116705}
-  _renderers:
-  - {fileID: 2328735919019793955}
-  - {fileID: 2868093949878492936}
+  _renderer: {fileID: 1105572008432146766}
   _muzzle: {fileID: 8030221736798684835}
   _hitCollider: {fileID: 4237144952277921793}
   _moveMoveCollider: {fileID: 584452268836685927}

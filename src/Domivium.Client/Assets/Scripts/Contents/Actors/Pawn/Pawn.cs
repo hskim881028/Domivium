@@ -8,7 +8,7 @@ namespace Domivium.Client.Contents.Actors
     public abstract class Pawn : Actor
     {
         [SerializeField] private HealthDisplay _healthDisplay;
-        [SerializeField] private SpriteRenderer[] _renderers;
+        [SerializeField] private Transform _renderer;
         [SerializeField] private Transform _muzzle;
 
         [SerializeField] private Collider2D _hitCollider;
@@ -28,12 +28,9 @@ namespace Domivium.Client.Contents.Actors
 
         public virtual void Die() { }
 
-        public void SetFlip(bool value)
+        public virtual void SetFlip(bool value)
         {
-            foreach (var r in _renderers)
-            {
-                r.flipX = value;
-            }
+            _renderer.localScale = new Vector3(value ? 1 : -1, 1, 1);
         }
 
         public void SetHealth(int current, int max) => _healthDisplay.Set(current, max);

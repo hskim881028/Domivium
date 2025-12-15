@@ -14,6 +14,9 @@ namespace Domivium.Client.Contents.Actors
         [SerializeField] private ParticleSystem _particleSystem;
         [SerializeField] private LineRenderer _lineRenderer;
         [SerializeField] private GameObject _sight;
+        [SerializeField] private Transform _head;
+        [SerializeField] private Transform _weapon;
+        [SerializeField] private Animator _animator;
 
         private int _layerMask;
 
@@ -43,10 +46,30 @@ namespace Domivium.Client.Contents.Actors
 
             var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 180f;
             var rotation = Quaternion.Euler(0f, 0f, angle);
+
             Muzzle.rotation = rotation;
+
+            if (!Mathf.Approximately(direction.x, 0)) // temp
+            {
+                var baseAngle = direction.x > 0 ? 180f : 0f;
+                var relativeAngle = Mathf.DeltaAngle(baseAngle, angle);
+                relativeAngle = Mathf.Clamp(relativeAngle, -45f, 45f);
+
+                var clampedAngle = baseAngle + relativeAngle;
+                _head.rotation = Quaternion.Euler(0f, 0f, clampedAngle);
+                _weapon.rotation = Quaternion.Euler(0f, 0f, clampedAngle);
+                var v = direction.x > 0 ? -1 : 1;
+                _head.localScale = new Vector3(v, v, 1);
+                _weapon.localScale = new Vector3(v, v, 1);
+            }
 
             _lineRenderer.SetPosition(0, Vector3.zero);
             _lineRenderer.SetPosition(1, Vector3.left * range);
+        }
+
+        public void PlayAnimation(int hash)
+        {
+            _animator.SetTrigger(hash);
         }
 
         private void Test(bool b)
